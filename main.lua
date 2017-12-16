@@ -24,7 +24,7 @@ end
 
 -- server / client
 
-socket = require "socket"
+enet = require "enet"
 
 function mk_server_main(port)
 	if port == nil then
@@ -34,12 +34,18 @@ function mk_server_main(port)
 	print("opening server at " .. port)
 
 	local server = {}
-	server.udp = socket.udp()
-	server.udp:settimeout(0)
-	server.udp:setsockname('127.0.0.1', tonumber(port))
+	server.host = enet.host_create("localhost:" .. port)
 
 	function server:update(dt)
-		print(server.udp:receive())
+		local event = server.host:service(100)
+
+		if event == nil then return end
+
+		if event.type == "connect" then
+			print("connected!")
+		elseif event.type == "receive" then
+			print("received: " .. event.data)
+		end
 	end
 
 	return server
@@ -54,12 +60,18 @@ function mk_client_main(server_ip, server_port)
 
 	local client = {}
 
-	client.udp = socket.udp()
-	client.udp:settimeout(0)
-	client.udp:setpeername(server_ip, tonumber(server_port))
+	client.host = enet.host_create()
+	client.server_host = client.host:connect(server_ip .. ":" .. server_port)
 
 	function client:update(dt)
-		client.udp:send({x=2,y="wow"})
+		local event = client.host:service(100)
+
+		if event == nil then return end
+
+		if event.type == "connect" then
+			print("connected!")
+			event.peer:send("nice!")
+		end
 	end
 
 	return client
