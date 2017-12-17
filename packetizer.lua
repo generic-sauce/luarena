@@ -41,7 +41,7 @@ function packetizer_mod.packet_to_inputs(p)
 			break
 		end
 
-		inputs[p:sub(1, index - 1)] = tonumber(p:sub(index, index))
+		inputs[p:sub(1, index - 1)] = (tonumber(p:sub(index, index)) == 1)
 		p = p:sub(index + 1)
 	end
 
