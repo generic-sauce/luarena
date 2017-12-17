@@ -14,10 +14,22 @@ return function(server, port)
 		os.exit(1)
 	end
 
+	function server:broadcast_update_packet()
+		function build_update_packet()
+			return tostring(#server.clients) -- currently the number of clients says it all
+		end
+
+		local update_packet = build_update_packet()
+		for _, client in pairs(server.clients) do
+			client:send(update_packet)
+		end
+	end
+
 	function server:handle_event(event)
 		if event.type == "connect" then
 			print("client joined!")
 			table.insert(server.clients, event.peer)
+			server:broadcast_update_packet()
 		elseif event.type == "receive" then
 			print("received: " .. event.data)
 		end

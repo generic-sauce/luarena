@@ -10,14 +10,17 @@ return function(client, server_ip, server_port)
 	client.host = enet.host_create()
 	client.server_host = client.host:connect(server_ip .. ":" .. server_port)
 
+	function client:handle_event(event)
+		if event.type == "receive" then
+			print("received: " .. event.data)
+		end
+	end
+
 	function client:update(dt)
-		local event = client.host:service(100)
-
-		if event == nil then return end
-
-		if event.type == "connect" then
-			print("connected!")
-			event.peer:send("nice!")
+		while true do
+			local event = client.host:service(100)
+			if event == nil then break end
+			client:handle_event(event)
 		end
 	end
 
