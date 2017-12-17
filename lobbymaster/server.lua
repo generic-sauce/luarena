@@ -3,6 +3,7 @@ local enet = require "enet"
 return function(server, port)
 	function server:on_client_connects()
 		print("client connected!")
+		server:broadcast_update_packet()
 	end
 
 	server.networker = require("networker/server")(server, port)

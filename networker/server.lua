@@ -19,10 +19,10 @@ return function(event_handler, port)
 
 	function server:broadcast_packet(p)
 		for _, client in pairs(server.clients) do
+			-- print("sending '" .. p .. "' to client")
 			client:send(p)
 		end
 	end
-
 
 	function server:handle_events()
 		while true do
