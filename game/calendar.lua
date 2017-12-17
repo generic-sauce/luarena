@@ -52,7 +52,7 @@ function calendar_mod.new(player_count, local_id)
 
 		for key, is_pressed in pairs(inputs) do
 			if old_inputs[key] ~= is_pressed then
-				table.insert(changed_inputs, is_pressed)
+				changed_inputs[key] = is_pressed
 			end
 		end
 

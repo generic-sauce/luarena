@@ -8,7 +8,12 @@ function new_player()
 	player.y = 0
 	player.inputs = { q = false, w = false, e = false, r = false }
 
-	function player:tick() end
+	function player:tick()
+		if player.inputs.q == true then
+			player.x = player.x + 1
+		end
+	end
+
 	function player:draw()
 		love.graphics.setColor(100, 100, 100)
 		love.graphics.rectangle("fill", player.x, player.y, 10, 10)
