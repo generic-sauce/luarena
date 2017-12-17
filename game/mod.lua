@@ -1,18 +1,17 @@
 local game_mod = {}
 local frame_mod = require("game/frame")
+local calendar_mod = require("game/calendar")
 
 function game_mod:new()
 	local game = {}
 	game.frame_history = {}
 	game.current_frame = frame_mod.initial()
-	game.calendar = {} -- list of user-events
-	game.frame_counter = 1 -- represen
+	game.calendar = calendar_mod.new()
 
 	function game:update(dt)
 		table.insert(game.frame_history, game.current_frame.clone())
 
-		game.frame_counter = game.frame_counter + 1
-
+		game.calendar:handle_user_inputs()
 		game.current_frame:update(dt)
 	end
 
