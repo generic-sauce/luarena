@@ -18,12 +18,8 @@ function game_mod.new(player_count, local_id)
 		print("backtracking to " .. frame_id)
 
 		print("old #game.frame_history = " .. #game.frame_history)
-		for i=1, #game.frame_history do
-			if frame_id <= #game.frame_history then
-				game.frame_history[#game.frame_history] = nil
-			else
-				break
-			end
+		while frame_id <= #game.frame_history do
+			game.frame_history[#game.frame_history] = nil
 		end
 
 		print("new #game.frame_history = " .. #game.frame_history)
