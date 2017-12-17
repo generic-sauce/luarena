@@ -1,11 +1,11 @@
 function love.load()
-	node = require("node/mod")()
+	master = require("lobbymaster/mod").create_lobby_master()
 end
 
 function love.update(dt)
-	node:update(dt)
+	master:update(dt)
 end
 
 function love.draw()
-	node:draw()
+	master:draw()
 end
