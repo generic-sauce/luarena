@@ -1,7 +1,7 @@
 -- create a network node (either server or client) by parsing the CLI args
 
 function new_node()
-	local game_mod = require("game")
+	local game_mod = require("game/mod")
 
 	local node = {}
 	node.game = game_mod.new()
