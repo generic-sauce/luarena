@@ -27,6 +27,7 @@ function game_mod.new(player_count, local_id)
 	end
 
 	function game:update(dt)
+		game.networker:handle_events()
 		game:update_local_calendar()
 
 		local current_time = love.timer.getTime()
