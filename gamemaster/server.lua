@@ -4,7 +4,7 @@ function new_servermaster(networker)
 	servermaster.networker = networker
 	networker.event_handler = servermaster
 
-	servermaster.game = require("game/mod").new()
+	servermaster.game = require("game/mod").new(#networker.clients + 1, 1)
 
 	function servermaster:update(dt)
 		servermaster.networker:handle_events()
