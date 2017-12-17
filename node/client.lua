@@ -1,13 +1,11 @@
 local enet = require "enet"
 
-return function(server_ip, server_port)
+return function(client, server_ip, server_port)
 	if server_port == nil then
 		server_port = "3842"
 	end
 
 	print("trying to connect to " .. server_ip .. ":" .. server_port)
-
-	local client = {}
 
 	client.host = enet.host_create()
 	client.server_host = client.host:connect(server_ip .. ":" .. server_port)

@@ -1,13 +1,12 @@
 local enet = require "enet"
 
-return function(port)
+return function(server, port)
 	if port == nil then
 		port = "3842"
 	end
 
 	print("opening server at " .. port)
 
-	local server = {}
 	server.host = enet.host_create("localhost:" .. port)
 	if server.host == nil then
 		print("Failed to open server")

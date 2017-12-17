@@ -1,5 +1,5 @@
 function love.load()
-	node = require("node")()
+	node = require("node/mod")()
 end
 
 function love.update(dt)
@@ -7,4 +7,5 @@ function love.update(dt)
 end
 
 function love.draw()
+	node:draw()
 end
