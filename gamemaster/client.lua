@@ -7,6 +7,7 @@ function new_clientmaster(networker)
 	clientmaster.game = require("game/mod").new()
 
 	function clientmaster:update(dt)
+		clientmaster.networker:handle_events()
 		clientmaster.game:update(dt)
 	end
 
