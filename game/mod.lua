@@ -31,7 +31,7 @@ function game_mod.new(player_count, local_id)
 		if frame_id == 1 then
 			game.current_frame = frame_mod.initial(player_count)
 		else
-			game.current_frame = game.frame_history[#game.frame_history].clone()
+			game.current_frame = game.frame_history[#game.frame_history]:clone() -- TODO this causes bad things!
 		end
 
 		local current_time = love.timer.getTime()
@@ -62,7 +62,7 @@ function game_mod.new(player_count, local_id)
 	end
 
 	function game:frame_update()
-		table.insert(game.frame_history, game.current_frame.clone())
+		table.insert(game.frame_history, game.current_frame:clone())
 
 		game.calendar:apply_to_frame(game.current_frame)
 		game.current_frame:tick()
