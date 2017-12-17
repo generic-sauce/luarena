@@ -59,9 +59,9 @@ function calendar_mod.new(player_count, local_id)
 		return changed_inputs
 	end
 
-	function calendar:apply_local_input_changes(inputs, frame_id)
+	function calendar:apply_input_changes(inputs, player_id, frame_id)
 		for key, is_pressed in pairs(inputs) do
-			table.insert(calendar.playertable[calendar.local_id][key], {value=is_pressed, frame_id=frame_id})
+			table.insert(calendar.playertable[player_id][key], {value=is_pressed, frame_id=frame_id})
 		end
 	end
 

@@ -18,9 +18,9 @@ function game_mod.new(player_count, local_id)
 
 		if next(changed_inputs) == nil then return end
 
-		game.calendar:apply_local_input_changes(changed_inputs, #game.frame_history + 1)
+		game.calendar:apply_input_changes(changed_inputs, game.local_id, #game.frame_history + 1)
 
-		local p = packetizer_mod.inputs_to_packet(changed_inputs, game.local_id)
+		local p = packetizer_mod.inputs_to_packet(changed_inputs, game.local_id, #game.frame_history + 1)
 		game:send(p)
 	end
 
