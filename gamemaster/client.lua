@@ -12,7 +12,7 @@ function new_clientmaster(networker, player_count, local_id)
 
 	function clientmaster:on_recv(p)
 		local changed_inputs, player_id, frame_id = packetizer_mod.packet_to_inputs(p)
-		clientmaster.calendar:apply_input_changes(changed_inputs, player_id, frame_id)
+		clientmaster:apply_input_changes(changed_inputs, player_id, frame_id)
 	end
 
 	print("client - gamemaster alive!")

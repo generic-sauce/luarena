@@ -12,7 +12,7 @@ function new_servermaster(networker)
 
 	function servermaster:on_recv(p)
 		local changed_inputs, player_id, frame_id = packetizer_mod.packet_to_inputs(p)
-		servermaster.calendar:apply_input_changes(changed_inputs, player_id, frame_id)
+		servermaster:apply_input_changes(changed_inputs, player_id, frame_id)
 
 		-- packet forwarding
 		for key, client in pairs(servermaster.networker.clients) do

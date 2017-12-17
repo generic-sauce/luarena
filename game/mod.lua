@@ -13,6 +13,38 @@ function game_mod.new(player_count, local_id)
 	game.local_id = local_id
 	game.start_time = love.timer.getTime()
 
+	-- frame_id is the oldest frame to be re-calculated
+	function game:backtrack(frame_id)
+		for i=1, #game.frame_history do
+			if frame_id <= #game.frame_history - i + 1 then
+				game.frame_history[#game.frame_history - i + 1] = nil
+			else
+				break
+			end
+		end
+
+		if frame_id == 1 then
+			game.current_frame = frame_mod.initial(player_count)
+		else
+			game.current_frame = game.frame_history[#game.frame_history].clone()
+		end
+
+		local current_time = love.timer.getTime()
+		while #game.frame_history * FRAME_DURATION < current_time - game.start_time do
+			game:frame_update()
+		end
+	end
+
+	-- will do calendar:apply_input_changes and backtrack
+	function game:apply_input_changes(changed_inputs, player_id, frame_id)
+		game.calendar:apply_input_changes(changed_inputs, player_id, frame_id)
+
+		if frame_id <= #game.frame_history then
+			game:backtrack(frame_id)
+		end
+		
+	end
+
 	function game:update_local_calendar()
 		local changed_inputs = game.calendar:detect_changed_local_inputs()
 
