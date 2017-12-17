@@ -22,7 +22,7 @@ function game_mod.new(player_count, local_id)
 		if frame_id == 1 then
 			self.current_frame = frame_mod.initial(player_count)
 		else
-			self.current_frame = self.frame_history[#self.frame_history]:clone() -- TODO this causes bad things!
+			self.current_frame = self.frame_history[#self.frame_history]:clone()
 		end
 
 		local current_time = love.timer.getTime()
