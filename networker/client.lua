@@ -28,6 +28,7 @@ return function(event_handler, server_ip, server_port)
 					client.event_handler:on_connect()
 				end
 			elseif event.type == "receive" then
+				-- print("received: " .. event.data .. " from " .. tostring(event.peer))
 				if client.event_handler.on_recv ~= nil then
 					client.event_handler:on_recv(event.data)
 				end

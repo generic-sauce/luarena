@@ -1,6 +1,7 @@
 function new_servermaster(networker)
 	local servermaster = {}
 
+	servermaster.networker = networker
 	networker.event_handler = servermaster
 
 	servermaster.game = require("game/mod").new()
