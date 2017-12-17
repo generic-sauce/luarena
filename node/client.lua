@@ -7,12 +7,16 @@ return function(client, server_ip, server_port)
 
 	print("trying to connect to " .. server_ip .. ":" .. server_port)
 
+	client.id = -1
 	client.host = enet.host_create()
 	client.server_host = client.host:connect(server_ip .. ":" .. server_port)
 
 	function client:handle_event(event)
 		if event.type == "receive" then
-			print("received: " .. event.data)
+			if client.id == -1 then
+				client.id = tonumber(event.data)
+				print("I'm client with id " .. client.id)
+			end
 		end
 	end
 
