@@ -9,14 +9,14 @@ function new_player()
 	player.inputs = { q = false, w = false, e = false, r = false }
 
 	function player:tick()
-		if player.inputs.q == true then
-			player.x = player.x + 1
+		if self.inputs.q == true then
+			self.x = self.x + 1
 		end
 	end
 
 	function player:draw()
 		love.graphics.setColor(100, 100, 100)
-		love.graphics.rectangle("fill", player.x, player.y, 10, 10)
+		love.graphics.rectangle("fill", self.x, self.y, 10, 10)
 	end
 
 	return player
@@ -31,19 +31,19 @@ function frame_mod.initial(player_count)
 	end
 
 	function frame:tick()
-		for _, entity in pairs(frame.entities) do
+		for _, entity in pairs(self.entities) do
 			entity:tick()
 		end
 	end
 
 	function frame:draw()
-		for _, entity in pairs(frame.entities) do
+		for _, entity in pairs(self.entities) do
 			entity:draw()
 		end
 	end
 
 	function frame:clone()
-		return clone_mod.clone(frame)
+		return clone_mod.clone(self)
 	end
 
 	return frame

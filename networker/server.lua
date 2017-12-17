@@ -18,7 +18,7 @@ return function(event_handler, port)
 	end
 
 	function server:broadcast_packet(p)
-		for _, client in pairs(server.clients) do
+		for _, client in pairs(self.clients) do
 			-- print("sending '" .. p .. "' to client " .. tostring(client))
 			client:send(p)
 		end
@@ -26,18 +26,18 @@ return function(event_handler, port)
 
 	function server:handle_events()
 		while true do
-			local event = server.host:service(100)
+			local event = self.host:service(100)
 
 			if event == nil then break end
 
 			if event.type == "connect" then
-				table.insert(server.clients, event.peer)
-				if server.event_handler.on_client_connects ~= nil then
-					server.event_handler:on_client_connects()
+				table.insert(self.clients, event.peer)
+				if self.event_handler.on_client_connects ~= nil then
+					self.event_handler:on_client_connects()
 				end
 			elseif event.type == "receive" then
-				if server.event_handler.on_recv ~= nil then
-					server.event_handler:on_recv(event.data)
+				if self.event_handler.on_recv ~= nil then
+					self.event_handler:on_recv(event.data)
 				end
 			else
 				print("networker/server got strange event of type: " .. event.type)

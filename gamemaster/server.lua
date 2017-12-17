@@ -7,15 +7,15 @@ function new_servermaster(networker)
 	networker.event_handler = servermaster
 
 	function servermaster:send(p)
-		servermaster.networker:broadcast_packet(p)
+		self.networker:broadcast_packet(p)
 	end
 
 	function servermaster:on_recv(p)
 		local changed_inputs, player_id, frame_id = packetizer_mod.packet_to_inputs(p)
-		servermaster:apply_input_changes(changed_inputs, player_id, frame_id)
+		self:apply_input_changes(changed_inputs, player_id, frame_id)
 
 		-- packet forwarding
-		for key, client in pairs(servermaster.networker.clients) do
+		for key, client in pairs(self.networker.clients) do
 			if key + 1 ~= player_id then
 				client:send(p)
 			end

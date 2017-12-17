@@ -9,14 +9,14 @@ return function(client, server_ip, server_port)
 			local data = p:sub(2, -1)
 
 			if packet_type == "u" then -- update packet
-				if client.id == nil then
-					client.id = tonumber(data)
-					print("I'm client with id " .. client.id)
+				if self.id == nil then
+					self.id = tonumber(data)
+					print("I'm client with id " .. self.id)
 				end
-				client.client_count = tonumber(data)
+				self.client_count = tonumber(data)
 			elseif packet_type == "g" then -- go packet
 				print("go!")
-				master = require("gamemaster/client")(client.networker, client.client_count + 1, client.id + 1)
+				master = require("gamemaster/client")(self.networker, self.client_count + 1, self.id + 1)
 			else
 				print("received strange packet: " .. p)
 			end
@@ -25,7 +25,7 @@ return function(client, server_ip, server_port)
 	client.networker = require("networker/client")(client, server_ip, server_port)
 
 	function client:update(dt)
-		client.networker:handle_events()
+		self.networker:handle_events()
 	end
 
 	return client

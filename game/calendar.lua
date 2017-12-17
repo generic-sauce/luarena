@@ -18,7 +18,7 @@ function calendar_mod.new(player_count, local_id)
 
 	function calendar:read_inputs(player_id, frame_id) -- frame_id == nil searches for newest
 		local inputs = {}
-		for key, hist in pairs(calendar.playertable[player_id]) do
+		for key, hist in pairs(self.playertable[player_id]) do
 			for i=1, #hist do
 				local hist_entry = hist[#hist - i + 1]
 				if frame_id == nil or hist_entry.frame_id <= frame_id then
@@ -33,7 +33,7 @@ function calendar_mod.new(player_count, local_id)
 
 	function calendar:apply_to_frame(f, frame_id)
 		for i=1, player_count do
-			local inputs = calendar:read_inputs(i, frame_id)
+			local inputs = self:read_inputs(i, frame_id)
 			for key, value in pairs(inputs) do
 				if f.entities[i].inputs[key] ~= value then
 					f.entities[i].inputs[key] = value
@@ -50,7 +50,7 @@ function calendar_mod.new(player_count, local_id)
 		inputs.e = love.keyboard.isDown('e')
 		inputs.r = love.keyboard.isDown('r')
 
-		local old_inputs = calendar:read_inputs(calendar.local_id, nil)
+		local old_inputs = self:read_inputs(self.local_id, nil)
 		local changed_inputs = {}
 
 		for key, is_pressed in pairs(inputs) do
@@ -64,7 +64,7 @@ function calendar_mod.new(player_count, local_id)
 
 	function calendar:apply_input_changes(inputs, player_id, frame_id)
 		for key, is_pressed in pairs(inputs) do
-			table.insert(calendar.playertable[player_id][key], {value=is_pressed, frame_id=frame_id})
+			table.insert(self.playertable[player_id][key], {value=is_pressed, frame_id=frame_id})
 		end
 	end
 

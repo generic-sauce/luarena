@@ -14,23 +14,22 @@ return function(event_handler, server_ip, server_port)
 	client.server_host = client.host:connect(server_ip .. ":" .. server_port)
 
 	function client:send_to_server(p)
-		client.server_host:send(p)
+		self.server_host:send(p)
 	end
 
 	function client:handle_events()
 		while true do
-			local event = client.host:service(100)
+			local event = self.host:service(100)
 
 			if event == nil then break end
 
 			if event.type == "connect" then
-				if client.event_handler.on_connect ~= nil then
-					client.event_handler:on_connect()
+				if self.event_handler.on_connect ~= nil then
+					self.event_handler:on_connect()
 				end
 			elseif event.type == "receive" then
-				-- print("received: " .. event.data .. " from " .. tostring(event.peer))
-				if client.event_handler.on_recv ~= nil then
-					client.event_handler:on_recv(event.data)
+				if self.event_handler.on_recv ~= nil then
+					self.event_handler:on_recv(event.data)
 				end
 			else
 				print("networker/client got strange event of type: " .. event.type)
