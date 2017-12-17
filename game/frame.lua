@@ -7,7 +7,7 @@ function new_player()
 	player.x = 0
 	player.y = 0
 
-	function player:update(dt) end
+	function player:tick() end
 	function player:draw()
 		love.graphics.setColor(100, 100, 100)
 		love.graphics.rectangle("fill", player.x, player.y, 10, 10)
@@ -24,9 +24,9 @@ function frame_mod.initial(player_count)
 		table.insert(frame.entities, new_player())
 	end
 
-	function frame:update(dt)
+	function frame:tick()
 		for _, entity in pairs(frame.entities) do
-			entity:update(dt)
+			entity:tick()
 		end
 	end
 
