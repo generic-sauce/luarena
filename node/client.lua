@@ -8,14 +8,25 @@ return function(client, server_ip, server_port)
 	print("trying to connect to " .. server_ip .. ":" .. server_port)
 
 	client.id = -1
+	client.client_count = -1
 	client.host = enet.host_create()
 	client.server_host = client.host:connect(server_ip .. ":" .. server_port)
 
 	function client:handle_event(event)
 		if event.type == "receive" then
-			if client.id == -1 then
-				client.id = tonumber(event.data)
-				print("I'm client with id " .. client.id)
+			local packet_type = event.data:sub(1, 1)
+			local data = event.data:sub(2, -1)
+
+			if packet_type == "u" then -- update packet
+				if client.id == -1 then
+					client.id = tonumber(data)
+					print("I'm client with id " .. client.id)
+				end
+				client.client_count = tonumber(data)
+			elseif packet_type == "g" then -- go packet
+				-- TODO go!
+			else
+				print("received strange packet: " .. event.data)
 			end
 		end
 	end

@@ -14,15 +14,19 @@ return function(server, port)
 		os.exit(1)
 	end
 
+	function server:broadcast_packet(p)
+		for _, client in pairs(server.clients) do
+			client:send(p)
+		end
+	end
+
 	function server:broadcast_update_packet()
 		function build_update_packet()
-			return tostring(#server.clients) -- currently the number of clients says it all
+			return "u" .. tostring(#server.clients) -- currently the number of clients says it all
+			-- "u" => update packet
 		end
 
-		local update_packet = build_update_packet()
-		for _, client in pairs(server.clients) do
-			client:send(update_packet)
-		end
+		server:broadcast_packet(build_update_packet())
 	end
 
 	function server:handle_event(event)
@@ -35,11 +39,20 @@ return function(server, port)
 		end
 	end
 
+	function server:go()
+		server:broadcast_packet("g")
+		print("go!")
+	end
+
 	function server:update(dt)
 		while true do
 			local event = server.host:service(100)
 			if event == nil then break end
 			server:handle_event(event)
+		end
+
+		if love.keyboard.isDown('g') then
+			server:go()
 		end
 	end
 
