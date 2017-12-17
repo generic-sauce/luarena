@@ -6,7 +6,6 @@ function new_node()
 	local node = {}
 	node.game = game_mod.new()
 
-	function node:update(dt) node.game:update(dt) end
 	function node:draw() node.game:draw() end
 
 	return node
@@ -16,7 +15,7 @@ function new_server(port)
 	return require("node/server")(new_node(), port)
 end
 
-function new_server(server_ip, server_port)
+function new_client(server_ip, server_port)
 	return require("node/client")(new_node(), server_ip, server_port)
 end
 
