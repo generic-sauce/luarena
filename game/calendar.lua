@@ -35,10 +35,7 @@ function calendar_mod.new(player_count, local_id)
 		for i=1, player_count do
 			local inputs = self:read_inputs(i, frame_id)
 			for key, value in pairs(inputs) do
-				if f.entities[i].inputs[key] ~= value then
-					f.entities[i].inputs[key] = value
-					print("setting inputs[" .. key .. "] of player " .. tostring(i) .. " to " .. tostring(value))
-				end
+				f.entities[i].inputs[key] = value
 			end
 		end
 	end
