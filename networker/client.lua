@@ -17,10 +17,6 @@ return function(event_handler, server_ip, server_port)
 		client.server_host:send(p)
 	end
 
-	-- fillable stubs
-	if client.event_handler.on_connect == nil then function client.event_handler:on_connect() end end
-	if client.event_handler.on_recv == nil then function client.event_handler:on_recv() end end
-
 	function client:handle_events()
 		while true do
 			local event = client.host:service(100)
@@ -28,9 +24,13 @@ return function(event_handler, server_ip, server_port)
 			if event == nil then break end
 
 			if event.type == "connect" then
-				client.event_handler:on_connect()
+				if client.event_handler.on_connect ~= nil then
+					client.event_handler:on_connect()
+				end
 			elseif event.type == "receive" then
-				client.event_handler:on_recv(event.data)
+				if client.event_handler.on_recv ~= nil then
+					client.event_handler:on_recv(event.data)
+				end
 			else
 				print("networker/client got strange event of type: " .. event.type)
 			end

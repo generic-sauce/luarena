@@ -16,6 +16,7 @@ return function(client, server_ip, server_port)
 				client.client_count = tonumber(data)
 			elseif packet_type == "g" then -- go packet
 				print("go!")
+				master = require("gamemaster/client")(client.networker)
 			else
 				print("received strange packet: " .. p)
 			end

@@ -18,7 +18,7 @@ return function(server, port)
 
 	function server:go()
 		server.networker:broadcast_packet("g")
-		print("go!")
+		master = require("gamemaster/server")(server.networker)
 	end
 
 	function server:update(dt)

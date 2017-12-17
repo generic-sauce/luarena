@@ -23,9 +23,6 @@ return function(event_handler, port)
 		end
 	end
 
-	-- fillable stubs
-	if server.event_handler.on_client_connects == nil then function server.event_handler:on_client_connects() end end
-	if server.event_handler.on_recv == nil then function server.event_handler:on_recv(p) end end
 
 	function server:handle_events()
 		while true do
@@ -35,9 +32,13 @@ return function(event_handler, port)
 
 			if event.type == "connect" then
 				table.insert(server.clients, event.peer)
-				server.event_handler:on_client_connects()
+				if server.event_handler.on_client_connects ~= nil then
+					server.event_handler:on_client_connects()
+				end
 			elseif event.type == "receive" then
-				server.event_handler:on_recv(event.data)
+				if server.event_handler.on_recv ~= nil then
+					server.event_handler:on_recv(event.data)
+				end
 			else
 				print("networker/server got strange event of type: " .. event.type)
 			end
