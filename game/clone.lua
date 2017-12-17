@@ -1,5 +1,22 @@
 local clone_mod = {}
 
+function stringify(t)
+	if type(t) == "function" then
+		return "<function>"
+	end
+
+	if type(t) ~= "table" then
+		return "" .. tostring(t)
+	end
+
+	local out = "{"
+	for k, v in pairs(t)
+	do
+		out = out .. stringify(k) .. "=" .. stringify(v) .. ","
+	end
+	return out .. "}"
+end
+
 function clone_mod.clone(state)
 	function pipe_through_map(obj, map)
 		if type(obj) ~= "table" then
@@ -24,23 +41,6 @@ function clone_mod.clone(state)
 	end
 
 	return pipe_through_map(state, {})
-end
-
-function clone_mod.stringify(t)
-	if type(t) == "function" then
-		return "<function>"
-	end
-
-	if type(t) ~= "table" then
-		return "" .. t
-	end
-
-	local out = "{"
-	for k, v in pairs(t)
-	do
-		out = out .. stringify(k) .. "=" .. stringify(v) .. ","
-	end
-	return out .. "}"
 end
 
 return clone_mod

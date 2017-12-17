@@ -1,24 +1,68 @@
 local calendar_mod = {} -- keeps track of the history of pressed keys for all players
 
-function initial_inputstate()
-	return { q = false, w = false, e = false, r = false }
-end
-
-function calendar_mod.new()
+function calendar_mod.new(player_count, local_id)
 	local calendar = {}
 
-	calendar.playertable = {}
-	-- TODO init playertable using initial_inputstate()
+	calendar.player_count = player_count
+	calendar.local_id = local_id
 
-	function calendar:detect_user_inputs()
+	calendar.playertable = {} -- Map<PlayerId, Map<Key, List<{value=<bool>, frame_id=<frame_id> }>>>
+	for i=1, player_count do
+		table.insert(calendar.playertable, {
+			q={{value=false, frame_id=1}},
+			w={{value=false, frame_id=1}},
+			e={{value=false, frame_id=1}},
+			r={{value=false, frame_id=1}},
+		})
+	end
+
+	function calendar:read_inputs(player_id, frame_id) -- frame_id == nil searches for newest
 		local inputs = {}
-		-- TODO detect inputs, which have been pressed/released (on the local computer)
+		for key, hist in pairs(calendar.playertable[player_id]) do
+			for i=1, #hist do
+				local hist_entry = hist[#hist - i + 1]
+				if frame_id == nil or hist_entry.frame_id <= frame_id then
+					inputs[key] = hist_entry.value
+					break
+				end
+			end
+		end
+
 		return inputs
 	end
 
-	function calendar:handle_user_inputs()
-		local inputs = calendar:detect_user_inputs()
-		-- TODO
+	function calendar:apply_to_frame(f, frame_id)
+		for i=1, player_count do
+			local inputs = calendar:read_inputs(i, frame_id)
+			for key, value in pairs(inputs) do
+				f.entities[i].inputs[key] = value
+			end
+		end
+	end
+
+	function calendar:detect_changed_local_inputs()
+		local inputs = {}
+		inputs.q = love.keyboard.isDown('q')
+		inputs.w = love.keyboard.isDown('w')
+		inputs.e = love.keyboard.isDown('e')
+		inputs.r = love.keyboard.isDown('r')
+
+		local old_inputs = calendar:read_inputs(calendar.local_id, nil)
+		local changed_inputs = {}
+
+		for key, is_pressed in pairs(inputs) do
+			if old_inputs[key] ~= is_pressed then
+				table.insert(changed_inputs, is_pressed)
+			end
+		end
+
+		return changed_inputs
+	end
+
+	function calendar:apply_local_input_changes(inputs, frame_id)
+		for key, is_pressed in pairs(inputs) do
+			table.insert(calendar.playertable[calendar.local_id][key], {value=is_pressed, frame_id=frame_id})
+		end
 	end
 
 	return calendar

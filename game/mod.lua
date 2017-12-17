@@ -4,7 +4,7 @@ local game_mod = {}
 local frame_mod = require("game/frame")
 local calendar_mod = require("game/calendar")
 
-function game_mod:new(player_count, local_id)
+function game_mod.new(player_count, local_id)
 	local game = {}
 	game.frame_history = {}
 	game.current_frame = frame_mod.initial(player_count)
@@ -12,19 +12,26 @@ function game_mod:new(player_count, local_id)
 	game.local_id = local_id
 	game.start_time = love.timer.getTime()
 
+	function game:update_local_calendar()
+		local changed_inputs = game.calendar:detect_changed_local_inputs()
+		game.calendar:apply_local_input_changes(changed_inputs, #game.frame_history + 1)
+
+		-- TODO send inputs to others
+	end
+
 	function game:frame_update()
 		table.insert(game.frame_history, game.current_frame.clone())
 
-		-- game.calendar:apply_to_frame(game.current_frame)
+		game.calendar:apply_to_frame(game.current_frame)
 		game.current_frame:tick()
 	end
 
 	function game:update(dt)
-		-- game:update_calendar()
+		game:update_local_calendar()
 
 		local current_time = love.timer.getTime()
 		while #game.frame_history * FRAME_DURATION < current_time - game.start_time do
-			-- game:update_calendar()
+			game:update_local_calendar()
 			game:frame_update()
 		end
 	end

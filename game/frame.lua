@@ -6,6 +6,7 @@ function new_player()
 
 	player.x = 0
 	player.y = 0
+	player.inputs = { q = false, w = false, e = false, r = false }
 
 	function player:tick() end
 	function player:draw()
