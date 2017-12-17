@@ -26,7 +26,7 @@ function frame_mod.initial(player_count)
 	local frame = {}
 	frame.entities = {}
 
-	for i=0, player_count do
+	for i=1, player_count do
 		table.insert(frame.entities, new_player())
 	end
 
