@@ -1,5 +1,5 @@
 local frame_mod = {}
-local clone_mod = require("game/clone")
+require("misc")
 
 function new_player()
 	local player = {}
@@ -43,7 +43,7 @@ function frame_mod.initial(player_count)
 	end
 
 	function frame:clone()
-		return clone_mod.clone(self)
+		return clone(self)
 	end
 
 	return frame

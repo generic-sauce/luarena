@@ -1,5 +1,3 @@
-local clone_mod = {}
-
 function stringify(t)
 	if type(t) == "function" then
 		return "<function>"
@@ -17,7 +15,7 @@ function stringify(t)
 	return out .. "}"
 end
 
-function clone_mod.clone(state)
+function clone(state)
 	function pipe_through_map(obj, map)
 		if type(obj) ~= "table" then
 			return obj
@@ -43,4 +41,36 @@ function clone_mod.clone(state)
 	return pipe_through_map(state, {})
 end
 
-return clone_mod
+HASH_SPACE = 2^16
+
+function hash(t)
+	if type(t) == "nil" then
+		return 1
+	elseif type(t) == "boolean" then
+		if t then
+			return 1
+		else
+			return 2
+		end
+	elseif type(t) == "number" then
+		return t % HASH_SPACE
+	elseif type(t) == "string" then
+		if t == "" then
+			return 4
+		else 
+			return (string.byte(t:sub(1,1)) + hash(t:sub(2)) * 2) % HASH_SPACE
+		end
+	elseif type(t) == "table" then
+		local val = 1 + hash(getmetatable(t))
+		for x, y in pairs(t) do
+			val = val + (hash(x) % (HASH_SPACE/2 + 1)) + hash(y)
+		end
+		return val % HASH_SPACE
+	elseif type(t) == "function" then
+		return 2
+	elseif type(t) == "userdata" then
+		return 5
+	else
+		print("can't hash type " .. type(t))
+	end
+end

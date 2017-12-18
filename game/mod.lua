@@ -4,6 +4,7 @@ local game_mod = {}
 local frame_mod = require("game/frame")
 local calendar_mod = require("game/calendar")
 local packetizer_mod = require("packetizer")
+require("misc")
 
 function game_mod.new(player_count, local_id)
 	local game = {}
@@ -60,6 +61,7 @@ function game_mod.new(player_count, local_id)
 	end
 
 	function game:update(dt)
+		print("calendar-hash = " .. tostring(hash(self.calendar)) .. ";\tframe-hash = " .. tostring(hash(self.current_frame)))
 		self.networker:handle_events()
 		self:update_local_calendar()
 
