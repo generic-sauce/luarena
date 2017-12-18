@@ -26,7 +26,7 @@ return function(event_handler, port)
 
 	function server:handle_events()
 		while true do
-			local event = self.host:service(100)
+			local event = self.host:service()
 
 			if event == nil then break end
 
