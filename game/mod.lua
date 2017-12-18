@@ -54,13 +54,17 @@ function game_mod.new(player_count, local_id)
 	end
 
 	function game:frame_update()
-		table.insert(self.frame_history, self.current_frame:clone())
-
-		self.calendar:apply_to_frame(self.current_frame)
+		self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
 		self.current_frame:tick()
+		table.insert(self.frame_history, self.current_frame:clone())
 	end
 
 	function game:update(dt)
+		if love.keyboard.isDown('b') then
+			print("backtracking to frame 2")
+			self:backtrack(2)
+		end
+
 		print("calendar-hash = " .. tostring(hash(self.calendar)) .. ";\tframe-hash = " .. tostring(hash(self.current_frame)))
 		self.networker:handle_events()
 		self:update_local_calendar()
