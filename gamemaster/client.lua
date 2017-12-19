@@ -1,4 +1,4 @@
-local packetizer_mod = require("packetizer")
+require("json")
 
 function new_clientmaster(networker, player_count, local_id)
 	local clientmaster = require("game/mod").new(player_count, local_id)
@@ -11,8 +11,8 @@ function new_clientmaster(networker, player_count, local_id)
 	end
 
 	function clientmaster:on_recv(p)
-		local changed_inputs, player_id, frame_id = packetizer_mod.packet_to_inputs(p)
-		self:apply_input_changes(changed_inputs, player_id, frame_id)
+		local t = json.decode(p)
+		self:apply_input_changes(t.inputs, t.player_id, t.frame_id)
 	end
 
 	print("client - gamemaster alive!")

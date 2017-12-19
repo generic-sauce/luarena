@@ -3,7 +3,8 @@ FRAME_DURATION = 0.005 -- in seconds
 local game_mod = {}
 local frame_mod = require("game/frame")
 local calendar_mod = require("game/calendar")
-local packetizer_mod = require("packetizer")
+require("json")
+
 require("misc")
 
 function game_mod.new(player_count, local_id)
@@ -49,7 +50,11 @@ function game_mod.new(player_count, local_id)
 
 		self.calendar:apply_input_changes(changed_inputs, self.local_id, #self.frame_history + 1)
 
-		local p = packetizer_mod.inputs_to_packet(changed_inputs, self.local_id, #self.frame_history + 1)
+		local p = json.encode({
+			inputs = changed_inputs,
+			player_id = self.local_id,
+			frame_id = #self.frame_history + 1
+		})
 		self:send(p)
 	end
 

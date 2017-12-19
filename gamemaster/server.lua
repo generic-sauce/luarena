@@ -1,4 +1,4 @@
-local packetizer_mod = require("packetizer")
+require('json')
 
 function new_servermaster(networker)
 	local servermaster = require("game/mod").new(#networker.clients + 1, 1)
@@ -11,8 +11,8 @@ function new_servermaster(networker)
 	end
 
 	function servermaster:on_recv(p)
-		local changed_inputs, player_id, frame_id = packetizer_mod.packet_to_inputs(p)
-		self:apply_input_changes(changed_inputs, player_id, frame_id)
+		local t = json.decode(p)
+		self:apply_input_changes(t.inputs, t.player_id, t.frame_id)
 
 		-- packet forwarding
 		for key, client in pairs(self.networker.clients) do
