@@ -11,7 +11,7 @@ function frame_mod.initial(chars)
 
 	function frame:tick()
 		for _, entity in pairs(self.entities) do
-			entity:tick()
+			entity:tick(self)
 		end
 	end
 
