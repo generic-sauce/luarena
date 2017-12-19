@@ -6,12 +6,21 @@ function new_player()
 
 	player.x = 0
 	player.y = 0
-	player.inputs = { q = false, w = false, e = false, r = false, mouse_x = 0, mouse_y = 0 }
+	player.walk_target_x, player.walk_target_y = nil, nil
+	player.inputs = { q = false, w = false, e = false, r = false, mouse_x = 0, mouse_y = 0, click = false, rclick = false }
 
 	function player:tick()
-		if self.inputs.q then
-			self.x = self.inputs.mouse_x
-			self.y = self.inputs.mouse_y
+		if self.inputs.rclick then
+			self.walk_target_x = self.inputs.mouse_x
+			self.walk_target_y = self.inputs.mouse_y
+		end
+
+		if self.walk_target_x ~= nil and self.walk_target_y ~= nil then
+			local move_vec_x  = (self.walk_target_x - self.x)
+			local move_vec_y  = (self.walk_target_y - self.y)
+			local l = math.sqrt(move_vec_x^2 + move_vec_y^2)
+			self.x = self.x + move_vec_x / l
+			self.y = self.y + move_vec_y / l
 		end
 	end
 

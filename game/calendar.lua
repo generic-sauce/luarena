@@ -15,6 +15,8 @@ function calendar_mod.new(player_count, local_id)
 			r={{value=false, frame_id=1}},
 			mouse_x={{value=0, frame_id=1}},
 			mouse_y={{value=0, frame_id=1}},
+			click={{value=false, frame_id=1}},
+			rclick={{value=false, frame_id=1}},
 		})
 	end
 
@@ -49,6 +51,8 @@ function calendar_mod.new(player_count, local_id)
 		inputs.e = love.keyboard.isDown('e')
 		inputs.r = love.keyboard.isDown('r')
 		inputs.mouse_x, inputs.mouse_y = love.mouse.getPosition()
+		inputs.click = love.mouse.isDown(1)
+		inputs.rclick = love.mouse.isDown(2)
 
 		local old_inputs = self:read_inputs(self.local_id, nil)
 		local changed_inputs = {}
