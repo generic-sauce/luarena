@@ -1,5 +1,7 @@
 return function (archer)
 
+	archer.q_cooldown = 0
+
 	function archer:new_arrow()
 		local arrow = {}
 
@@ -49,7 +51,9 @@ return function (archer)
 	end
 
 	function archer:char_tick(frame)
-		if self.inputs.q then
+		self.q_cooldown = math.max(0, self.q_cooldown - 1)
+		if self.inputs.q and self.q_cooldown == 0 then
+			self.q_cooldown = 100
 			table.insert(frame.entities, self:new_arrow())
 		end
 	end
