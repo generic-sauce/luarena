@@ -23,9 +23,9 @@ return function (archer)
 		end
 
 		function arrow:tick(frame)
-			arrow.x = arrow.x + arrow.speed_x
-			arrow.y = arrow.y + arrow.speed_y
-			if arrow.x < 0 or arrow.x > 1000 or arrow.y < 0 or arrow.y > 1000 then
+			self.x = self.x + self.speed_x
+			self.y = self.y + self.speed_y
+			if self.x < 0 or self.x > 1000 or self.y < 0 or self.y > 1000 then
 				self:destroy(frame)
 			end
 

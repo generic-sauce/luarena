@@ -10,6 +10,7 @@ return function(server, char, port)
 
 	function server:on_recv(p)
 		if p.tag == "join" then
+			print("A new client joined!")
 			table.insert(self.chars, p.char)
 			self:broadcast_chars_packet()
 		else
