@@ -12,7 +12,7 @@ return function(event_handler, port)
 	print("opening server at " .. port)
 
 	server.clients = {}
-	server.host = enet.host_create("localhost:" .. port)
+	server.host = enet.host_create("*:" .. port)
 	if server.host == nil then
 		print("Failed to open server")
 		os.exit(1)
