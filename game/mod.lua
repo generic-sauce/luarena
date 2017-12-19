@@ -65,7 +65,6 @@ function game_mod.new(player_count, local_id)
 			self:backtrack(2)
 		end
 
-		print("calendar-hash = " .. tostring(hash(self.calendar)) .. ";\tframe-hash = " .. tostring(hash(self.current_frame)))
 		self.networker:handle_events()
 		self:update_local_calendar()
 

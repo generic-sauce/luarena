@@ -6,11 +6,12 @@ function new_player()
 
 	player.x = 0
 	player.y = 0
-	player.inputs = { q = false, w = false, e = false, r = false }
+	player.inputs = { q = false, w = false, e = false, r = false, mouse_x = 0, mouse_y = 0 }
 
 	function player:tick()
-		if self.inputs.q == true then
-			self.x = self.x + 1
+		if self.inputs.q then
+			self.x = self.inputs.mouse_x
+			self.y = self.inputs.mouse_y
 		end
 	end
 
