@@ -1,25 +1,37 @@
 local enet = require "enet"
 
-return function(server, port)
-	function server:on_client_connects()
-		print("client connected!")
-		self:broadcast_update_packet()
+return function(server, char, port)
+	if char == nil then
+		print("missing character!")
+		usage()
+	end
+
+	server.chars = {char}
+
+	function server:on_recv(p)
+		if p.tag == "join" then
+			table.insert(self.chars, p.char)
+			self:broadcast_chars_packet()
+		else
+			print("received packet with strange tag: " .. tostring(p.tag))
+			os.exit(1)
+		end
 	end
 
 	server.networker = require("networker/server")(server, port)
 
-	function server:broadcast_update_packet()
-		function build_update_packet()
-			return "u" .. tostring(#self.networker.clients)	-- currently the number of clients says it all
-															-- "u" => update packet
-		end
-
-		self.networker:broadcast_packet(build_update_packet())
+	function server:broadcast_chars_packet()
+		self.networker:broadcast_packet({
+			tag = "chars",
+			chars = self.chars
+		})
 	end
 
 	function server:go()
-		self.networker:broadcast_packet("g")
-		master = require("gamemaster/server")(self.networker)
+		self.networker:broadcast_packet({
+			tag = "go"
+		})
+		master = require("gamemaster/server")(self.chars, self.networker)
 	end
 
 	function server:update(dt)

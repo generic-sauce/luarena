@@ -1,4 +1,5 @@
 local enet = require "enet"
+require "json"
 
 return function(event_handler, port)
 	local server = {}
@@ -19,15 +20,13 @@ return function(event_handler, port)
 
 	function server:broadcast_packet(p)
 		for _, client in pairs(self.clients) do
-			-- print("sending '" .. p .. "' to client " .. tostring(client))
-			client:send(p)
+			client:send(json.encode(p))
 		end
 	end
 
 	function server:handle_events()
 		while true do
 			local event = self.host:service()
-
 			if event == nil then break end
 
 			if event.type == "connect" then
@@ -37,7 +36,7 @@ return function(event_handler, port)
 				end
 			elseif event.type == "receive" then
 				if self.event_handler.on_recv ~= nil then
-					self.event_handler:on_recv(event.data)
+					self.event_handler:on_recv(json.decode(event.data))
 				end
 			else
 				print("networker/server got strange event of type: " .. event.type)

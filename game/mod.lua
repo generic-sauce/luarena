@@ -3,15 +3,14 @@ FRAME_DURATION = 0.005 -- in seconds
 local game_mod = {}
 local frame_mod = require("game/frame")
 local calendar_mod = require("game/calendar")
-require("json")
-
 require("misc")
 
-function game_mod.new(player_count, local_id)
+function game_mod.new(chars, local_id)
 	local game = {}
 	game.frame_history = {}
-	game.current_frame = frame_mod.initial(player_count)
-	game.calendar = calendar_mod.new(player_count, local_id)
+	game.chars = chars
+	game.current_frame = frame_mod.initial(chars)
+	game.calendar = calendar_mod.new(#chars, local_id)
 	game.local_id = local_id
 	game.start_time = love.timer.getTime()
 
@@ -22,7 +21,7 @@ function game_mod.new(player_count, local_id)
 		end
 
 		if frame_id == 1 then
-			self.current_frame = frame_mod.initial(player_count)
+			self.current_frame = frame_mod.initial(game.chars)
 		else
 			self.current_frame = self.frame_history[#self.frame_history]:clone()
 		end
@@ -50,12 +49,11 @@ function game_mod.new(player_count, local_id)
 
 		self.calendar:apply_input_changes(changed_inputs, self.local_id, #self.frame_history + 1)
 
-		local p = json.encode({
+		self:send({
 			inputs = changed_inputs,
 			player_id = self.local_id,
 			frame_id = #self.frame_history + 1
 		})
-		self:send(p)
 	end
 
 	function game:frame_update()

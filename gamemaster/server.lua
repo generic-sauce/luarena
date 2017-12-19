@@ -1,7 +1,5 @@
-require('json')
-
-function new_servermaster(networker)
-	local servermaster = require("game/mod").new(#networker.clients + 1, 1)
+function new_servermaster(chars, networker)
+	local servermaster = require("game/mod").new(chars, 1)
 
 	servermaster.networker = networker
 	networker.event_handler = servermaster
@@ -11,13 +9,12 @@ function new_servermaster(networker)
 	end
 
 	function servermaster:on_recv(p)
-		local t = json.decode(p)
-		self:apply_input_changes(t.inputs, t.player_id, t.frame_id)
+		self:apply_input_changes(p.inputs, p.player_id, p.frame_id)
 
 		-- packet forwarding
 		for key, client in pairs(self.networker.clients) do
 			if key + 1 ~= player_id then
-				client:send(p)
+				client:send(json.encode(p))
 			end
 		end
 	end

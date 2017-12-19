@@ -1,7 +1,7 @@
 local frame_mod = {}
 require("misc")
 
-function new_player()
+function new_player(char)
 	local player = {}
 
 	player.x = 0
@@ -29,15 +29,15 @@ function new_player()
 		love.graphics.rectangle("fill", self.x, self.y, 10, 10)
 	end
 
-	return player
+	return require("characters/" .. char)(player)
 end
 
-function frame_mod.initial(player_count)
+function frame_mod.initial(chars)
 	local frame = {}
 	frame.entities = {}
 
-	for i=1, player_count do
-		table.insert(frame.entities, new_player())
+	for _, char in pairs(chars) do
+		table.insert(frame.entities, new_player(char))
 	end
 
 	function frame:tick()

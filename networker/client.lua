@@ -1,4 +1,5 @@
 local enet = require "enet"
+require "json"
 
 return function(event_handler, server_ip, server_port)
 	local client = {}
@@ -14,7 +15,8 @@ return function(event_handler, server_ip, server_port)
 	client.server_host = client.host:connect(server_ip .. ":" .. server_port)
 
 	function client:send_to_server(p)
-		self.server_host:send(p)
+		local packet = json.encode(p)
+		self.server_host:send(packet)
 	end
 
 	function client:handle_events()
@@ -29,7 +31,7 @@ return function(event_handler, server_ip, server_port)
 				end
 			elseif event.type == "receive" then
 				if self.event_handler.on_recv ~= nil then
-					self.event_handler:on_recv(event.data)
+					self.event_handler:on_recv(json.decode(event.data))
 				end
 			else
 				print("networker/client got strange event of type: " .. event.type)

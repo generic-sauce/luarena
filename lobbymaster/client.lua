@@ -1,25 +1,36 @@
 local enet = require "enet"
+require "json"
 
-return function(client, server_ip, server_port)
-	client.id = nil
-	client.client_count = nil
+return function(client, char, server_ip, server_port)
+	if char == nil then
+		print("missing character!")
+		usage()
+	end
+
+	client.local_id = nil
+	client.chars = nil
 
 	function client:on_recv(p)
-			local packet_type = p:sub(1, 1)
-			local data = p:sub(2, -1)
-
-			if packet_type == "u" then -- update packet
-				if self.id == nil then
-					self.id = tonumber(data)
-					print("I'm client with id " .. self.id)
+			if p.tag == "chars" then
+				if self.local_id == nil then
+					self.local_id = #p.chars
+					print("I'm client with id " .. self.local_id)
 				end
-				self.client_count = tonumber(data)
-			elseif packet_type == "g" then -- go packet
+				self.chars = p.chars
+			elseif p.tag == "go" then
 				print("go!")
-				master = require("gamemaster/client")(self.networker, self.client_count + 1, self.id + 1)
+				master = require("gamemaster/client")(self.networker, self.chars, self.local_id)
 			else
-				print("received strange packet: " .. p)
+				print("received strange packet with tag: " .. p.tag)
 			end
+	end
+
+
+	function client:on_connect()
+		self.networker:send_to_server({
+			tag = "join",
+			char = char
+		})
 	end
 
 	client.networker = require("networker/client")(client, server_ip, server_port)

@@ -1,7 +1,5 @@
-require("json")
-
-function new_clientmaster(networker, player_count, local_id)
-	local clientmaster = require("game/mod").new(player_count, local_id)
+function new_clientmaster(networker, chars, local_id)
+	local clientmaster = require("game/mod").new(chars, local_id)
 
 	clientmaster.networker = networker
 	networker.event_handler = clientmaster
@@ -11,8 +9,7 @@ function new_clientmaster(networker, player_count, local_id)
 	end
 
 	function clientmaster:on_recv(p)
-		local t = json.decode(p)
-		self:apply_input_changes(t.inputs, t.player_id, t.frame_id)
+		self:apply_input_changes(p.inputs, p.player_id, p.frame_id)
 	end
 
 	print("client - gamemaster alive!")
