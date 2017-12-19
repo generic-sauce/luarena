@@ -3,6 +3,7 @@ function new_player(char)
 
 	player.x = 0
 	player.y = 0
+	player.health = 100
 	player.walk_target_x, player.walk_target_y = nil, nil
 	player.inputs = { q = false, w = false, e = false, r = false, mouse_x = 0, mouse_y = 0, click = false, rclick = false }
 
@@ -32,8 +33,10 @@ function new_player(char)
 	end
 
 	function player:draw()
+		love.graphics.setColor(255, 0, 0)
+		love.graphics.rectangle("fill", self.x - 5, self.y - 5 -10, 10 * player.health/100, 2)
 		love.graphics.setColor(100, 100, 100)
-		love.graphics.rectangle("fill", self.x, self.y, 10, 10)
+		love.graphics.rectangle("fill", self.x - 5, self.y - 5, 10, 10)
 	end
 
 	return require("characters/" .. char)(player)
