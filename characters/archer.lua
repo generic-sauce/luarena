@@ -11,8 +11,8 @@ return function (archer)
 		arrow.speed_x = self.inputs.mouse_x - self.x
 		arrow.speed_y = self.inputs.mouse_y - self.y
 		local l = math.sqrt(arrow.speed_x^2 + arrow.speed_y^2)
-		arrow.speed_x = arrow.speed_x / l
-		arrow.speed_y = arrow.speed_y / l
+		arrow.speed_x = 2 * arrow.speed_x / l
+		arrow.speed_y = 2 * arrow.speed_y / l
 
 		function arrow:destroy(frame)
 			for key, entity in pairs(frame.entities) do
