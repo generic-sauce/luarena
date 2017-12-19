@@ -19,7 +19,7 @@ function new_player(char)
 			if l < 1 then
 				self.x = self.walk_target_x
 				self.y = self.walk_target_y
-				walk_target_x, walk_target_y = nil, nil
+				self.walk_target_x, self.walk_target_y = nil, nil
 			else
 				self.x = self.x + move_vec_x / l
 				self.y = self.y + move_vec_y / l
