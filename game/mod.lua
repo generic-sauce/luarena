@@ -1,5 +1,6 @@
 FRAME_DURATION = 0.005 -- in seconds
 INPUT_DELAY = 10
+AVG_BACKTRACK_UPDATE_FREQUENCY = 1000
 
 local game_mod = {}
 local frame_mod = require("game/frame")
@@ -54,6 +55,7 @@ function game_mod.new(chars, local_id)
 		self.calendar:apply_input_changes(changed_inputs, self.local_id, #self.frame_history + 1 + INPUT_DELAY)
 
 		self:send({
+			tag = "inputs",
 			inputs = changed_inputs,
 			player_id = self.local_id,
 			frame_id = #self.frame_history + 1 + INPUT_DELAY
@@ -81,6 +83,10 @@ function game_mod.new(chars, local_id)
 
 		local current_time = love.timer.getTime()
 		while #self.frame_history * FRAME_DURATION < current_time - self.start_time do
+			if #self.frame_history % AVG_BACKTRACK_UPDATE_FREQUENCY and self.send_avg_update_packet ~= nil then
+					self:send_avg_update_packet() -- Just happens on the server (this is mega hacky!)
+			end
+
 			self:update_local_calendar()
 			self:frame_update()
 		end
