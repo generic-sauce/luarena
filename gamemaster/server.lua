@@ -13,7 +13,7 @@ function new_servermaster(chars, networker)
 
 		-- packet forwarding
 		for key, client in pairs(self.networker.clients) do
-			if key + 1 ~= player_id then
+			if key + 1 ~= p.player_id then
 				client:send(json.encode(p))
 			end
 		end
