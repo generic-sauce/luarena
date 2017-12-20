@@ -16,9 +16,12 @@ function game_mod.new(chars, local_id)
 
 	-- frame_id is the oldest frame to be re-calculated
 	function game:backtrack(frame_id)
+		local c = 0
 		while frame_id <= #self.frame_history do
+			c = c + 1
 			self.frame_history[#self.frame_history] = nil
 		end
+		print("backtracking " .. tostring(c) .. " frames")
 
 		if frame_id == 1 then
 			self.current_frame = frame_mod.initial(game.chars)
@@ -57,6 +60,10 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:frame_update()
+		if #self.frame_history % 200 == 0 then
+			os.execute("paplay beep.wav")
+		end
+
 		self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
 		self.current_frame:tick()
 		table.insert(self.frame_history, self.current_frame:clone())
