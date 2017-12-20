@@ -1,4 +1,3 @@
-local gamemaster_mod = require('gamemaster/mod')
 local backtrack_balance_mod = require('gamemaster/backtrack_balance')
 
 function new_clientmaster(networker, chars, local_id)
