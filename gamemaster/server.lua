@@ -35,8 +35,8 @@ function new_servermaster(chars, networker)
 				tag = "avg_backtrack",
 				avg_backtrack = self.avg_backtrack_list[i]
 			}))
-			self.avg_backtrack_list = {}
 		end
+		self.avg_backtrack_list = {}
 	end
 
 	print("server - gamemaster alive!")
