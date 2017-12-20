@@ -1,9 +1,9 @@
-local backtrack_balance_mod = require('gamemaster/backtrack_balance')
+local backtrack_balancer_mod = require('gamemaster/backtrack_balancer')
 
 function new_clientmaster(networker, chars, local_id)
 	local clientmaster = require("game/mod").new(chars, local_id)
 
-	clientmaster.balancer = backtrack_balance_mod.new()
+	clientmaster.balancer = backtrack_balancer_mod.new()
 
 	clientmaster.networker = networker
 	networker.event_handler = clientmaster
