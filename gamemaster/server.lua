@@ -30,13 +30,13 @@ function new_servermaster(chars, networker)
 	end
 
 	function servermaster:send_avg_update_packet()
-		for i=1, #self.networker.clients do
+		for i, value in pairs(self.avg_backtrack_list) do
 			self.networker.clients[i]:send(json.encode({
 				tag = "avg_backtrack",
-				avg_backtrack = self.avg_backtrack_list[i]
+				avg_backtrack = value
 			}))
+			self.avg_backtrack_list[i] = nil
 		end
-		self.avg_backtrack_list = {}
 	end
 
 	print("server - gamemaster alive!")

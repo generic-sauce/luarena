@@ -1,4 +1,4 @@
-AVG_FACTOR_COUNT = 50
+AVG_FACTOR_COUNT = 5
 
 local gamemaster_mod = {}
 

@@ -19,9 +19,9 @@ function new_clientmaster(networker, chars, local_id)
 			self:apply_input_changes(p.inputs, p.player_id, p.frame_id)
 		elseif p.tag == "avg_backtrack" then
 			if p.avg_backtrack ~= nil and self.avg_backtrack ~= nil then
-				self.start_time = self.start_time + FRAME_DURATION * (p.avg_backtrack - self.avg_backtrack)
+				self.start_time = self.start_time + FRAME_DURATION * (self.avg_backtrack - p.avg_backtrack)/2
+				self.avg_backtrack = nil
 			end
-			self.avg_backtrack = nil
 		else
 			print("clientmaster received packet of strange tag: " .. tostring(p.tag))
 		end
