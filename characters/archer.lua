@@ -43,7 +43,7 @@ return function (archer)
 		end
 
 		function arrow:draw()
-			love.graphics.setColor(0, 0, 100)
+			love.graphics.setColor(0, 0, 255)
 			love.graphics.rectangle("fill", self.x - 2, self.y - 2, 4, 4)
 		end
 
