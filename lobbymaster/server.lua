@@ -1,3 +1,5 @@
+START_DELAY = 1
+
 local enet = require "enet"
 
 return function(server, char, port)
@@ -29,10 +31,12 @@ return function(server, char, port)
 	end
 
 	function server:go()
+		local start_time = require("socket").gettime() + START_DELAY
 		self.networker:broadcast_packet({
-			tag = "go"
+			tag = "go",
+			start_time = start_time
 		})
-		master = require("gamemaster/server")(self.chars, self.networker)
+		master = require("gamemaster/server")(self.chars, self.networker, start_time)
 	end
 
 	function server:update(dt)
