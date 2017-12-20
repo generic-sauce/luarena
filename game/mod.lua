@@ -1,6 +1,6 @@
 FRAME_DURATION = 0.005 -- in seconds
 INPUT_DELAY = 10
-AVG_BACKTRACK_UPDATE_FREQUENCY = 2000
+BACKTRACK_BALANCE_INTERVAL = 2000
 
 local game_mod = {}
 local frame_mod = require("game/frame")
@@ -60,10 +60,6 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:frame_update()
-		if #self.frame_history % 200 == 0 then
-			-- os.execute("paplay beep.wav &")
-		end
-
 		self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
 		self.current_frame:tick()
 		table.insert(self.frame_history, self.current_frame:clone())
@@ -80,8 +76,8 @@ function game_mod.new(chars, local_id)
 
 		local current_time = love.timer.getTime()
 		while #self.frame_history * FRAME_DURATION < current_time - self.start_time do
-			if #self.frame_history % AVG_BACKTRACK_UPDATE_FREQUENCY and self.send_avg_update_packet ~= nil then
-					self:send_avg_update_packet() -- Just happens on the server (this is mega hacky!)
+			if self.gamemaster_update ~= nil then
+				self:gamemaster_update()
 			end
 
 			self:update_local_calendar()

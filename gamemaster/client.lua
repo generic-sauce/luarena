@@ -1,9 +1,10 @@
 local gamemaster_mod = require('gamemaster/mod')
+local backtrack_balance_mod = require('gamemaster/backtrack_balance')
 
 function new_clientmaster(networker, chars, local_id)
 	local clientmaster = require("game/mod").new(chars, local_id)
 
-	clientmaster.avg_backtrack = nil
+	clientmaster.balancer = backtrack_balance_mod.new()
 
 	clientmaster.networker = networker
 	networker.event_handler = clientmaster
@@ -15,12 +16,12 @@ function new_clientmaster(networker, chars, local_id)
 	function clientmaster:on_recv(p)
 		if p.tag == "inputs" then
 			local current_backtrack = #self.frame_history - p.frame_id + 1 -- may be negative
-			self.avg_backtrack = gamemaster_mod.calc_avg_backtrack(self.avg_backtrack, current_backtrack)
+			self.balancer:push_value(current_backtrack)
 			self:apply_input_changes(p.inputs, p.player_id, p.frame_id)
 		elseif p.tag == "avg_backtrack" then
-			if p.avg_backtrack ~= nil and self.avg_backtrack ~= nil then
-				self.start_time = self.start_time + FRAME_DURATION * (self.avg_backtrack - p.avg_backtrack)/2
-				self.avg_backtrack = nil
+			local avg = self.balancer:pop_avg()
+			if p.avg_backtrack ~= nil and avg ~= nil then
+				self.start_time = self.start_time + FRAME_DURATION * (avg - p.avg_backtrack)/2
 			end
 		else
 			print("clientmaster received packet of strange tag: " .. tostring(p.tag))
