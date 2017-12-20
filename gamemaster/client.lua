@@ -18,7 +18,9 @@ function new_clientmaster(networker, chars, local_id)
 			self.avg_backtrack = gamemaster_mod.calc_avg_backtrack(self.avg_backtrack, current_backtrack)
 			self:apply_input_changes(p.inputs, p.player_id, p.frame_id)
 		elseif p.tag == "avg_backtrack" then
-			self.start_time = self.start_time + FRAME_DURATION * (p.avg_backtrack - self.avg_backtrack)
+			if p.avg_backtrack ~= nil and self.avg_backtrack ~= nil then
+				self.start_time = self.start_time + FRAME_DURATION * (p.avg_backtrack - self.avg_backtrack)
+			end
 			self.avg_backtrack = nil
 		else
 			print("clientmaster received packet of strange tag: " .. tostring(p.tag))
