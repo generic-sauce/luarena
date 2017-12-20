@@ -1,4 +1,5 @@
 FRAME_DURATION = 0.005 -- in seconds
+INPUT_DELAY = 10
 
 local game_mod = {}
 local frame_mod = require("game/frame")
@@ -50,18 +51,18 @@ function game_mod.new(chars, local_id)
 
 		if next(changed_inputs) == nil then return end
 
-		self.calendar:apply_input_changes(changed_inputs, self.local_id, #self.frame_history + 1)
+		self.calendar:apply_input_changes(changed_inputs, self.local_id, #self.frame_history + 1 + INPUT_DELAY)
 
 		self:send({
 			inputs = changed_inputs,
 			player_id = self.local_id,
-			frame_id = #self.frame_history + 1
+			frame_id = #self.frame_history + 1 + INPUT_DELAY
 		})
 	end
 
 	function game:frame_update()
 		if #self.frame_history % 200 == 0 then
-			os.execute("paplay beep.wav")
+			-- os.execute("paplay beep.wav &")
 		end
 
 		self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
