@@ -1,5 +1,5 @@
-function new_servermaster(chars, networker, start_time)
-	local servermaster = require("game/mod").new(chars, 1, start_time)
+function new_servermaster(chars, networker)
+	local servermaster = require("game/mod").new(chars, 1)
 
 	servermaster.networker = networker
 	networker.event_handler = servermaster

@@ -1,5 +1,5 @@
-function new_clientmaster(networker, chars, local_id, start_time)
-	local clientmaster = require("game/mod").new(chars, local_id, start_time)
+function new_clientmaster(networker, chars, local_id)
+	local clientmaster = require("game/mod").new(chars, local_id)
 
 	clientmaster.networker = networker
 	networker.event_handler = clientmaster

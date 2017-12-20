@@ -19,7 +19,7 @@ return function(client, char, server_ip, server_port)
 				self.chars = p.chars
 			elseif p.tag == "go" then
 				print("go!")
-				master = require("gamemaster/client")(self.networker, self.chars, self.local_id, p.start_time)
+				master = require("gamemaster/client")(self.networker, self.chars, self.local_id)
 			else
 				print("received strange packet with tag: " .. p.tag)
 			end

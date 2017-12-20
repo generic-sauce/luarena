@@ -6,14 +6,14 @@ local frame_mod = require("game/frame")
 local calendar_mod = require("game/calendar")
 require("misc")
 
-function game_mod.new(chars, local_id, start_time)
+function game_mod.new(chars, local_id)
 	local game = {}
 	game.frame_history = {}
 	game.chars = chars
 	game.current_frame = frame_mod.initial(chars)
 	game.calendar = calendar_mod.new(#chars, local_id)
 	game.local_id = local_id
-	game.start_time = start_time
+	game.start_time = love.timer.getTime()
 
 	-- frame_id is the oldest frame to be re-calculated
 	function game:backtrack(frame_id)
@@ -30,7 +30,7 @@ function game_mod.new(chars, local_id, start_time)
 			self.current_frame = self.frame_history[#self.frame_history]:clone()
 		end
 
-		local current_time = require("socket").gettime()
+		local current_time = love.timer.getTime()
 		while #self.frame_history * FRAME_DURATION < current_time - self.start_time do
 			self:frame_update()
 		end
@@ -79,7 +79,7 @@ function game_mod.new(chars, local_id, start_time)
 		self.networker:handle_events()
 		self:update_local_calendar()
 
-		local current_time = require("socket").gettime()
+		local current_time = love.timer.getTime()
 		while #self.frame_history * FRAME_DURATION < current_time - self.start_time do
 			self:update_local_calendar()
 			self:frame_update()
