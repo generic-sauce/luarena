@@ -14,27 +14,19 @@ return function (archer)
 		arrow.speed_x = 2 * arrow.speed_x / l
 		arrow.speed_y = 2 * arrow.speed_y / l
 
-		function arrow:destroy(frame)
-			for key, entity in pairs(frame.entities) do
-				if entity == self then
-					table.remove(frame.entities, key)
-				end
-			end
-		end
-
 		function arrow:tick(frame)
 			self.x = self.x + self.speed_x
 			self.y = self.y + self.speed_y
 			if self.x < 0 or self.x > 1000 or self.y < 0 or self.y > 1000 then
-				self:destroy(frame)
+				frame:remove_entity(self)
 			end
 
 			for key, entity in pairs(frame.entities) do
 				if entity ~= self and entity ~= self.owner then
 					if math.abs(self.x - entity.x) < 10 and math.abs(self.y - entity.y) < 10 then
-						if entity.health ~= nil then
-							entity.health = math.max(0, entity.health - 10)
-							self:destroy(frame)
+						if entity.damage ~= nil then
+							entity:damage(10)
+							frame:remove_entity(self)
 						end
 					end
 				end

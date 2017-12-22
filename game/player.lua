@@ -7,6 +7,10 @@ function new_player(char)
 	player.walk_target_x, player.walk_target_y = nil, nil
 	player.inputs = { q = false, w = false, e = false, r = false, mouse_x = 0, mouse_y = 0, click = false, rclick = false }
 
+	function player:damage(dmg)
+		self.health = math.max(0, self.health - dmg)
+	end
+
 	function player:tick(frame)
 		if self.inputs.rclick then
 			self.walk_target_x = self.inputs.mouse_x
