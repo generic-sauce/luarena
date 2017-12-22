@@ -26,7 +26,7 @@ return function (archer)
 					if self.shape:intersects(entity.shape) then
 						if entity.damage ~= nil then
 							entity:damage(10)
-							entities:remove(self)
+							frame.entities:remove(self)
 						end
 					end
 				end
