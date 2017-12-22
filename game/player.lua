@@ -1,10 +1,15 @@
+local rect_mod = require("space/rect")
+local vec_mod = require('space/vec')
+
 function new_player(char)
 	local player = {}
 
-	player.x = 0
-	player.y = 0
+	player.shape = rect_mod.by_center_and_size(
+		vec_mod(0, 0),
+		vec_mod(10, 10)
+	)
 	player.health = 100
-	player.walk_target_x, player.walk_target_y = nil, nil
+	player.walk_target = nil
 	player.inputs = { q = false, w = false, e = false, r = false, mouse_x = 0, mouse_y = 0, click = false, rclick = false }
 
 	function player:damage(dmg)
@@ -13,21 +18,16 @@ function new_player(char)
 
 	function player:tick(frame)
 		if self.inputs.rclick then
-			self.walk_target_x = self.inputs.mouse_x
-			self.walk_target_y = self.inputs.mouse_y
+			self.walk_target = vec_mod(self.inputs.mouse_x, self.inputs.mouse_y)
 		end
 
-		if self.walk_target_x ~= nil and self.walk_target_y ~= nil then
-			local move_vec_x  = (self.walk_target_x - self.x)
-			local move_vec_y  = (self.walk_target_y - self.y)
-			local l = math.sqrt(move_vec_x^2 + move_vec_y^2)
-			if l < 1 then
-				self.x = self.walk_target_x
-				self.y = self.walk_target_y
-				self.walk_target_x, self.walk_target_y = nil, nil
+		if self.walk_target ~= nil then
+			local move_vec = self.walk_target - self.shape:center()
+			if move_vec:length() < 1 then
+				self.shape.center_vec = self.walk_target -- TODO should be using a setter-method
+				self.walk_target = nil
 			else
-				self.x = self.x + move_vec_x / l
-				self.y = self.y + move_vec_y / l
+				self.shape.center_vec = self.shape:center() + move_vec:normalized()
 			end
 		end
 
@@ -36,11 +36,15 @@ function new_player(char)
 		end
 	end
 
-	function player:draw()
-		love.graphics.setColor(255, 0, 0)
-		love.graphics.rectangle("fill", self.x - 5, self.y - 5 -10, 10 * self.health/100, 2)
-		love.graphics.setColor(100, 100, 100)
-		love.graphics.rectangle("fill", self.x - 5, self.y - 5, 10, 10)
+	function player:draw(cam)
+		cam:draw_world_rect(self.shape, 100, 100, 100)
+
+		local bar_offset = 10
+		local bar_height = 3
+		cam:draw_world_rect(rect_mod.by_left_top_and_size(
+			self.shape:left_top() - vec_mod(0, bar_offset),
+			vec_mod(self.shape:size().x * self.health/100, bar_height)
+		), 255, 0, 0)
 	end
 
 	return require("characters/" .. char)(player)

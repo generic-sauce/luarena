@@ -1,3 +1,5 @@
+local map_mod = require('map')
+
 local frame_mod = {}
 require("misc")
 
@@ -15,6 +17,7 @@ local entities_meta = {
 
 function frame_mod.initial(chars)
 	local frame = {}
+	frame.map = map_mod.new()
 	frame.entities = setmetatable({}, entities_meta)
 
 	for _, char in pairs(chars) do
@@ -23,13 +26,14 @@ function frame_mod.initial(chars)
 
 	function frame:tick()
 		for _, entity in pairs(self.entities) do
-			entity:tick(self.entities)
+			entity:tick(self)
 		end
 	end
 
-	function frame:draw()
+	function frame:draw(cam)
+		self.map:draw(cam)
 		for _, entity in pairs(self.entities) do
-			entity:draw()
+			entity:draw(cam)
 		end
 	end
 

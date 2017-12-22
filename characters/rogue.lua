@@ -1,3 +1,6 @@
+local rect_mod = require('space/rect')
+local vec_mod = require('space/vec')
+
 return function (rogue)
 
 	rogue.q_cooldown = 0
@@ -7,39 +10,39 @@ return function (rogue)
 		local aoe = {}
 
 		aoe.owner = self
-		aoe.x = self.x
-		aoe.y = self.y
+		aoe.shape = rect_mod.by_center_and_size(
+			self.shape:center(),
+			vec_mod(100, 100)
+		)
 		aoe.life_counter = 100
 
-		function aoe:tick(entities)
+		function aoe:tick(frame)
 			if self.life_counter == 100 then
-				for key, entity in pairs(entities) do
-					if entity ~= self and entity ~= self.owner then
-						if math.abs(self.x - entity.x) < 40 and math.abs(self.y - entity.y) < 40 then
-							if entity.damage ~= nil then
-								entity:damage(20)
-							end
-						end
+				for key, entity in pairs(frame.entities) do
+					if entity ~= self
+						and entity ~= self.owner
+						and self.shape:intersects(entity.shape)
+						and entity.damage ~= nil then
+							entity:damage(20)
 					end
 				end
 			end
 
 			self.life_counter = self.life_counter - 1
 			if self.life_counter <= 0 then
-				entities:remove(self)
+				frame.entities:remove(self)
 			end
 		end
 
-		function aoe:draw()
-			love.graphics.setColor(100, 100, 100, 100)
-			love.graphics.rectangle("fill", self.x - 20, self.y - 20, 40, 40)
+		function aoe:draw(cam)
+			cam:draw_world_rect(self.shape, 100, 100, 100, 100)
 		end
 
 		return aoe
 	end
 
 
-	function rogue:char_tick(entities)
+	function rogue:char_tick(frame)
 		self.q_cooldown = math.max(0, self.q_cooldown - 1)
 		self.w_cooldown = math.max(0, self.w_cooldown - 1)
 
@@ -48,24 +51,19 @@ return function (rogue)
 
 			self.q_cooldown = 100
 
-			local jump_x = self.inputs.mouse_x - self.x
-			local jump_y = self.inputs.mouse_y - self.y
+			local jump = vec_mod(self.inputs.mouse_x, self.inputs.mouse_y) - self.shape:center()
 
-			local l = math.sqrt(jump_x^2 + jump_y^2)
-			if l > MAX_JUMP then
-				jump_x = MAX_JUMP * jump_x / l
-				jump_y = MAX_JUMP * jump_y / l
+			if jump:length() > MAX_JUMP then
+				jump = jump:normalized() * MAX_JUMP
 			end
 
-			self.x = self.x + jump_x
-			self.y = self.y + jump_y
-
-			self.walk_target_x, self.walk_target_y = nil, nil
+			self.shape.center_vec = self.shape:center() + jump -- TODO danger!
+			self.walk_target = nil
 		end
 
 		if self.inputs.w and self.w_cooldown == 0 then
 			self.w_cooldown = 100
-			table.insert(entities, self:new_aoe())
+			table.insert(frame.entities, self:new_aoe())
 		end
 	end
 

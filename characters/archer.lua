@@ -1,3 +1,6 @@
+local rect_mod = require('space/rect')
+local vec_mod = require('space/vec')
+
 return function (archer)
 
 	archer.q_cooldown = 0
@@ -6,24 +9,21 @@ return function (archer)
 		local arrow = {}
 
 		arrow.owner = self
-		arrow.x = self.x
-		arrow.y = self.y
-		arrow.speed_x = self.inputs.mouse_x - self.x
-		arrow.speed_y = self.inputs.mouse_y - self.y
-		local l = math.sqrt(arrow.speed_x^2 + arrow.speed_y^2)
-		arrow.speed_x = 2 * arrow.speed_x / l
-		arrow.speed_y = 2 * arrow.speed_y / l
+		arrow.shape = rect_mod.by_center_and_size(
+			self.shape:center(),
+			vec_mod(4, 4)
+		)
+		arrow.speed = (vec_mod(self.inputs.mouse_x, self.inputs.mouse_y) - self.shape:center()):normalized() * 2
 
-		function arrow:tick(entities)
-			self.x = self.x + self.speed_x
-			self.y = self.y + self.speed_y
-			if self.x < 0 or self.x > 1000 or self.y < 0 or self.y > 1000 then
-				entities:remove(self)
+		function arrow:tick(frame)
+			self.shape.center_vec = self.shape:center() + self.speed -- TODO danger!
+			if not frame.map:rect():surrounds(self.shape) then
+				frame.entities:remove(self)
 			end
 
-			for key, entity in pairs(entities) do
+			for key, entity in pairs(frame.entities) do
 				if entity ~= self and entity ~= self.owner then
-					if math.abs(self.x - entity.x) < 10 and math.abs(self.y - entity.y) < 10 then
+					if self.shape:intersects(entity.shape) then
 						if entity.damage ~= nil then
 							entity:damage(10)
 							entities:remove(self)
@@ -34,19 +34,18 @@ return function (archer)
 
 		end
 
-		function arrow:draw()
-			love.graphics.setColor(0, 0, 255)
-			love.graphics.rectangle("fill", self.x - 2, self.y - 2, 4, 4)
+		function arrow:draw(cam)
+			cam:draw_world_rect(self.shape, 0, 0, 255)
 		end
 
 		return arrow
 	end
 
-	function archer:char_tick(entities)
+	function archer:char_tick(frame)
 		self.q_cooldown = math.max(0, self.q_cooldown - 1)
 		if self.inputs.q and self.q_cooldown == 0 then
 			self.q_cooldown = 100
-			table.insert(entities, self:new_arrow())
+			table.insert(frame.entities, self:new_arrow())
 		end
 	end
 

@@ -5,10 +5,14 @@ BACKTRACK_BALANCE_INTERVAL = 2000
 local game_mod = {}
 local frame_mod = require("game/frame")
 local calendar_mod = require("game/calendar")
+local cam_mod = require("space/cam")
+local vec_mod = require('space/vec')
+
 require("misc")
 
 function game_mod.new(chars, local_id)
 	local game = {}
+	game.cam = cam_mod.fixed(vec_mod(0, 0))
 	game.frame_history = {}
 	game.chars = chars
 	game.current_frame = frame_mod.initial(chars)
@@ -45,7 +49,7 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:update_local_calendar()
-		local changed_inputs = self.calendar:detect_changed_local_inputs()
+		local changed_inputs = self.calendar:detect_changed_local_inputs(self.cam)
 
 		if next(changed_inputs) == nil then return end
 
@@ -86,7 +90,7 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:draw()
-		self.current_frame:draw()
+		self.current_frame:draw(self.cam)
 	end
 
 	return game

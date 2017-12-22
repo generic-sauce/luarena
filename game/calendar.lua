@@ -1,3 +1,5 @@
+local vec_mod = require('space/vec')
+
 local calendar_mod = {} -- keeps track of the history of pressed keys for all players
 
 function calendar_mod.new(player_count, local_id)
@@ -13,8 +15,8 @@ function calendar_mod.new(player_count, local_id)
 			w={{value=false, frame_id=1}},
 			e={{value=false, frame_id=1}},
 			r={{value=false, frame_id=1}},
-			mouse_x={{value=0, frame_id=1}},
-			mouse_y={{value=0, frame_id=1}},
+			mouse_x={{value=0, frame_id=1}}, -- in world-coordinate
+			mouse_y={{value=0, frame_id=1}}, -- in world-coordinates
 			click={{value=false, frame_id=1}},
 			rclick={{value=false, frame_id=1}},
 		})
@@ -44,13 +46,17 @@ function calendar_mod.new(player_count, local_id)
 		end
 	end
 
-	function calendar:detect_changed_local_inputs()
+	function calendar:detect_changed_local_inputs(cam)
 		local inputs = {}
 		inputs.q = love.keyboard.isDown('q')
 		inputs.w = love.keyboard.isDown('w')
 		inputs.e = love.keyboard.isDown('e')
 		inputs.r = love.keyboard.isDown('r')
-		inputs.mouse_x, inputs.mouse_y = love.mouse.getPosition()
+
+		local mouse = vec_mod(love.mouse.getPosition())
+		mouse = cam:screen_to_world_vec(mouse)
+
+		inputs.mouse_x, inputs.mouse_y = mouse.x, mouse.y
 		inputs.click = love.mouse.isDown(1)
 		inputs.rclick = love.mouse.isDown(2)
 
