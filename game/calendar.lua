@@ -57,8 +57,14 @@ function calendar_mod.new(player_count, local_id)
 		mouse = cam:screen_to_world_vec(mouse)
 
 		inputs.mouse_x, inputs.mouse_y = mouse.x, mouse.y
-		inputs.click = love.mouse.isDown(1)
-		inputs.rclick = love.mouse.isDown(2)
+		local major, minor = love.getVersion()
+		if major == 0 and minor < 10 then
+			inputs.click = love.mouse.isDown("l")
+			inputs.rclick = love.mouse.isDown("r")
+		else
+			inputs.click = love.mouse.isDown(1)
+			inputs.rclick = love.mouse.isDown(2)
+		end
 
 		local old_inputs = self:read_inputs(self.local_id, nil)
 		local changed_inputs = {}
