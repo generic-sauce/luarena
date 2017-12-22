@@ -16,7 +16,7 @@ return function (archer)
 		arrow.speed = (vec_mod(self.inputs.mouse_x, self.inputs.mouse_y) - self.shape:center()):normalized() * 2
 
 		function arrow:tick(frame)
-			self.shape.center_vec = self.shape:center() + self.speed -- TODO danger!
+			self.shape = self.shape:with_center_keep_size(self.shape:center() + self.speed)
 			if not frame.map:rect():surrounds(self.shape) then
 				frame.entities:remove(self)
 			end

@@ -57,7 +57,7 @@ return function (rogue)
 				jump = jump:normalized() * MAX_JUMP
 			end
 
-			self.shape.center_vec = self.shape:center() + jump -- TODO danger!
+			self.shape = self.shape:with_center_keep_size(self.shape:center() + jump)
 			self.walk_target = nil
 		end
 

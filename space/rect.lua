@@ -1,3 +1,5 @@
+-- vectors are immutable atomic data structures, never access their members directly
+
 local vec_mod = require('space/vec')
 
 local rect_mod = {}
@@ -16,6 +18,20 @@ rect_mod.by_center_and_size = function(center, size)
 		center_vec = center,
 		size_vec = size
 	}, meta)
+
+	function rect:with_size_keep_center(size)
+		return rect_mod.by_center_and_size(
+			self:center(),
+			size
+		)
+	end
+
+	function rect:with_center_keep_size(center)
+		return rect_mod.by_center_and_size(
+			center,
+			self:size()
+		)
+	end
 
 	function rect:center() 
 		return self.center_vec

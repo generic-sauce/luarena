@@ -24,7 +24,7 @@ function new_player(char)
 		if self.walk_target ~= nil then
 			local move_vec = self.walk_target - self.shape:center()
 			if move_vec:length() < 1 then
-				self.shape.center_vec = self.walk_target -- TODO should be using a setter-method
+				self.shape = self.shape:with_center_keep_size(self.walk_target)
 				self.walk_target = nil
 			else
 				self.shape.center_vec = self.shape:center() + move_vec:normalized()

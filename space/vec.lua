@@ -1,4 +1,6 @@
-function vec_mod(x, y) 
+-- vectors are immutable atomic data structures, never access their members directly
+
+function vec_mod(x, y)
 	assert(x ~= nil)
 	assert(y ~= nil)
 
@@ -37,6 +39,14 @@ function vec_mod(x, y)
 
 	function v:length()
 		return math.sqrt(self.x^2 + self.y^2)
+	end
+
+	function v:with_x(x)
+		return vec_mod(x, self.y)
+	end
+
+	function v:with_y(y)
+		return vec_mod(self.x, y)
 	end
 
 	function v:normalized()
