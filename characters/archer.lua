@@ -13,7 +13,7 @@ return function (archer)
 			self.shape:center(),
 			vec_mod(4, 4)
 		)
-		arrow.speed = (vec_mod(self.inputs.mouse_x, self.inputs.mouse_y) - self.shape:center()):normalized() * 2
+		arrow.speed = (self.inputs.mouse - self.shape:center()):normalized() * 2
 
 		function arrow:tick(frame)
 			self.shape = self.shape:with_center_keep_size(self.shape:center() + self.speed)

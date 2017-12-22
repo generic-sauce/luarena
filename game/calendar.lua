@@ -15,7 +15,7 @@ function calendar_mod.new(player_count, local_id)
 			w={{value=false, frame_id=1}},
 			e={{value=false, frame_id=1}},
 			r={{value=false, frame_id=1}},
-			mouse_x={{value=0, frame_id=1}}, -- in world-coordinate
+			mouse_x={{value=0, frame_id=1}}, -- in world-coordinates
 			mouse_y={{value=0, frame_id=1}}, -- in world-coordinates
 			click={{value=false, frame_id=1}},
 			rclick={{value=false, frame_id=1}},
@@ -39,9 +39,17 @@ function calendar_mod.new(player_count, local_id)
 
 	function calendar:apply_to_frame(f, frame_id)
 		for i=1, player_count do
+			f.entities[i].inputs.mouse = vec_mod(-1, -1)
+
 			local inputs = self:read_inputs(i, frame_id)
 			for key, value in pairs(inputs) do
-				f.entities[i].inputs[key] = value
+				if key == "mouse_x" then
+					f.entities[i].inputs.mouse = f.entities[i].inputs.mouse:with_x(value)
+				elseif key == "mouse_y" then
+					f.entities[i].inputs.mouse = f.entities[i].inputs.mouse:with_y(value)
+				else
+					f.entities[i].inputs[key] = value
+				end
 			end
 		end
 	end

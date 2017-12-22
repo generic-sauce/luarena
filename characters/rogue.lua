@@ -51,7 +51,7 @@ return function (rogue)
 
 			self.q_cooldown = 100
 
-			local jump = vec_mod(self.inputs.mouse_x, self.inputs.mouse_y) - self.shape:center()
+			local jump = self.inputs.mouse - self.shape:center()
 
 			if jump:length() > MAX_JUMP then
 				jump = jump:normalized() * MAX_JUMP

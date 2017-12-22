@@ -10,7 +10,7 @@ function new_player(char)
 	)
 	player.health = 100
 	player.walk_target = nil
-	player.inputs = { q = false, w = false, e = false, r = false, mouse_x = 0, mouse_y = 0, click = false, rclick = false }
+	player.inputs = { q = false, w = false, e = false, r = false, mouse = vec_mod(-2, -2), click = false, rclick = false }
 
 	function player:damage(dmg)
 		self.health = math.max(0, self.health - dmg)
@@ -18,7 +18,7 @@ function new_player(char)
 
 	function player:tick(frame)
 		if self.inputs.rclick then
-			self.walk_target = vec_mod(self.inputs.mouse_x, self.inputs.mouse_y)
+			self.walk_target = self.inputs.mouse
 		end
 
 		if self.walk_target ~= nil then
