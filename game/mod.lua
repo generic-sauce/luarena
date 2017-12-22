@@ -12,10 +12,10 @@ require("misc")
 
 function game_mod.new(chars, local_id)
 	local game = {}
-	game.cam = cam_mod.fixed(vec_mod(0, 0))
+	game.current_frame = frame_mod.initial(chars)
+	game.cam = cam_mod.fixed(game.current_frame.map:rect():center())
 	game.frame_history = {}
 	game.chars = chars
-	game.current_frame = frame_mod.initial(chars)
 	game.calendar = calendar_mod.new(#chars, local_id)
 	game.local_id = local_id
 	game.start_time = love.timer.getTime()

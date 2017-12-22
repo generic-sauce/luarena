@@ -70,7 +70,7 @@ rect_mod.by_center_and_size = function(center, size)
 	end
 
 	function rect:intersects(r2)
-		return self:left() <= other_rect:right()
+		return self:left() <= r2:right()
 			and r2:left() <= self:right()
 			and self:top() <= r2:bottom()
 			and r2:top() >= self:bottom()

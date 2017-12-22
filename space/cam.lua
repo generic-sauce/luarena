@@ -7,7 +7,7 @@ return {
 
 		local cam = {
 			pos_vec = pos, -- in world coordinates
-			zoom = 3 -- world_length * zoom = pixel_length
+			zoom = 0.6 -- world_length * zoom = pixel_length
 		}
 
 		function cam:viewport() -- visible world-coordinates rect
