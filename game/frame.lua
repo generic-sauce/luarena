@@ -1,17 +1,21 @@
 local frame_mod = {}
 require("misc")
 
-function frame_mod.initial(chars)
-	local frame = {}
-	frame.entities = {}
-
-	function frame:remove_entity(entity)
-		for key, e in pairs(self.entities) do
-			if entity == e then
-				table.remove(self.entities, key)
+local entities_meta = {
+	__index = {
+		remove = function(self, entity)
+			for key, e in pairs(self) do
+				if entity == e then
+					table.remove(self, key)
+				end
 			end
 		end
-	end
+	}
+}
+
+function frame_mod.initial(chars)
+	local frame = {}
+	frame.entities = setmetatable({}, entities_meta)
 
 	for _, char in pairs(chars) do
 		table.insert(frame.entities, require('game/player')(char))
@@ -19,7 +23,7 @@ function frame_mod.initial(chars)
 
 	function frame:tick()
 		for _, entity in pairs(self.entities) do
-			entity:tick(self)
+			entity:tick(self.entities)
 		end
 	end
 
