@@ -1,7 +1,7 @@
 local rect_mod = require('space/rect')
 local vec_mod = require('space/vec')
 
-local cam_mod = {} -- a cam is just a viewport-generator; a viewport contains a rect in world coordinates
+local cam_mod = {} -- a cam is just a viewport-generator
 
 local function get_screen_size()
 	return vec_mod(love.graphics.getWidth(), love.graphics.getHeight())
