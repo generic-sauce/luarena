@@ -7,9 +7,17 @@ local function get_screen_size()
 	return vec_mod(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
-local function new_viewport(rect)
+local function new_viewport(pos, zoom)
 	local viewport = {}
-	viewport.rect = rect
+	viewport.pos = pos -- in world coordinates (center of view)
+	viewport.zoom = zoom -- world_length * zoom = pixel_length
+
+	function viewport:rect() -- in world coordinates
+		return rect_mod.by_center_and_size(
+			self.pos,
+			get_screen_size() / self.zoom
+		)
+	end
 
 	function viewport:draw_world_rect(world_rect, r, g, b, a)
 		local screen_rect = self:world_to_screen_rect(world_rect)
@@ -18,29 +26,18 @@ local function new_viewport(rect)
 	end
 
 	function viewport:world_to_screen_vec(vec)
-		local ret = vec - self.rect:left_top()
-		local screen_size = get_screen_size()
-		return ret
-			:with_x(ret.x * screen_size.x / self.rect:width())
-			:with_y(ret.y * screen_size.y / self.rect:height())
+		return (vec - self:rect():left_top()) * self.zoom
 	end
 
 	function viewport:screen_to_world_vec(vec)
-		local screen_size = get_screen_size()
-		return vec
-			:with_x(vec.x * self.rect:width() / screen_size.x)
-			:with_y(vec.y * self.rect:height() / screen_size.y)
-			+ self.rect:left_top()
+		return (vec / self.zoom) + self:rect():left_top()
 	end
 
 	function viewport:world_to_screen_rect(world_rect)
 		local size = world_rect:size()
-		local screen_size = get_screen_size()
 		return rect_mod.by_center_and_size(
 			self:world_to_screen_vec(world_rect:center()),
-			size
-				:with_x(size.x * screen_size.x / self.rect:width())
-				:with_y(size.y * screen_size.y / self.rect:height())
+			size * self.zoom
 		)
 	end
 
@@ -51,15 +48,15 @@ function cam_mod.fixed(pos)
 	assert(pos ~= nil)
 
 	local cam = {
-		pos_vec = pos, -- in world coordinates
-		zoom = 2 -- world_length * zoom = pixel_length
+		pos_vec = pos,
+		zoom = 2
 	}
 
 	function cam:viewport(frame)
-		return new_viewport(rect_mod.by_center_and_size(
+		return new_viewport(
 			self.pos_vec,
-			get_screen_size() / self.zoom
-		))
+			self.zoom
+		)
 	end
 
 	return cam
@@ -70,14 +67,14 @@ function cam_mod.following(entity_id)
 
 	local cam = {
 		entity_id = entity_id,
-		zoom = 2 -- world_length * zoom = pixel_length
+		zoom = 2
 	}
 
 	function cam:viewport(frame)
-		return new_viewport(rect_mod.by_center_and_size(
+		return new_viewport(
 			frame.entities[entity_id].shape:center(),
-			get_screen_size() / self.zoom
-		))
+			self.zoom
+		)
 	end
 
 	return cam
