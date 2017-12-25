@@ -16,8 +16,8 @@ function map_mod.new()
 		)
 	end
 
-	function map:draw(cam)
-		return cam:draw_world_rect(self:rect(), 70, 70, 0)
+	function map:draw(viewport)
+		return viewport:draw_world_rect(self:rect(), 70, 70, 0)
 	end
 
 	return map

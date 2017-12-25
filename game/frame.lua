@@ -30,10 +30,12 @@ function frame_mod.initial(chars)
 		end
 	end
 
-	function frame:draw(cam)
-		self.map:draw(cam)
+	function frame:draw(viewport)
+		assert(viewport ~= nil)
+
+		self.map:draw(viewport)
 		for _, entity in pairs(self.entities) do
-			entity:draw(cam)
+			entity:draw(viewport)
 		end
 	end
 

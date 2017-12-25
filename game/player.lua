@@ -36,12 +36,12 @@ function new_player(char)
 		end
 	end
 
-	function player:draw(cam)
-		cam:draw_world_rect(self.shape, 100, 100, 100)
+	function player:draw(viewport)
+		viewport:draw_world_rect(self.shape, 100, 100, 100)
 
 		local bar_offset = 10
 		local bar_height = 3
-		cam:draw_world_rect(rect_mod.by_left_top_and_size(
+		viewport:draw_world_rect(rect_mod.by_left_top_and_size(
 			self.shape:left_top() - vec_mod(0, bar_offset),
 			vec_mod(self.shape:size().x * self.health/100, bar_height)
 		), 255, 0, 0)

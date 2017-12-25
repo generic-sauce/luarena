@@ -34,8 +34,8 @@ return function (rogue)
 			end
 		end
 
-		function aoe:draw(cam)
-			cam:draw_world_rect(self.shape, 100, 100, 100, 100)
+		function aoe:draw(viewport)
+			viewport:draw_world_rect(self.shape, 100, 100, 100, 100)
 		end
 
 		return aoe

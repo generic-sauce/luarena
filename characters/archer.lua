@@ -34,8 +34,8 @@ return function (archer)
 
 		end
 
-		function arrow:draw(cam)
-			cam:draw_world_rect(self.shape, 0, 0, 255)
+		function arrow:draw(viewport)
+			viewport:draw_world_rect(self.shape, 0, 0, 255)
 		end
 
 		return arrow

@@ -54,7 +54,7 @@ function calendar_mod.new(player_count, local_id)
 		end
 	end
 
-	function calendar:detect_changed_local_inputs(cam)
+	function calendar:detect_changed_local_inputs(viewport)
 		local inputs = {}
 		inputs.q = love.keyboard.isDown('q')
 		inputs.w = love.keyboard.isDown('w')
@@ -62,7 +62,7 @@ function calendar_mod.new(player_count, local_id)
 		inputs.r = love.keyboard.isDown('r')
 
 		local mouse = vec_mod(love.mouse.getPosition())
-		mouse = cam:screen_to_world_vec(mouse)
+		mouse = viewport:screen_to_world_vec(mouse)
 
 		inputs.mouse_x, inputs.mouse_y = mouse.x, mouse.y
 		local major, minor = love.getVersion()

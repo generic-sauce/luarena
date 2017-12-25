@@ -13,7 +13,9 @@ require("misc")
 function game_mod.new(chars, local_id)
 	local game = {}
 	game.current_frame = frame_mod.initial(chars)
-	game.cam = cam_mod.fixed(game.current_frame.map:rect():center())
+	game.cam = -- choose one:
+			cam_mod.following(local_id)
+			-- cam_mod.fixed(game.current_frame.map:rect():center())
 	game.frame_history = {}
 	game.chars = chars
 	game.calendar = calendar_mod.new(#chars, local_id)
@@ -49,7 +51,8 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:update_local_calendar()
-		local changed_inputs = self.calendar:detect_changed_local_inputs(self.cam)
+		local viewport = self.cam:viewport(self.current_frame)
+		local changed_inputs = self.calendar:detect_changed_local_inputs(viewport)
 
 		if next(changed_inputs) == nil then return end
 
@@ -90,7 +93,8 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:draw()
-		self.current_frame:draw(self.cam)
+		local viewport = self.cam:viewport(self.current_frame)
+		self.current_frame:draw(viewport)
 	end
 
 	return game
