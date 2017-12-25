@@ -13,11 +13,11 @@ function new_node()
 	return node
 end
 
-function new_server(char, port)
+local function new_server(char, port)
 	return require("lobbymaster/server")(new_node(), char, port)
 end
 
-function new_client(char, server_ip, server_port)
+local function new_client(char, server_ip, server_port)
 	return require("lobbymaster/client")(new_node(), char, server_ip, server_port)
 end
 
