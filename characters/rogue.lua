@@ -6,7 +6,7 @@ return function (rogue)
 	rogue.q_cooldown = 0
 	rogue.w_cooldown = 0
 
-	function rogue:new_aoe()
+	function rogue:new_aoe(frame)
 		local aoe = {}
 
 		aoe.owner = self
@@ -16,27 +16,28 @@ return function (rogue)
 		)
 		aoe.life_counter = 100
 
-		function aoe:tick(frame)
-			if self.life_counter == 100 then
-				for key, entity in pairs(frame.entities) do
-					if entity ~= self
-						and entity ~= self.owner
-						and self.shape:intersects(entity.shape)
-						and entity.damage ~= nil then
-							entity:damage(20)
-					end
+		function aoe:initial_damage(frame)
+			for _, entity in pairs(frame:find_colliders(self.shape)) do
+				if entity ~= self
+					and entity ~= self.owner
+					and entity.damage ~= nil then
+						entity:damage(20)
 				end
 			end
+		end
 
+		function aoe:tick(frame)
 			self.life_counter = self.life_counter - 1
 			if self.life_counter <= 0 then
-				frame.entities:remove(self)
+				frame:remove(self)
 			end
 		end
 
 		function aoe:draw(viewport)
 			viewport:draw_world_rect(self.shape, 100, 100, 100, 100)
 		end
+
+		aoe:initial_damage(frame)
 
 		return aoe
 	end
@@ -63,7 +64,7 @@ return function (rogue)
 
 		if self.inputs.w and self.w_cooldown == 0 then
 			self.w_cooldown = 100
-			table.insert(frame.entities, self:new_aoe())
+			frame:add(self:new_aoe(frame))
 		end
 	end
 

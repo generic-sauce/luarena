@@ -1,3 +1,20 @@
+function table.remove_val(t, val)
+	for k, v in pairs(t) do
+		if v == val then
+			table.remove(t, k)
+		end
+	end
+end
+
+function table.contains(t, val)
+	for k, v in pairs(t) do
+		if v == val then
+			return true
+		end
+	end
+	return false
+end
+
 function stringify(t)
 	if type(t) == "function" then
 		return "<function>"
