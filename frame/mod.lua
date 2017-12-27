@@ -21,7 +21,7 @@ function frame_mod.initial(chars)
 	frame.entities = setmetatable({}, entities_meta)
 
 	for _, char in pairs(chars) do
-		table.insert(frame.entities, require('game/player')(char))
+		table.insert(frame.entities, require('frame/player')(char))
 	end
 
 	function frame:tick()

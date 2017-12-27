@@ -53,6 +53,14 @@ function vec_mod(x, y)
 		return self / self:length()
 	end
 
+	function v:cropped_to(l)
+		if self:length() > l then
+			return self:normalized() * l
+		else
+			return self
+		end
+	end
+
 	return v
 end
 

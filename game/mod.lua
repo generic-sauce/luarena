@@ -3,7 +3,7 @@ INPUT_DELAY = 10
 BACKTRACK_BALANCE_INTERVAL = 2000
 
 local game_mod = {}
-local frame_mod = require("game/frame")
+local frame_mod = require("frame/mod")
 local calendar_mod = require("game/calendar")
 local cam_mod = require("space/cam")
 local vec_mod = require('space/vec')
