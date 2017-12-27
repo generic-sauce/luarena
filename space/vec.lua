@@ -61,6 +61,10 @@ function vec_mod(x, y)
 		end
 	end
 
+	function v:with_length(l)
+		return self:normalized() * l
+	end
+
 	return v
 end
 

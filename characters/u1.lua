@@ -22,7 +22,7 @@ return function (u1)
 	local R_COOLDOWN = 75
 	local R_DAMAGE = 15
 	local R_DAMAGE_ADD = 15
-	local R_RANGE = 30
+	local R_RANGE = 50
 
 	u1.state = nil
 	u1.dagger_list = {}
@@ -39,7 +39,7 @@ return function (u1)
 		self.walk_target = nil
 		self.q_cooldown = Q_COOLDOWN
 		self.state = "q"
-		table.insert(frame.entities, blade)
+		frame:add(blade)
 
 		blade.owner = self
 		blade.start_center = self.shape:center()
@@ -50,25 +50,20 @@ return function (u1)
 		blade.speed = (self.inputs.mouse - self.shape:center()):normalized()
 
 		function blade:remove_self(frame)
-			frame.entities:remove(self)
+			frame:remove(self)
 			self.owner.state = nil
+		end
+
+		function blade:on_enter_collider(frame, e)
+			if e ~= self.owner and e.damage ~= nil then
+				e:damage(Q_DAMAGE)
+			end
 		end
 
 		function blade:tick(frame)
 			self.shape = self.shape:with_center_keep_size(self.shape:center() + self.speed)
 			if (self.start_center - self.shape:center()):length() > Q_RANGE or not frame.map:rect():surrounds(self.shape) then
 				self:remove_self(frame)
-			end
-
-			for key, entity in pairs(frame.entities) do
-				if entity ~= self and entity ~= self.owner then
-					if self.shape:intersects(entity.shape) then
-						if entity.damage ~= nil then
-							entity:damage(Q_DAMAGE)
-							self:remove_self(frame)
-						end
-					end
-				end
 			end
 
 		end
@@ -87,29 +82,27 @@ return function (u1)
 		dagger.landed = false
 
 		self.w_cooldown = W_COOLDOWN
-		table.insert(frame.entities, dagger)
-
 		dagger.owner = self
 		dagger.shape = rect_mod.by_center_and_size(
 			self.shape:center() + (self.inputs.mouse - self.shape:center()):cropped_to(W_RANGE),
 			vec_mod(3, 3)
 		)
 
+		frame:add(dagger)
+
 		function dagger:land(frame)
 			self.landed = true
 			if #self.owner.dagger_list == W_MAX_DAGGERS then
-				frame.entities:remove(self.owner.dagger_list[1])
+				frame:remove(self.owner.dagger_list[1])
 				table.remove(self.owner.dagger_list, 1)
 			end
 			table.insert(self.owner.dagger_list, self)
 
-			for key, entity in pairs(frame.entities) do
-				if entity ~= self.owner and entity ~= self then
-					if self.shape:intersects(entity.shape) then
-						if entity.damage ~= nil then
-							entity:damage(W_DAMAGE)
-						end
-					end
+			for key, entity in pairs(frame:find_colliders(self.shape)) do
+				if entity ~= self.owner
+					and entity ~= self
+					and entity.damage ~= nil then
+					entity:damage(W_DAMAGE)
 				end
 			end
 		end
@@ -122,7 +115,7 @@ return function (u1)
 		end
 
 		function dagger:draw(viewport)
-			if self.timer == 0 then
+			if self.landed then
 				-- render dagger
 				viewport:draw_world_rect(self.shape, 200, 200, 255)
 			else
@@ -142,7 +135,7 @@ return function (u1)
 		for _, dagger in pairs(self.dagger_list) do
 			if closest == nil or (dagger.shape:center() - self.inputs.mouse):length() < (closest.shape:center() - self.inputs.mouse):length() then
 				closest = dagger
-			end
+		end
 		end
 		if closest ~= nil then
 			self.e_cooldown = E_COOLDOWN
@@ -151,32 +144,42 @@ return function (u1)
 		end
 	end
 
-	function u1:mk_r_aoe(dmg)
+	function u1:mk_r_aoe(frame)
 		local aoe = {}
 
 		aoe.owner = self
 		aoe.shape = rect_mod.by_center_and_size(
 			self.shape:center(),
-			vec_mod(1, 1):cropped_to(R_RANGE)
+			vec_mod(1, 1) * R_RANGE
 		)
 		aoe.life_counter = 80
-		aoe.dmg = dmg
 
-		function aoe:tick(frame)
-			if self.life_counter == 100 then
-				for key, entity in pairs(frame.entities) do
-					if entity ~= self
-						and entity ~= self.owner
-						and self.shape:intersects(entity.shape)
-						and entity.damage ~= nil then
-							entity:damage(self.dmg)
-					end
+		function aoe:initial_damage(frame)
+			local dmg = R_DAMAGE
+			local colliders = frame:find_colliders(self.shape)
+
+			for _, dagger in pairs(self.owner.dagger_list) do
+				if dagger.landed and table.contains(colliders, dagger) then
+					frame:remove(dagger)
+					table.remove_val(self.owner.dagger_list, dagger)
+					table.remove_val(colliders, dagger)
+					dmg = dmg + R_DAMAGE_ADD
 				end
 			end
 
+			for _, entity in pairs(colliders) do
+				if entity ~= self
+					and entity ~= self.owner
+					and entity.damage ~= nil then
+						entity:damage(dmg)
+				end
+			end
+		end
+
+		function aoe:tick(frame)
 			self.life_counter = self.life_counter - 1
 			if self.life_counter <= 0 then
-				frame.entities:remove(self)
+				frame:remove(self)
 			end
 		end
 
@@ -184,26 +187,30 @@ return function (u1)
 			viewport:draw_world_rect(self.shape, 100, 100, 100, 100)
 		end
 
+		aoe:initial_damage(frame)
+
 		return aoe
 	end
 
 
 	function u1:use_r_skill(frame)
-		local dmg = R_DAMAGE
-
 		self.r_cooldown = R_COOLDOWN
 
-		for i, dagger in pairs(self.dagger_list) do
-			print(i)
-			if (self.shape:center() - dagger.shape:center()):length() < R_RANGE then
-				dmg = dmg + R_DAMAGE_ADD
-				frame.entities:remove(dagger)
-				table.remove(self.dagger_list, i)
-			end
-		end
+		local aoe = self:mk_r_aoe(frame)
+		frame:add(aoe)
+	end
 
-		local aoe = self:mk_r_aoe(dmg)
-		table.insert(frame.entities, aoe)
+	function u1:on_enter_collider(frame, e)
+		if self.state == "e-dash" then
+			for _, entity in pairs(frame.entities) do
+				if entity ~= self
+				and self.shape:intersects(entity.shape)
+				and entity.damage ~= nil then
+					entity:damage(E_DAMAGE)
+				end
+			end
+
+		end
 	end
 
 	function u1:char_tick(frame)
@@ -235,15 +242,6 @@ return function (u1)
 		end
 
 		if self.state == "e-dash" then
-			for key, entity in pairs(frame.entities) do
-				if entity ~= self
-				and self.shape:intersects(entity.shape)
-				and entity.damage ~= nil then
-					-- TODO prevent multiple damage to same target!
-					entity:damage(E_DAMAGE)
-				end
-			end
-
 			if self.walk_target == nil then
 				-- dash already there
 				self.state = nil
@@ -252,6 +250,7 @@ return function (u1)
 				self.shape = self.shape:with_center_keep_size(self.shape:center() + move_vec:cropped_to(E_DASH_SPEED))
 			end
 		end
+
 	end
 
 	function u1:draw(viewport)
