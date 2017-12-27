@@ -52,11 +52,7 @@ return function (rogue)
 
 			self.q_cooldown = 100
 
-			local jump = self.inputs.mouse - self.shape:center()
-
-			if jump:length() > MAX_JUMP then
-				jump = jump:normalized() * MAX_JUMP
-			end
+			local jump = (self.inputs.mouse - self.shape:center()):cropped_to(MAX_JUMP)
 
 			self.shape = self.shape:with_center_keep_size(self.shape:center() + jump)
 			self.walk_target = nil
