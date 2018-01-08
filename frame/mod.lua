@@ -29,6 +29,10 @@ function frame_mod.initial(chars)
 			table.insert(self.inactive_tasks, {task=task, status="delay"})
 		end
 
+		function entity:remove_task(task) -- only works for active tasks
+			table.remove_val(self.tasks, task)
+		end
+
 		table.insert(self.entities, entity)
 	end
 

@@ -68,19 +68,19 @@ return function(frame)
 				if is_in_relation(entity.tasks, task.task, "prevent") then
 					table.remove(entity.inactive_tasks, key)
 					if task.task.on_prevent ~= nil then
-						task.task:on_prevent(self)
+						task.task:on_prevent(entity, self)
 					end
 				elseif not is_in_relation(entity.tasks, task, "delay") then
 					table.remove(entity.inactive_tasks, key)
 					table.insert(entity.tasks, task.task)
 					if task.task.init ~= nil then
-						task.task:init(self)
+						task.task:init(entity, self)
 					end
 
 					for _, partner in pairs(get_relation_partners("cancel")) do
 						table.remove_val(entity.tasks, partner)
 						if partner.on_cancel ~= nil then
-							partner:on_cancel(self)
+							partner:on_cancel(entity, self)
 						end
 					end
 
@@ -88,14 +88,16 @@ return function(frame)
 						table.remove_val(entity.tasks, partner)
 						table.insert(entity.inactive_tasks, {status="pause", task=partner})
 						if partner.on_pause ~= nil then
-							partner:on_pause(self)
+							partner:on_pause(entity, self)
 						end
 					end
 				end
 			end
 
 			for _, task in pairs(entity.tasks) do
-				task:tick(self)
+				if task.tick ~= nil then
+					task:tick(entity, self)
+				end
 			end
 		end
 	end
