@@ -14,7 +14,7 @@ local function generate_walk_task(walk_target)
 			entity.shape = entity.shape:with_center_keep_size(self.walk_target)
 			entity:remove_task(self)
 		else
-			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(WALKSPEED)
+			entity.shape = entity.shape:with_center_keep_size(entity.shape:center() + move_vec:with_length(WALKSPEED))
 		end
 	end
 
