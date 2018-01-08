@@ -1,5 +1,7 @@
 require('misc')
 
+local task_mod = {}
+
 local TASK_TYPEMAP = {
 	skill = {},
 	move = {},
@@ -56,12 +58,18 @@ local TASK_RELATION = build_task_relation({
 assert("cancel" == TASK_RELATION['walk']['walk'])
 
 local function get_relation_partners(tasks, task, rel)
-	assert(task.type ~= nil)
+	assert(task.types ~= nil, "get_relation_partners(): task.types == nil")
 
 	local partners = {}
 	for _, active_task in pairs(tasks) do
-		if active_task ~= task and TASK_RELATION[active_task.type][task.type] == rel then
-			table.insert(partners, active_task)
+		assert(active_task.types ~= nil, "get_relation_partners(): active_task.types == nil")
+		for _, t in pairs(task.types) do
+			for _, active_t in pairs(active_task.types) do
+				if active_task ~= task and TASK_RELATION[active_t][t] == rel
+					and not table.contains(partners, active_task) then
+					table.insert(partners, active_task)
+				end
+			end
 		end
 	end
 	return partners
@@ -71,7 +79,7 @@ local function is_in_relation(tasks, task, rel)
 	return #get_relation_partners(tasks, task, rel) > 0
 end
 
-return function(frame)
+function task_mod.init_frame(frame)
 	function frame:tick_tasks()
 		for _, entity in pairs(self.entities) do
 			for key, task in pairs(entity.inactive_tasks) do
@@ -111,6 +119,29 @@ return function(frame)
 			end
 		end
 	end
-
-	return frame
 end
+
+function task_mod.init_entity(entity)
+	assert(entity.tasks == nil)
+	entity.tasks = {}
+	assert(entity.inactive_tasks == nil)
+	entity.inactive_tasks = {}
+
+	function entity:add_task(task)
+		table.insert(self.inactive_tasks, {task=task, status="delay"})
+	end
+
+	function entity:remove_task(task) -- only works for active tasks
+		table.remove_val(self.tasks, task)
+	end
+
+	function entity:get_tasks_by_types(types)
+		assert(false, "TODO")
+	end
+
+	function entity:has_tasks_by_types(types)
+		return #self:get_tasks_by_types(types) > 0
+	end
+end
+
+return task_mod

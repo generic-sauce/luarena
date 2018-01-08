@@ -1,16 +1,19 @@
 local map_mod = require('map')
-local task_mod = require('frame/task')
 local collision_mod = require('frame/collision')
+local task_mod = require('frame/task')
 
 local frame_mod = {}
 require("misc")
 
 function frame_mod.initial(chars)
-	local frame = task_mod(collision_mod({}))
+	local frame = {}
 	frame.map = map_mod.new()
 	frame.entities = {}
 
 	function frame:init(chars)
+		collision_mod.init_frame(self)
+		task_mod.init_frame(self)
+
 		for _, char in pairs(chars) do
 			self:add(require('frame/player')(char))
 		end
@@ -19,21 +22,8 @@ function frame_mod.initial(chars)
 	function frame:add(entity)
 		assert(entity ~= nil)
 
-		assert(entity.colliders == nil)
-		entity.colliders = {}
-
-		assert(entity.tasks == nil)
-		entity.tasks = {}
-		assert(entity.inactive_tasks == nil)
-		entity.inactive_tasks = {}
-
-		function entity:add_task(task)
-			table.insert(self.inactive_tasks, {task=task, status="delay"})
-		end
-
-		function entity:remove_task(task) -- only works for active tasks
-			table.remove_val(self.tasks, task)
-		end
+		collision_mod.init_entity(entity)
+		task_mod.init_entity(entity)
 
 		table.insert(self.entities, entity)
 	end

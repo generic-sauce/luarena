@@ -6,7 +6,7 @@ WALKSPEED = 0.7
 local function generate_walk_task(walk_target)
 	assert(walk_target ~= nil)
 
-	local task = {walk_target = walk_target, type = "walk"}
+	local task = {walk_target = walk_target, types = {"walk"}}
 
 	function task:tick(entity, frame)
 		local move_vec = self.walk_target - entity.shape:center()

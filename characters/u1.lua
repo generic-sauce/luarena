@@ -34,7 +34,7 @@ return function (u1)
 	function u1:use_q_skill(frame)
 		local u1 = self
 
-		local task = { type = "channel" }
+		local task = { types = {"channel"} }
 
 		function task:init(u1, frame)
 			local task = self
@@ -97,7 +97,7 @@ return function (u1)
 	function u1:use_w_skill(frame)
 		local u1 = self
 
-		local task = { type = "skill" }
+		local task = { types = {"skill"} }
 
 		function task:init(u1, frame)
 			local task = self
@@ -161,7 +161,7 @@ return function (u1)
 	function u1:use_e_skill(frame)
 		local u1 = self
 
-		local task = { type = "walk" }
+		local task = { types = {"walk", "skill"} }
 
 		function task:init(u1, frame)
 			local task = self
@@ -186,7 +186,7 @@ return function (u1)
 
 			local move_vec = task.walk_target - u1.shape:center()
 			if move_vec:length() < E_JUMP_RANGE then
-				local dash_task = { type = "dash" }
+				local dash_task = { types = {"dash", "skill"} }
 
 				dash_task.dash_target = task.walk_target
 
@@ -276,7 +276,7 @@ return function (u1)
 	function u1:use_r_skill(frame)
 		local u1 = self
 
-		local task = { type = "skill" }
+		local task = { types = {"skill"} }
 
 		function task:init()
 			self.r_cooldown = R_COOLDOWN

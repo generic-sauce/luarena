@@ -1,3 +1,5 @@
+local collision_mod = {}
+
 local function call_on_exit_collider(entity, frame, collider)
 	if entity.on_exit_collider ~= nil then
 		entity:on_exit_collider(frame, collider)
@@ -22,8 +24,7 @@ local function call_on_enter_collider(entity, frame, collider)
 	end
 end
 
-return function(frame)
-
+function collision_mod.init_frame(frame)
 	function frame:find_colliders(shape)
 		local colliders = {}
 		for _, e in pairs(self.entities) do
@@ -33,7 +34,6 @@ return function(frame)
 		end
 		return colliders
 	end
-
 
 	function frame:update_colliders()
 		for _, e1 in pairs(self.entities) do
@@ -62,6 +62,11 @@ return function(frame)
 			entity:tick(self)
 		end
 	end
-
-	return frame
 end
+
+function collision_mod.init_entity(entity)
+	assert(entity.colliders == nil)
+	entity.colliders = {}
+end
+
+return collision_mod
