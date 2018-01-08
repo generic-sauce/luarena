@@ -14,7 +14,7 @@ local function find_subclasses(type)
 	local subs = {type}
 	for sub, sub_supers in pairs(TASK_TYPEMAP) do
 		if table.contains(sub_supers, type) then
-			for _, subsub in find_subclasses(sub) do
+			for _, subsub in pairs(find_subclasses(sub)) do
 				if not table.contains(subs, subsub) then
 					table.insert(subs, subsub)
 				end
