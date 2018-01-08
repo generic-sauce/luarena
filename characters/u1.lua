@@ -59,8 +59,10 @@ return function (u1)
 				frame:remove(blade)
 			end
 
-			function blade:on_enter_collider(u1, frame, e)
-				if e ~= u1 and e.damage ~= nil then
+			function blade:on_enter_collider(frame, e)
+				local blade = self
+
+				if e ~= blade.u1 and e.damage ~= nil then
 					e:damage(Q_DAMAGE)
 				end
 			end
