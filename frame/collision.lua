@@ -1,3 +1,27 @@
+local function call_on_exit_collider(entity, frame, collider)
+	if entity.on_exit_collider ~= nil then
+		entity:on_exit_collider(frame, collider)
+	end
+
+	for _, task in pairs(entity.tasks) do
+		if task.on_exit_collider ~= nil then
+			task:on_exit_collider(entity, frame, collider)
+		end
+	end
+end
+
+local function call_on_enter_collider(entity, frame, collider)
+	if entity.on_enter_collider ~= nil then
+		entity:on_enter_collider(frame, collider)
+	end
+
+	for _, task in pairs(entity.tasks) do
+		if task.on_enter_collider ~= nil then
+			task:on_enter_collider(entity, frame, collider)
+		end
+	end
+end
+
 return function(frame)
 
 	function frame:find_colliders(shape)
@@ -10,21 +34,22 @@ return function(frame)
 		return colliders
 	end
 
+
 	function frame:update_colliders()
 		for _, e1 in pairs(self.entities) do
 			for _, e2 in pairs(self.entities) do
 				if e1 ~= e2 and e1.shape ~= nil and e2.shape ~= nil then
 					local colliding = e1.shape:intersects(e2.shape)
 					if table.contains(e1.colliders, e2) and not colliding then
-						if e1.on_exit_collider ~= nil then e1:on_exit_collider(self, e2) end
-						if e2.on_exit_collider ~= nil then e2:on_exit_collider(self, e1) end
 						table.remove_val(e1.colliders, e2)
 						table.remove_val(e2.colliders, e1)
+						call_on_exit_collider(e1, self, e2)
+						call_on_exit_collider(e2, self, e1)
 					elseif not table.contains(e1.colliders, e2) and colliding then
-						if e1.on_enter_collider ~= nil then e1:on_enter_collider(self, e2) end
-						if e2.on_enter_collider ~= nil then e2:on_enter_collider(self, e1) end
 						table.insert(e1.colliders, e2)
 						table.insert(e2.colliders, e1)
+						call_on_enter_collider(e1, self, e2)
+						call_on_enter_collider(e2, self, e1)
 					end
 				end
 			end
