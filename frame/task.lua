@@ -33,10 +33,14 @@ local function build_task_relation(syntaxed_task_relation)
 	end
 
 	for _, entry in pairs(syntaxed_task_relation) do
-		for _, oldsub in pairs(find_subclasses(entry.old)) do
-			for _, newsub in pairs(find_subclasses(entry.new)) do
-				assert(out[oldsub][newsub] == "none") -- or out[oldsub][newsub] == entry.relation
-				out[oldsub][newsub] = entry.relation
+		for _, old in pairs(entry.old) do
+			for _, new in pairs(entry.new) do
+				for _, oldsub in pairs(find_subclasses(old)) do
+					for _, newsub in pairs(find_subclasses(new)) do
+						assert(out[oldsub][newsub] == "none") -- or out[oldsub][newsub] == entry.relation
+						out[oldsub][newsub] = entry.relation
+					end
+				end
 			end
 		end
 	end
@@ -46,10 +50,7 @@ end
 
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
-	{old = "walk", new = "walk", relation = "cancel"},
-	{old = "walk", new = "channel", relation = "cancel"},
-	{old = "channel", new = "walk", relation = "cancel"},
-	{old = "channel", new = "channel", relation = "cancel"},
+	{old = {"walk", "channel"}, new = {"walk", "channel"}, relation = "cancel"}
 })
 
 assert("cancel" == TASK_RELATION['walk']['walk'])
