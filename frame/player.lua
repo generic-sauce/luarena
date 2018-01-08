@@ -1,20 +1,20 @@
 local rect_mod = require("space/rect")
 local vec_mod = require('space/vec')
 
+WALKSPEED = 0.7
+
 local function generate_walk_task(walk_target)
 	assert(walk_target ~= nil)
-
-	local MOVESPEED = 0.7
 
 	local task = {walk_target = walk_target, type = "walk"}
 
 	function task:tick(entity, frame)
 		local move_vec = self.walk_target - entity.shape:center()
-		if move_vec:length() < MOVESPEED then
+		if move_vec:length() < WALKSPEED then
 			entity.shape = entity.shape:with_center_keep_size(self.walk_target)
 			entity:remove_task(self)
 		else
-			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(MOVESPEED)
+			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(WALKSPEED)
 		end
 	end
 

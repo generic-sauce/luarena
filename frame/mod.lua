@@ -17,6 +17,8 @@ function frame_mod.initial(chars)
 	end
 
 	function frame:add(entity)
+		assert(entity ~= nil)
+
 		assert(entity.colliders == nil)
 		entity.colliders = {}
 

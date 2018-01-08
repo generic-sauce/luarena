@@ -1,9 +1,11 @@
 require('misc')
 
 local TASK_TYPEMAP = {
+	skill = {},
 	move = {},
 	walk = {"move"},
-	dash = {"move"}
+	dash = {"move"},
+	channel = {"skill"}
 }
 
 local function find_subclasses(type)
@@ -44,7 +46,10 @@ end
 
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
-	{old = "walk", new = "walk", relation = "cancel"}
+	{old = "walk", new = "walk", relation = "cancel"},
+	{old = "walk", new = "channel", relation = "cancel"},
+	{old = "channel", new = "walk", relation = "cancel"},
+	{old = "channel", new = "channel", relation = "cancel"},
 })
 
 assert("cancel" == TASK_RELATION['walk']['walk'])
