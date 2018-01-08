@@ -21,14 +21,16 @@ local function find_subclasses(type)
 end
 
 local function build_task_relation(syntaxed_task_relation)
-	local submeta = { __index = function () return "none" end }
+	local out = {}
 
-	local out = setmetatable({}, { __index = function () return setmetatable({}, submeta) end })
-	for _, entry in pairs(syntaxed_task_relation) do
-		if out[entry.old] == nil then
-			out[entry.old] = setmetatable({}, submeta)
+	for k, _ in pairs(TASK_TYPEMAP) do
+		out[k] = {}
+		for k2, _ in pairs(TASK_TYPEMAP) do
+			out[k][k2] = "none"
 		end
+	end
 
+	for _, entry in pairs(syntaxed_task_relation) do
 		for _, oldsub in pairs(find_subclasses(entry.old)) do
 			for _, newsub in pairs(find_subclasses(entry.new)) do
 				assert(out[oldsub][newsub] == "none") -- or out[oldsub][newsub] == entry.relation
@@ -42,24 +44,26 @@ end
 
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
-	{old = "dash", new = "dash", relation = "delay"},
 	{old = "walk", new = "walk", relation = "cancel"}
 })
 
-local function is_in_relation(tasks, task, rel)
-	return #get_relation_partners(tasks, task, rel) > 0
-end
+assert("cancel" == TASK_RELATION['walk']['walk'])
 
 local function get_relation_partners(tasks, task, rel)
+	assert(task.type ~= nil)
+
 	local partners = {}
 	for _, active_task in pairs(tasks) do
-		if TASK_RELATION[active_task.type][task.type] == rel then
+		if active_task ~= task and TASK_RELATION[active_task.type][task.type] == rel then
 			table.insert(partners, active_task)
 		end
 	end
 	return partners
 end
 
+local function is_in_relation(tasks, task, rel)
+	return #get_relation_partners(tasks, task, rel) > 0
+end
 
 return function(frame)
 	function frame:tick_tasks()
@@ -70,21 +74,21 @@ return function(frame)
 					if task.task.on_prevent ~= nil then
 						task.task:on_prevent(entity, self)
 					end
-				elseif not is_in_relation(entity.tasks, task, "delay") then
+				elseif not is_in_relation(entity.tasks, task.task, "delay") then
 					table.remove(entity.inactive_tasks, key)
 					table.insert(entity.tasks, task.task)
-					if task.task.init ~= nil then
+					if task.task.init ~= nil and task.status == "delay" then
 						task.task:init(entity, self)
 					end
 
-					for _, partner in pairs(get_relation_partners("cancel")) do
+					for _, partner in pairs(get_relation_partners(entity.tasks, task.task, "cancel")) do
 						table.remove_val(entity.tasks, partner)
 						if partner.on_cancel ~= nil then
 							partner:on_cancel(entity, self)
 						end
 					end
 
-					for _, partner in pairs(get_relation_partners("pause")) do
+					for _, partner in pairs(get_relation_partners(entity.tasks, task.task, "pause")) do
 						table.remove_val(entity.tasks, partner)
 						table.insert(entity.inactive_tasks, {status="pause", task=partner})
 						if partner.on_pause ~= nil then

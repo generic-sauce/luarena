@@ -1,17 +1,34 @@
 local rect_mod = require("space/rect")
 local vec_mod = require('space/vec')
 
+local function generate_walk_task(walk_target)
+	assert(walk_target ~= nil)
+
+	local MOVESPEED = 0.7
+
+	local task = {walk_target = walk_target, type = "walk"}
+
+	function task:tick(entity, frame)
+		local move_vec = self.walk_target - entity.shape:center()
+		if move_vec:length() < MOVESPEED then
+			entity.shape = entity.shape:with_center_keep_size(self.walk_target)
+			entity:remove_task(self)
+		else
+			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(MOVESPEED)
+		end
+	end
+
+	return task
+end
+
 function new_player(char)
 	local player = {}
-
-	local MOVESPEED = 0.5 -- in world coordinates per tick()
 
 	player.shape = rect_mod.by_center_and_size(
 		vec_mod(0, 0),
 		vec_mod(10, 10)
 	)
 	player.health = 100
-	player.walk_target = nil
 	player.inputs = { q = false, w = false, e = false, r = false, mouse = vec_mod(-2, -2), click = false, rclick = false }
 
 	function player:damage(dmg)
@@ -20,17 +37,7 @@ function new_player(char)
 
 	function player:tick(frame)
 		if self.inputs.rclick then
-			self.walk_target = self.inputs.mouse
-		end
-
-		if self.walk_target ~= nil then
-			local move_vec = self.walk_target - self.shape:center()
-			if move_vec:length() < MOVESPEED then
-				self.shape = self.shape:with_center_keep_size(self.walk_target)
-				self.walk_target = nil
-			else
-				self.shape.center_vec = self.shape:center() + move_vec:with_length(MOVESPEED)
-			end
+			self:add_task(generate_walk_task(self.inputs.mouse))
 		end
 
 		if self.char_tick ~= nil then
