@@ -159,7 +159,7 @@ return function (u1)
 	function u1:use_e_skill(frame)
 		local u1 = self
 
-		local task = { type = "skill" }
+		local task = { type = "walk" }
 
 		function task:init(u1, frame)
 			local task = self
@@ -175,7 +175,6 @@ return function (u1)
 				u1:remove_task(task)
 			else
 				task.walk_target = closest.shape:center()
-				print("go!")
 				u1.e_cooldown = E_COOLDOWN
 			end
 		end
