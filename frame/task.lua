@@ -7,7 +7,9 @@ local TASK_TYPEMAP = {
 	move = {},
 	walk = {"move"},
 	dash = {"move"},
-	channel = {"skill"}
+	channel = {"skill"},
+	riven_q = {"skill"},
+	riven_q_dash = {"dash"}
 }
 
 local function find_subclasses(type)
@@ -52,7 +54,8 @@ end
 
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
-	{old = {"walk", "channel"}, new = {"walk", "channel"}, relation = "cancel"}
+	{old = {"walk", "channel"}, new = {"walk", "channel"}, relation = "cancel"},
+	{old = {"walk"}, new = {"dash"}, relation = "cancel"}
 })
 
 assert("cancel" == TASK_RELATION['walk']['walk'])

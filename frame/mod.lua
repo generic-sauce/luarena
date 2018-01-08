@@ -25,6 +25,18 @@ function frame_mod.initial(chars)
 		collision_mod.init_entity(entity)
 		task_mod.init_entity(entity)
 
+		function entity:get_tasks(type)
+			local tasks = {}
+
+			for _, task in pairs(self.tasks) do
+				if task.type == type then
+					table.insert(tasks, task)
+				end
+			end
+
+			return tasks
+		end
+
 		table.insert(self.entities, entity)
 	end
 
