@@ -118,6 +118,8 @@ return function (u1)
 			frame:add(dagger)
 
 			function dagger:land(frame)
+				local dagger = self
+
 				self.landed = true
 				if #self.u1.dagger_list == W_MAX_DAGGERS then
 					frame:remove(self.u1.dagger_list[1])
@@ -135,21 +137,25 @@ return function (u1)
 			end
 
 			function dagger:tick(frame)
-				self.timer = math.max(0, dagger.timer - 1)
-				if self.timer == 0 and not self.landed then
+				local dagger = self
+
+				dagger.timer = math.max(0, dagger.timer - 1)
+				if dagger.timer == 0 and not dagger.landed then
 					dagger:land(frame)
 				end
 			end
 
 			function dagger:draw(viewport)
-				if self.landed then
+				local dagger = self
+
+				if dagger.landed then
 					-- render dagger
-					viewport:draw_world_rect(self.shape, 200, 200, 255)
+					viewport:draw_world_rect(dagger.shape, 200, 200, 255)
 				else
 					-- render shadow
 					viewport:draw_world_rect(rect_mod.by_center_and_size(
-						self.shape:center(),
-						self.shape:size() * 3
+						dagger.shape:center(),
+						dagger.shape:size() * 3
 					), 40, 40, 40, 80)
 				end
 			end
@@ -203,6 +209,8 @@ return function (u1)
 				end
 
 				function dash_task:on_enter_collider(u1, frame, entity)
+					local dash_task = self
+
 					if entity ~= u1 and entity.damage ~= nil then
 						entity:damage(E_DAMAGE)
 					end
@@ -264,6 +272,8 @@ return function (u1)
 		end
 
 		function aoe:draw(viewport)
+			local aoe = self
+
 			viewport:draw_world_rect(self.shape, 100, 100, 100, 100)
 		end
 
@@ -276,10 +286,12 @@ return function (u1)
 	function u1:use_r_skill(frame)
 		local u1 = self
 
-		local task = { types = {"skill"}, u1 = u1 }
+		local task = { types = {"skill"} }
 
-		function task:init()
-			self.u1.r_cooldown = R_COOLDOWN
+		function task:init(u1, frame)
+			local task = self
+
+			u1.r_cooldown = R_COOLDOWN
 
 			local aoe = u1:mk_r_aoe(frame)
 			frame:add(aoe)
@@ -289,6 +301,8 @@ return function (u1)
 	end
 
 	function u1:char_tick(frame)
+		local u1 = self
+
 		self.q_cooldown = math.max(0, self.q_cooldown - 1)
 		self.w_cooldown = math.max(0, self.w_cooldown - 1)
 		self.e_cooldown = math.max(0, self.e_cooldown - 1)
@@ -312,6 +326,8 @@ return function (u1)
 	end
 
 	function u1:draw(viewport)
+		local u1 = self
+
 		local alpha = nil
 		if self.state == "q" then
 			alpha = 100
@@ -329,6 +345,8 @@ return function (u1)
 	end
 
 	function u1:damage(dmg)
+		local u1 = self
+
 		-- TODO don't apply damage, while q-task is active!
 		self.health = math.max(0, self.health - dmg)
 	end
