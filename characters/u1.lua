@@ -276,10 +276,10 @@ return function (u1)
 	function u1:use_r_skill(frame)
 		local u1 = self
 
-		local task = { types = {"skill"} }
+		local task = { types = {"skill"}, u1 = u1 }
 
 		function task:init()
-			self.r_cooldown = R_COOLDOWN
+			self.u1.r_cooldown = R_COOLDOWN
 
 			local aoe = u1:mk_r_aoe(frame)
 			frame:add(aoe)
