@@ -26,7 +26,7 @@ function new_player(char)
 
 	player.shape = rect_mod.by_center_and_size(
 		vec_mod(0, 0),
-		vec_mod(10, 10)
+		vec_mod(20, 20)
 	)
 	player.health = 100
 	player.inputs = { q = false, w = false, e = false, r = false, mouse = vec_mod(-2, -2), click = false, rclick = false }
