@@ -20,7 +20,7 @@ function frame_mod.initial(chars)
 	end
 
 	function frame:add(entity)
-		assert(entity ~= nil)
+		assert(entity)
 
 		collision_mod.init_entity(entity)
 		task_mod.init_entity(entity)
@@ -31,8 +31,8 @@ function frame_mod.initial(chars)
 	function frame:remove(entity)
 		for _, e in pairs(self.entities) do
 			if table.contains(e.colliders, entity) then
-				if e.on_exit_collider ~= nil then e:on_exit_collider(self, entity) end
 				table.remove_val(e.colliders, entity)
+				collision_mod.call_on_exit_collider(e, self, entity)
 			end
 		end
 		table.remove_val(self.entities, entity)
@@ -44,7 +44,7 @@ function frame_mod.initial(chars)
 	end
 
 	function frame:draw(viewport)
-		assert(viewport ~= nil)
+		assert(viewport)
 
 		self.map:draw(viewport)
 		for _, entity in pairs(self.entities) do

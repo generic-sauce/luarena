@@ -15,6 +15,35 @@ function table.contains(t, val)
 	return false
 end
 
+function table.insert_once(t, val)
+	if not table.contains(t, val) then
+		table.insert(t, val)
+	end
+end
+
+function table.intersection(t1, t2) -- only call with arrays
+	local out = {}
+	for _, v in pairs(t1) do
+		if table.contains(t2, v) then
+			table.insert(out, v)
+		end
+	end
+	return out
+end
+
+function table.union(t1, t2) -- only call with arrays
+	local out = {}
+	for _, v in pairs(t1) do
+		table.insert(out, v)
+	end
+	for _, v in pairs(t2) do
+		table.insert_once(out, v)
+	end
+	return out
+end
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 function stringify(t)
 	if type(t) == "function" then
 		return "<function>"

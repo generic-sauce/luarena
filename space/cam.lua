@@ -45,7 +45,7 @@ local function new_viewport(pos, zoom)
 end
 
 function cam_mod.fixed(pos)
-	assert(pos ~= nil)
+	assert(pos)
 
 	local cam = {
 		pos_vec = pos,
@@ -63,7 +63,7 @@ function cam_mod.fixed(pos)
 end
 
 function cam_mod.following(entity_id)
-	assert(entity_id ~= nil)
+	assert(entity_id)
 
 	local cam = {
 		entity_id = entity_id,

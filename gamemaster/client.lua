@@ -19,7 +19,7 @@ function new_clientmaster(networker, chars, local_id)
 			self:apply_input_changes(p.inputs, p.player_id, p.frame_id)
 		elseif p.tag == "avg_backtrack" then
 			local avg = self.balancer:pop_avg()
-			if p.avg_backtrack ~= nil and avg ~= nil then
+			if p.avg_backtrack and avg then
 				self.start_time = self.start_time + FRAME_DURATION * (avg - p.avg_backtrack)/2
 			end
 		else

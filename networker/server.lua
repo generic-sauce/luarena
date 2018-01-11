@@ -31,11 +31,11 @@ return function(event_handler, port)
 
 			if event.type == "connect" then
 				table.insert(self.clients, event.peer)
-				if self.event_handler.on_client_connects ~= nil then
+				if self.event_handler.on_client_connects then
 					self.event_handler:on_client_connects()
 				end
 			elseif event.type == "receive" then
-				if self.event_handler.on_recv ~= nil then
+				if self.event_handler.on_recv then
 					self.event_handler:on_recv(json.decode(event.data))
 				end
 			else

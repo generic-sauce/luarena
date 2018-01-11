@@ -83,7 +83,7 @@ function game_mod.new(chars, local_id)
 
 		local current_time = love.timer.getTime()
 		while #self.frame_history * FRAME_DURATION < current_time - self.start_time do
-			if self.gamemaster_update ~= nil then
+			if self.gamemaster_update then
 				self:gamemaster_update()
 			end
 

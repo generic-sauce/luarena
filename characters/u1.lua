@@ -57,7 +57,7 @@ return function (u1)
 			function blade:on_enter_collider(frame, e)
 				local blade = self
 
-				if e ~= blade.u1 and e.damage ~= nil then
+				if e ~= blade.u1 and e.damage then
 					e:damage(Q_DAMAGE)
 				end
 			end
@@ -134,8 +134,8 @@ return function (u1)
 				for key, entity in pairs(frame:find_colliders(self.shape)) do
 					if entity ~= self.u1
 						and entity ~= self
-						and entity.damage ~= nil then
-						entity:damage(W_DAMAGE)
+						and entity.damage then
+							entity:damage(W_DAMAGE)
 					end
 				end
 			end
@@ -215,7 +215,7 @@ return function (u1)
 				function dash_task:on_enter_collider(u1, frame, entity)
 					local dash_task = self
 
-					if entity ~= u1 and entity.damage ~= nil then
+					if entity ~= u1 and entity.damage then
 						entity:damage(E_DAMAGE)
 					end
 				end
@@ -260,7 +260,7 @@ return function (u1)
 			for _, entity in pairs(colliders) do
 				if entity ~= aoe
 					and entity ~= aoe.u1
-					and entity.damage ~= nil then
+					and entity.damage then
 						entity:damage(dmg)
 				end
 			end

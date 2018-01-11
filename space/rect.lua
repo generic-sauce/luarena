@@ -5,8 +5,8 @@ local vec_mod = require('space/vec')
 local rect_mod = {}
 
 rect_mod.by_center_and_size = function(center, size)
-	assert(center ~= nil)
-	assert(size ~= nil)
+	assert(center)
+	assert(size)
 
 	local meta = {
 		__tostring = function(self)

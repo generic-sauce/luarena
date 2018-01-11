@@ -36,7 +36,7 @@ function new_servermaster(chars, networker)
 		if #self.frame_history % BACKTRACK_BALANCE_INTERVAL then
 			for i, balancer in pairs(self.balancer_list) do
 				local avg = balancer:pop_avg()
-				if avg ~= nil then
+				if avg then
 					self.networker.clients[i]:send(json.encode({
 						tag = "avg_backtrack",
 						avg_backtrack = avg

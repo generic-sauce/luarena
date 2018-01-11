@@ -4,7 +4,7 @@ local vec_mod = require('space/vec')
 WALKSPEED = 0.7
 
 local function generate_walk_task(walk_target)
-	assert(walk_target ~= nil)
+	assert(walk_target)
 
 	local task = {walk_target = walk_target, class = "walk"}
 
@@ -40,7 +40,7 @@ function new_player(char)
 			self:add_task(generate_walk_task(self.inputs.mouse))
 		end
 
-		if self.char_tick ~= nil then
+		if self.char_tick then
 			self:char_tick(frame)
 		end
 	end

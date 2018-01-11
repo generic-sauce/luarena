@@ -25,9 +25,7 @@ local function find_superclasses(class)
 	local superclasses = {class}
 	for _, super in pairs(TASK_CLASSMAP[class]) do
 		for _, nested_super in pairs(find_superclasses(super)) do
-			if not table.contains(superclasses, nested_super) then -- necessary? -- I guess so, you wouldn't like having the same class in `superclasses` multiple times
-				table.insert(superclasses, nested_super)
-			end
+			table.insert_once(superclasses, nested_super)
 		end
 	end
 	return superclasses
@@ -38,9 +36,7 @@ local function find_subclasses(class)
 	for sub, sub_supers in pairs(TASK_CLASSMAP) do
 		if table.contains(sub_supers, class) then
 			for _, subsub in pairs(find_subclasses(sub)) do
-				if not table.contains(subs, subsub) then
-					table.insert(subs, subsub)
-				end
+				table.insert_once(subs, subsub)
 			end
 		end
 	end
@@ -82,14 +78,13 @@ local TASK_RELATION = build_task_relation({
 assert("cancel" == TASK_RELATION['walk']['walk'])
 
 local function get_relation_partners(tasks, task, rel)
-	assert(task.class ~= nil, "get_relation_partners(): task.class == nil")
+	assert(task.class, "get_relation_partners(): task.class == nil")
 
 	local partners = {}
 	for _, active_task in pairs(tasks) do
-		assert(active_task.class ~= nil, "get_relation_partners(): active_task.class == nil")
-		if active_task ~= task and TASK_RELATION[active_task.class][task.class] == rel
-			and not table.contains(partners, active_task) then
-			table.insert(partners, active_task)
+		assert(active_task.class, "get_relation_partners(): active_task.class == nil")
+		if active_task ~= task and TASK_RELATION[active_task.class][task.class] == rel then
+			table.insert_once(partners, active_task)
 		end
 	end
 	return partners
@@ -105,19 +100,19 @@ function task_mod.init_frame(frame)
 			for key, task in pairs(entity.inactive_tasks) do
 				if is_in_relation(entity.tasks, task.task, "prevent") then
 					table.remove(entity.inactive_tasks, key)
-					if task.task.on_prevent ~= nil then
+					if task.task.on_prevent then
 						task.task:on_prevent(entity, self)
 					end
 				elseif not is_in_relation(entity.tasks, task.task, "delay") then
 					table.remove(entity.inactive_tasks, key)
 					table.insert(entity.tasks, task.task)
-					if task.task.init ~= nil and task.status == "delay" then
+					if task.task.init and task.status == "delay" then
 						task.task:init(entity, self)
 					end
 
 					for _, partner in pairs(get_relation_partners(entity.tasks, task.task, "cancel")) do
 						table.remove_val(entity.tasks, partner)
-						if partner.on_cancel ~= nil then
+						if partner.on_cancel then
 							partner:on_cancel(entity, self)
 						end
 					end
@@ -125,7 +120,7 @@ function task_mod.init_frame(frame)
 					for _, partner in pairs(get_relation_partners(entity.tasks, task.task, "pause")) do
 						table.remove_val(entity.tasks, partner)
 						table.insert(entity.inactive_tasks, {status="pause", task=partner})
-						if partner.on_pause ~= nil then
+						if partner.on_pause then
 							partner:on_pause(entity, self)
 						end
 					end
@@ -133,7 +128,7 @@ function task_mod.init_frame(frame)
 			end
 
 			for _, task in pairs(entity.tasks) do
-				if task.tick ~= nil then
+				if task.tick then
 					task:tick(entity, self)
 				end
 			end
@@ -163,9 +158,7 @@ function task_mod.init_entity(entity)
 			for _, task_super_class in pairs(find_superclasses(task.class)) do
 				for _, super_class in pairs(superclasses) do
 					if super_class == task_super_class then
-						if not table.contains(tasks, task) then
-							table.insert(tasks, task)
-						end
+						table.insert_once(tasks, task)
 					end
 				end
 			end

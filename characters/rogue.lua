@@ -20,7 +20,7 @@ return function (rogue)
 			for _, entity in pairs(frame:find_colliders(self.shape)) do
 				if entity ~= self
 					and entity ~= self.owner
-					and entity.damage ~= nil then
+					and entity.damage then
 						entity:damage(20)
 				end
 			end

@@ -1,8 +1,8 @@
 -- vectors are immutable atomic data structures, never access their members directly
 
 function vec_mod(x, y)
-	assert(x ~= nil)
-	assert(y ~= nil)
+	assert(x)
+	assert(y)
 
 	local meta = {}
 	function meta:__index(i)

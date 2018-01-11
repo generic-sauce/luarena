@@ -26,11 +26,11 @@ return function(event_handler, server_ip, server_port)
 			if event == nil then break end
 
 			if event.type == "connect" then
-				if self.event_handler.on_connect ~= nil then
+				if self.event_handler.on_connect then
 					self.event_handler:on_connect()
 				end
 			elseif event.type == "receive" then
-				if self.event_handler.on_recv ~= nil then
+				if self.event_handler.on_recv then
 					self.event_handler:on_recv(json.decode(event.data))
 				end
 			else

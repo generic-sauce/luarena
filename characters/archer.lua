@@ -16,7 +16,7 @@ return function (archer)
 		arrow.speed = (self.inputs.mouse - self.shape:center()):normalized() * 2
 
 		function arrow:on_enter_collider(frame, e)
-			if e.damage ~= nil and e ~= self.owner then
+			if e.damage and e ~= self.owner then
 				e:damage(20)
 				frame:remove(self)
 			end
