@@ -10,15 +10,15 @@ local Q_DASH_DISTANCE = 50
 local Q_DASH_SPEED = 2
 local Q_ATTACK_DAMAGE = 10
 
-local function generate_attack_area(entity, timeout, relative_position, size)
-	local attack = {}
-	attack.owner = entity
-	attack.shape = rect_mod.by_center_and_size(
+local function generate_relative_area(entity, timeout, relative_position, size)
+	local area = {}
+	area.owner = entity
+	area.shape = rect_mod.by_center_and_size(
 		entity.shape:center() + relative_position,
 		size)
-	attack.timeout = timeout
+	area.timeout = timeout
 
-	function attack:tick(frame)
+	function area:tick(frame)
 		self.timeout = math.max(0, self.timeout - 1)
 
 		if self.timeout == 0 then
@@ -28,11 +28,11 @@ local function generate_attack_area(entity, timeout, relative_position, size)
 		end
 	end
 
-	function attack:draw(viewport)
+	function area:draw(viewport)
 		viewport:draw_world_rect(self.shape, 0, 0, 255)
 	end
 
-	return attack
+	return area
 end
 
 local function generate_q_task()
@@ -59,7 +59,7 @@ local function generate_q_dash_task(dash_target)
 	local task = {types = {"riven_q_dash"}, dash_target = dash_target }
 
 	function task:init(entity, frame)
-		local attack = generate_attack_area(
+		local attack = generate_relative_area(
 			entity,
 			Q_DASH_DISTANCE / Q_DASH_SPEED,
 			(self.dash_target - entity.shape:center()):with_length(10),
