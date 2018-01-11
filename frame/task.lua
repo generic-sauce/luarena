@@ -12,11 +12,23 @@ local TASK_TYPEMAP = {
 	riven_q_dash = {"dash"}
 }
 
-local function find_subclasses(type)
+local function find_supertypes(type)
+	local type_supers = {type}
+	for _, super in pairs(TASK_TYPEMAP[type]) do
+		for _, nested_super in pairs(find_supertypes(super)) do
+			if not table.contains(type_supers, nested_super) then -- necessary?
+				table.insert(type_supers, nested_super)
+			end
+		end
+	end
+	return type_supers
+end
+
+local function find_subtypes(type)
 	local subs = {type}
 	for sub, sub_supers in pairs(TASK_TYPEMAP) do
 		if table.contains(sub_supers, type) then
-			for _, subsub in pairs(find_subclasses(sub)) do
+			for _, subsub in pairs(find_subtypes(sub)) do
 				if not table.contains(subs, subsub) then
 					table.insert(subs, subsub)
 				end
@@ -39,8 +51,8 @@ local function build_task_relation(syntaxed_task_relation)
 	for _, entry in pairs(syntaxed_task_relation) do
 		for _, old in pairs(entry.old) do
 			for _, new in pairs(entry.new) do
-				for _, oldsub in pairs(find_subclasses(old)) do
-					for _, newsub in pairs(find_subclasses(new)) do
+				for _, oldsub in pairs(find_subtypes(old)) do
+					for _, newsub in pairs(find_subtypes(new)) do
 						assert(out[oldsub][newsub] == "none") -- or out[oldsub][newsub] == entry.relation
 						out[oldsub][newsub] = entry.relation
 					end
@@ -139,7 +151,21 @@ function task_mod.init_entity(entity)
 	end
 
 	function entity:get_tasks_by_types(types)
-		assert(false, "TODO")
+		local tasks = {}
+		for _, task in pairs(self.tasks) do
+			for _, task_type in pairs(task.types) do
+				for _, task_super_type in pairs(find_supertypes(task_type)) do
+					for _, type in pairs(types) do
+						if type == task_super_type then
+							if not table.contains(tasks, task) then
+								table.insert(tasks, task)
+							end
+						end
+					end
+				end
+			end
+		end
+		return tasks
 	end
 
 	function entity:has_tasks_by_types(types)
