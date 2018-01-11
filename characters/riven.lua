@@ -8,6 +8,35 @@ local Q_DASH_COOLDOWN = 70
 local Q_DASH_INSTANCES = 3
 local Q_DASH_DISTANCE = 50
 local Q_DASH_SPEED = 2
+local Q_ATTACK_DAMAGE = 20
+
+local function generate_attack_area(entity, timeout, relative_position, size)
+	local attack = {}
+	attack.owner = entity
+	attack.shape = rect_mod.by_center_and_size(
+		entity.shape:center() + relative_position,
+		size)
+	attack.timeout = timeout
+
+	function attack:tick(frame)
+		self.timeout = math.max(0, self.timeout - 1)
+
+		if self.timeout == 0 then
+			frame:remove(self)
+		else
+			self.shape = self.shape:with_center_keep_size(entity.shape:center() + relative_position)
+		end
+		print("generate_attack_area tick")
+	end
+
+	function attack:draw(viewport)
+		viewport:draw_world_rect(self.shape, 0, 0, 255)
+		print("generate_attack_area draw")
+	end
+
+	print("generate_attack_area")
+	return attack
+end
 
 local function generate_q_task()
 	local task = {type = "riven_q",
@@ -31,6 +60,25 @@ local function generate_q_dash_task(dash_target)
 	assert(dash_target ~= nil)
 
 	local task = {type = "riven_q_dash", dash_target = dash_target }
+
+	function task:init(entity, frame)
+		local attack = generate_attack_area(
+			entity,
+			Q_DASH_DISTANCE / Q_DASH_SPEED,
+			(self.dash_target - entity.shape:center()):with_length(10),
+			vec_mod(16, 16))
+
+		function attack:on_enter_collider(frame, entity)
+			if entity.damage ~= nil and entity ~= self.owner then
+				entity:damage(Q_ATTACK_DAMAGE)
+				print("generate_attack_area deal damange")
+			end
+
+			print("generate_attack_area on_enter_collider")
+		end
+
+		frame:add(attack)
+	end
 
 	function task:tick(entity, frame)
 		local move_vec = self.dash_target - entity.shape:center()
