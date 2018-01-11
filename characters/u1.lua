@@ -34,7 +34,7 @@ return function (u1)
 	function u1:use_q_skill(frame)
 		local u1 = self
 
-		local task = { types = {"channel"} }
+		local task = { class = "u1_q" }
 
 		function task:init(u1, frame)
 			local task = self
@@ -45,6 +45,7 @@ return function (u1)
 			task.blade = blade
 
 			blade.u1 = u1
+			blade.alive = true
 
 			blade.start_center = u1.shape:center()
 			blade.shape = rect_mod.by_center_and_size(
@@ -52,12 +53,6 @@ return function (u1)
 				vec_mod(4, 4)
 			)
 			blade.speed = (u1.inputs.mouse - u1.shape:center()):normalized()
-
-			function blade:remove_self(frame)
-				local blade = self
-
-				frame:remove(blade)
-			end
 
 			function blade:on_enter_collider(frame, e)
 				local blade = self
@@ -72,7 +67,8 @@ return function (u1)
 
 				blade.shape = blade.shape:with_center_keep_size(blade.shape:center() + blade.speed)
 				if (blade.start_center - blade.shape:center()):length() > Q_RANGE or not frame.map:rect():surrounds(blade.shape) then
-					blade:remove_self(frame)
+					frame:remove(blade)
+					blade.alive = false
 				end
 			end
 
@@ -83,6 +79,14 @@ return function (u1)
 			end
 
 			frame:add(blade)
+		end
+
+		function task:tick(entity, frame)
+			local task = self
+
+			if not task.blade.alive then
+				entity:remove_task(task)
+			end
 		end
 
 		function task:on_cancel(entity, frame)
@@ -97,7 +101,7 @@ return function (u1)
 	function u1:use_w_skill(frame)
 		local u1 = self
 
-		local task = { types = {"skill"} }
+		local task = { class = "u1_w" }
 
 		function task:init(u1, frame)
 			local task = self
@@ -167,7 +171,7 @@ return function (u1)
 	function u1:use_e_skill(frame)
 		local u1 = self
 
-		local task = { types = {"walk", "skill"} }
+		local task = { class = "u1_e_walk" }
 
 		function task:init(u1, frame)
 			local task = self
@@ -192,7 +196,7 @@ return function (u1)
 
 			local move_vec = task.walk_target - u1.shape:center()
 			if move_vec:length() < E_JUMP_RANGE then
-				local dash_task = { types = {"dash", "skill"} }
+				local dash_task = { class = "u1_e_dash" }
 
 				dash_task.dash_target = task.walk_target
 
@@ -286,7 +290,7 @@ return function (u1)
 	function u1:use_r_skill(frame)
 		local u1 = self
 
-		local task = { types = {"skill"} }
+		local task = { class = "u1_r" }
 
 		function task:init(u1, frame)
 			local task = self
@@ -329,7 +333,7 @@ return function (u1)
 		local u1 = self
 
 		local alpha = nil
-		if self.state == "q" then
+		if u1:has_tasks_by_class("u1_q") then
 			alpha = 100
 		else
 			alpha = 255
@@ -347,8 +351,9 @@ return function (u1)
 	function u1:damage(dmg)
 		local u1 = self
 
-		-- TODO don't apply damage, while q-task is active!
-		self.health = math.max(0, self.health - dmg)
+		if not u1:has_tasks_by_class("u1_q") then
+			self.health = math.max(0, self.health - dmg)
+		end
 	end
 
 	return u1

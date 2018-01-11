@@ -36,7 +36,7 @@ local function generate_relative_area(entity, timeout, relative_position, size)
 end
 
 local function generate_q_task()
-	local task = {types = {"riven_q"},
+	local task = {class = "riven_q",
 		instances = Q_DASH_INSTANCES,
 		dash_cooldown = Q_DASH_COOLDOWN,
 		timeout = Q_TIMEOUT}
@@ -56,7 +56,7 @@ end
 local function generate_q_dash_task(dash_target)
 	assert(dash_target ~= nil)
 
-	local task = {types = {"riven_q_dash"}, dash_target = dash_target }
+	local task = {class = "riven_q_dash", dash_target = dash_target }
 
 	function task:init(entity, frame)
 		local attack = generate_relative_area(
@@ -99,7 +99,7 @@ return function (character)
 		self.q_cooldown = math.max(0, self.q_cooldown - 1)
 
 		if self.inputs.q then
-			local q_tasks = self:get_tasks_by_types({"riven_q"})
+			local q_tasks = self:get_tasks_by_class("riven_q")
 			assert(not (#q_tasks > 1))
 
 			if #q_tasks == 1 then

@@ -2,33 +2,42 @@ require('misc')
 
 local task_mod = {}
 
-local TASK_TYPEMAP = {
+local TASK_CLASSMAP = {
 	skill = {},
 	move = {},
 	walk = {"move"},
 	dash = {"move"},
 	channel = {"skill"},
+
 	riven_q = {"skill"},
-	riven_q_dash = {"dash"}
+	riven_q_dash = {"dash"},
+
+	u1_q = {"skill"},
+	u1_w = {"skill"},
+	u1_e_walk = {"skill", "walk"},
+	u1_e_dash = {"skill", "dash"},
+	u1_r = {"skill"}
 }
 
-local function find_supertypes(type)
-	local type_supers = {type}
-	for _, super in pairs(TASK_TYPEMAP[type]) do
-		for _, nested_super in pairs(find_supertypes(super)) do
-			if not table.contains(type_supers, nested_super) then -- necessary?
-				table.insert(type_supers, nested_super)
+local function find_superclasses(class)
+	assert(type(class) == "string", "find_superclasses(): class is not string!")
+
+	local superclasses = {class}
+	for _, super in pairs(TASK_CLASSMAP[class]) do
+		for _, nested_super in pairs(find_superclasses(super)) do
+			if not table.contains(superclasses, nested_super) then -- necessary? -- I guess so, you wouldn't like having the same class in `superclasses` multiple times
+				table.insert(superclasses, nested_super)
 			end
 		end
 	end
-	return type_supers
+	return superclasses
 end
 
-local function find_subtypes(type)
-	local subs = {type}
-	for sub, sub_supers in pairs(TASK_TYPEMAP) do
-		if table.contains(sub_supers, type) then
-			for _, subsub in pairs(find_subtypes(sub)) do
+local function find_subclasses(class)
+	local subs = {class}
+	for sub, sub_supers in pairs(TASK_CLASSMAP) do
+		if table.contains(sub_supers, class) then
+			for _, subsub in pairs(find_subclasses(sub)) do
 				if not table.contains(subs, subsub) then
 					table.insert(subs, subsub)
 				end
@@ -41,9 +50,9 @@ end
 local function build_task_relation(syntaxed_task_relation)
 	local out = {}
 
-	for k, _ in pairs(TASK_TYPEMAP) do
+	for k, _ in pairs(TASK_CLASSMAP) do
 		out[k] = {}
-		for k2, _ in pairs(TASK_TYPEMAP) do
+		for k2, _ in pairs(TASK_CLASSMAP) do
 			out[k][k2] = "none"
 		end
 	end
@@ -51,8 +60,8 @@ local function build_task_relation(syntaxed_task_relation)
 	for _, entry in pairs(syntaxed_task_relation) do
 		for _, old in pairs(entry.old) do
 			for _, new in pairs(entry.new) do
-				for _, oldsub in pairs(find_subtypes(old)) do
-					for _, newsub in pairs(find_subtypes(new)) do
+				for _, oldsub in pairs(find_subclasses(old)) do
+					for _, newsub in pairs(find_subclasses(new)) do
 						assert(out[oldsub][newsub] == "none") -- or out[oldsub][newsub] == entry.relation
 						out[oldsub][newsub] = entry.relation
 					end
@@ -67,24 +76,20 @@ end
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
 	{old = {"walk", "channel"}, new = {"walk", "channel"}, relation = "cancel"},
-	{old = {"walk"}, new = {"dash"}, relation = "cancel"}
+	{old = {"walk"}, new = {"riven_q_dash" --[[ I think not all dashes should cancel walking]]}, relation = "cancel"}
 })
 
 assert("cancel" == TASK_RELATION['walk']['walk'])
 
 local function get_relation_partners(tasks, task, rel)
-	assert(task.types ~= nil, "get_relation_partners(): task.types == nil")
+	assert(task.class ~= nil, "get_relation_partners(): task.class == nil")
 
 	local partners = {}
 	for _, active_task in pairs(tasks) do
-		assert(active_task.types ~= nil, "get_relation_partners(): active_task.types == nil")
-		for _, t in pairs(task.types) do
-			for _, active_t in pairs(active_task.types) do
-				if active_task ~= task and TASK_RELATION[active_t][t] == rel
-					and not table.contains(partners, active_task) then
-					table.insert(partners, active_task)
-				end
-			end
+		assert(active_task.class ~= nil, "get_relation_partners(): active_task.class == nil")
+		if active_task ~= task and TASK_RELATION[active_task.class][task.class] == rel
+			and not table.contains(partners, active_task) then
+			table.insert(partners, active_task)
 		end
 	end
 	return partners
@@ -150,16 +155,16 @@ function task_mod.init_entity(entity)
 		table.remove_val(self.tasks, task)
 	end
 
-	function entity:get_tasks_by_types(types)
+	function entity:get_tasks_by_class(class)
+		local superclasses = find_superclasses(class)
+
 		local tasks = {}
 		for _, task in pairs(self.tasks) do
-			for _, task_type in pairs(task.types) do
-				for _, task_super_type in pairs(find_supertypes(task_type)) do
-					for _, type in pairs(types) do
-						if type == task_super_type then
-							if not table.contains(tasks, task) then
-								table.insert(tasks, task)
-							end
+			for _, task_super_class in pairs(find_superclasses(task.class)) do
+				for _, super_class in pairs(superclasses) do
+					if super_class == task_super_class then
+						if not table.contains(tasks, task) then
+							table.insert(tasks, task)
 						end
 					end
 				end
@@ -168,8 +173,8 @@ function task_mod.init_entity(entity)
 		return tasks
 	end
 
-	function entity:has_tasks_by_types(types)
-		return #self:get_tasks_by_types(types) > 0
+	function entity:has_tasks_by_class(class)
+		return #self:get_tasks_by_class(class) > 0
 	end
 end
 
