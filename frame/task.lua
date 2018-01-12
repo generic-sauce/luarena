@@ -151,15 +151,11 @@ function task_mod.init_entity(entity)
 	end
 
 	function entity:get_tasks_by_class(class)
-		local superclasses = find_superclasses(class)
-
 		local tasks = {}
 		for _, task in pairs(self.tasks) do
 			for _, task_super_class in pairs(find_superclasses(task.class)) do
-				for _, super_class in pairs(superclasses) do
-					if super_class == task_super_class then
-						table.insert_once(tasks, task)
-					end
+				if class == task_super_class then
+					table.insert_once(tasks, task)
 				end
 			end
 		end
