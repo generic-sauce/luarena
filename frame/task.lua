@@ -8,9 +8,12 @@ local TASK_CLASSMAP = {
 	walk = {"move"},
 	dash = {"move"},
 	channel = {"skill"},
+	stun = {},
 
 	riven_q = {"skill"},
-	riven_q_dash = {"dash"},
+	riven_q_dash = {"skill", "dash"},
+	riven_w = {"skill"},
+	riven_w_stun = {"stun"},
 
 	u1_q = {"skill"},
 	u1_w = {"skill"},
@@ -58,7 +61,7 @@ local function build_task_relation(syntaxed_task_relation)
 			for _, new in pairs(entry.new) do
 				for _, oldsub in pairs(find_subclasses(old)) do
 					for _, newsub in pairs(find_subclasses(new)) do
-						assert(out[oldsub][newsub] == "none") -- or out[oldsub][newsub] == entry.relation
+						assert(out[oldsub][newsub] == "none" or out[oldsub][newsub] == entry.relation)
 						out[oldsub][newsub] = entry.relation
 					end
 				end
@@ -72,7 +75,9 @@ end
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
 	{old = {"walk", "channel"}, new = {"walk", "channel"}, relation = "cancel"},
-	{old = {"walk"}, new = {"riven_q_dash" --[[ I think not all dashes should cancel walking]]}, relation = "cancel"}
+	{old = {"walk"}, new = {"dash"}, relation = "pause"},
+	{old = {"walk"}, new = {"stun"}, relation = "pause"},
+	{old = {"stun"}, new = {"walk", "skill"}, relation = "delay"}
 })
 
 assert("cancel" == TASK_RELATION['walk']['walk'])

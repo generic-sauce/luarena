@@ -9,6 +9,13 @@ local Q_DASH_INSTANCES = 3
 local Q_DASH_DISTANCE = 50
 local Q_DASH_SPEED = 2
 local Q_ATTACK_DAMAGE = 10
+local Q_ATTACK_SIZE = vec_mod(16, 16)
+
+local W_COOLDOWN = 100
+local W_ANIMATION_TIMEOUT = 20
+local W_SIZE = vec_mod(40, 40)
+local W_STUN_TIMEOUT = 40
+local W_DAMAGE = 10
 
 local function generate_relative_area(entity, timeout, relative_position, size)
 	local area = {}
@@ -63,7 +70,7 @@ local function generate_q_dash_task(dash_target)
 			entity,
 			Q_DASH_DISTANCE / Q_DASH_SPEED,
 			(self.dash_target - entity.shape:center()):with_length(10),
-			vec_mod(16, 16))
+			Q_ATTACK_SIZE)
 
 		function attack:on_enter_collider(frame, entity)
 			if entity.damage ~= nil and entity ~= self.owner then
@@ -87,20 +94,66 @@ local function generate_q_dash_task(dash_target)
 	return task
 end
 
+local function generate_w_stun_task()
+	local task = {class = "riven_w_stun",
+		timeout = W_STUN_TIMEOUT}
+
+	function task:tick(entity, frame)
+		self.timeout = math.max(0, self.timeout - 1)
+
+		if self.timeout == 0 then
+			entity:remove_task(self)
+		end
+	end
+
+	return task
+end
+
+local function generate_w_task()
+	local task = {class = "riven_w",
+		animation_timeout = W_ANIMATION_TIMEOUT}
+
+	function task:init(entity, frame)
+		local attack = generate_relative_area(
+			entity,
+			W_ANIMATION_TIMEOUT,
+			vec_mod(0, 0),
+			W_SIZE)
+
+		for _, entity in pairs(frame:find_colliders(attack.shape)) do
+			if entity.damage and entity ~= attack.owner then
+				entity:damage(W_DAMAGE)
+				entity:add_task(generate_w_stun_task())
+			end
+		end
+
+		print("w")
+		frame:add(attack)
+	end
+
+	function task:tick(entity, frame)
+		entity:remove_task(self)
+	end
+
+	return task
+end
 
 return function (character)
 	character.q_cooldown = 0
+	character.w_cooldown = 0
 
 	character.inputs.q = true
+	character.inputs.w = true
 
 	function character:char_tick()
 		-- TODO create q wait task for sub dashes
 
 		self.q_cooldown = math.max(0, self.q_cooldown - 1)
+		self.w_cooldown = math.max(0, self.w_cooldown - 1)
 
 		if self.inputs.q then
 			local q_tasks = self:get_tasks_by_class("riven_q")
-			assert(not (#q_tasks > 1))
+			assert(not (#q_tasks > 1), stringify(q_tasks))
 
 			if #q_tasks == 1 then
 				local q_task = q_tasks[1]
@@ -122,6 +175,11 @@ return function (character)
 				self:add_task(generate_q_dash_task(self.shape:center() +
 					(self.inputs.mouse - self.shape:center()):with_length(Q_DASH_DISTANCE)))
 			end
+		end
+
+		if self.inputs.w and self.w_cooldown == 0 then
+			self.w_cooldown = W_COOLDOWN
+			self:add_task(generate_w_task())
 		end
 	end
 
