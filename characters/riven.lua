@@ -6,16 +6,22 @@ local Q_COOLDOWN = 1000
 local Q_TIMEOUT = 500
 local Q_DASH_COOLDOWN = 70
 local Q_DASH_INSTANCES = 3
-local Q_DASH_DISTANCE = 50
+local Q_DASH_DISTANCE = 25
 local Q_DASH_SPEED = 2
 local Q_ATTACK_DAMAGE = 10
 local Q_ATTACK_SIZE = vec_mod(16, 16)
 
-local W_COOLDOWN = 100
+local W_COOLDOWN = 1000
 local W_ANIMATION_TIMEOUT = 20
 local W_SIZE = vec_mod(40, 40)
 local W_STUN_TIMEOUT = 40
 local W_DAMAGE = 10
+
+local E_COOLDOWN = 400
+local E_DASH_DISTANCE = 40
+local E_DASH_SPEED = 2
+local E_SHIELD_TIMEOUT = 70
+local E_SHIELD_SIZE = vec_mod(25, 25)
 
 local function generate_relative_area(entity, timeout, relative_position, size)
 	local area = {}
@@ -73,7 +79,7 @@ local function generate_q_dash_task(dash_target)
 			Q_ATTACK_SIZE)
 
 		function attack:on_enter_collider(frame, entity)
-			if entity.damage ~= nil and entity ~= self.owner then
+			if entity.damage ~= nil and entity ~= self.owner and not (entity.owner and entity.owner == attack.owner) then
 				entity:damage(Q_ATTACK_DAMAGE)
 			end
 		end
@@ -121,7 +127,7 @@ local function generate_w_task()
 			W_SIZE)
 
 		for _, entity in pairs(frame:find_colliders(attack.shape)) do
-			if entity.damage and entity ~= attack.owner then
+			if entity.damage and entity ~= attack.owner and not (entity.owner and entity.owner == attack.owner) then
 				entity:damage(W_DAMAGE)
 				entity:add_task(generate_w_stun_task())
 			end
@@ -138,18 +144,55 @@ local function generate_w_task()
 	return task
 end
 
+local function generate_e_task(dash_target)
+	assert(dash_target ~= nil)
+
+	local task = {class = "riven_e", dash_target = dash_target}
+
+	function task:init(entity, frame)
+		local shield = generate_relative_area(
+			entity,
+			E_SHIELD_TIMEOUT,
+			vec_mod(0, 0),
+			E_SHIELD_SIZE)
+
+		function shield:damage(dmg)
+			-- TODO doesnt work multiplayer
+			frame:remove(shield)
+		end
+
+		shield.owner = entity
+		frame:add(shield)
+	end
+
+	function task:tick(entity, frame)
+		local move_vec = self.dash_target - entity.shape:center()
+		if move_vec:length() < E_DASH_SPEED then
+			entity.shape = entity.shape:with_center_keep_size(self.dash_target)
+			entity:remove_task(self)
+		else
+			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(E_DASH_SPEED)
+		end
+	end
+
+	return task
+end
+
 return function (character)
 	character.q_cooldown = 0
 	character.w_cooldown = 0
+	character.e_cooldown = 0
 
 	character.inputs.q = true
 	character.inputs.w = true
+	character.inputs.e = true
 
 	function character:char_tick()
 		-- TODO create q wait task for sub dashes
 
 		self.q_cooldown = math.max(0, self.q_cooldown - 1)
 		self.w_cooldown = math.max(0, self.w_cooldown - 1)
+		self.e_cooldown = math.max(0, self.e_cooldown - 1)
 
 		if self.inputs.q then
 			local q_tasks = self:get_tasks_by_class("riven_q")
@@ -180,6 +223,12 @@ return function (character)
 		if self.inputs.w and self.w_cooldown == 0 then
 			self.w_cooldown = W_COOLDOWN
 			self:add_task(generate_w_task())
+		end
+
+		if self.inputs.e and self.e_cooldown == 0 then
+			self.e_cooldown = E_COOLDOWN
+			self:add_task(generate_e_task(self.shape:center() +
+				(self.inputs.mouse - self.shape:center()):with_length(E_DASH_DISTANCE)))
 		end
 	end
 
