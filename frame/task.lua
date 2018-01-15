@@ -7,7 +7,6 @@ local TASK_CLASSMAP = {
 	move = {},
 	walk = {"move"},
 	dash = {"move"},
-	channel = {"skill"},
 	stun = {},
 
 	riven_q = {"skill"},
@@ -75,11 +74,10 @@ end
 
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
-	{old = {"walk", "channel"}, new = {"walk", "channel"}, relation = "cancel"},
-	{old = {"walk"}, new = {"dash"}, relation = "pause"},
-	{old = {"walk"}, new = {"stun"}, relation = "pause"},
+	{old = {"walk"}, new = {"walk"}, relation = "cancel"},
+	{old = {"walk"}, new = {"dash", "stun"}, relation = "pause"},
 	{old = {"stun"}, new = {"walk", "skill"}, relation = "delay"},
-	{old = {"dash"}, new = {"dash"}, relation = "delay"}
+	{old = {"dash"}, new = {"dash", "walk"}, relation = "delay"}
 })
 
 assert("cancel" == TASK_RELATION['walk']['walk'])
