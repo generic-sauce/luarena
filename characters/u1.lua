@@ -199,12 +199,21 @@ return function (u1)
 				local dash_task = { class = "u1_e_dash" }
 
 				dash_task.dash_target = task.walk_target
+				dash_task.dmg_factor = (u1.shape:center() - task.walk_target):length() / E_JUMP_RANGE -- small dashes deal less damage
 
 				function dash_task:init(u1, frame)
+					local dash_task = self
+
 					for _, entity in pairs(u1.colliders) do
-						if entity ~= u1 and entity.damage then
-							entity:damage(E_DAMAGE)
-						end
+						dash_task:damage_entity(entity)
+					end
+				end
+
+				function dash_task:damage_entity(entity)
+					local dash_task = self
+
+					if entity ~= u1 and entity.damage then
+						entity:damage(E_DAMAGE * dash_task.dmg_factor)
 					end
 				end
 
@@ -223,9 +232,7 @@ return function (u1)
 				function dash_task:on_enter_collider(u1, frame, entity)
 					local dash_task = self
 
-					if entity ~= u1 and entity.damage then
-						entity:damage(E_DAMAGE)
-					end
+					dash_task:damage_entity(entity)
 				end
 
 				u1:add_task(dash_task)
