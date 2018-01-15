@@ -200,6 +200,14 @@ return function (u1)
 
 				dash_task.dash_target = task.walk_target
 
+				function dash_task:init(u1, frame)
+					for _, entity in pairs(u1.colliders) do
+						if entity ~= u1 and entity.damage then
+							entity:damage(E_DAMAGE)
+						end
+					end
+				end
+
 				function dash_task:tick(u1, frame)
 					local dash_task = self
 
