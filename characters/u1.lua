@@ -13,7 +13,7 @@ local W_MAX_DAGGERS = 4
 local W_DAMAGE = 5
 
 local E_COOLDOWN = 50
-local E_JUMP_RANGE = 40
+local E_JUMP_RANGE = 100
 local E_DASH_SPEED = 2
 local E_DAMAGE = 12
 
