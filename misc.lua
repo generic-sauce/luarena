@@ -44,7 +44,7 @@ end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-function stringify(t)
+function stringify(t, depth)
 	if type(t) == "function" then
 		return "<function>"
 	end
@@ -53,10 +53,18 @@ function stringify(t)
 		return "" .. tostring(t)
 	end
 
+	if depth == 0 then
+		return "<table>"
+	end
+
 	local out = "{"
 	for k, v in pairs(t)
 	do
-		out = out .. stringify(k) .. "=" .. stringify(v) .. ","
+		if depth then
+			out = out .. stringify(k, depth-1) .. "=" .. stringify(v, depth-1) .. ","
+		else
+			out = out .. stringify(k) .. "=" .. stringify(v) .. ","
+		end
 	end
 	return out .. "}"
 end
