@@ -1,7 +1,7 @@
 local rect_mod = require('space/rect')
 local vec_mod = require('space/vec')
 
-local REGEN_INTERVAL = 5
+local REGEN_INTERVAL = 20
 
 return function (dummy)
 	dummy.health_counter = 0
