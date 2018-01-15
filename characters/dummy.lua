@@ -18,9 +18,9 @@ return function (dummy)
 		end
 	end
 
-	function dummy:on_damage(damage)
+	function dummy:damage(dmg)
 		self.regen_counter = 0
-		self.health = math.max(0, self.health - damage)
+		self.health = math.max(0, self.health - dmg)
 	end
 
 	return dummy
