@@ -247,14 +247,18 @@ return function (u1)
 
 			local dmg = R_DAMAGE
 			local colliders = frame:find_colliders(aoe.shape)
-
+			local obsolete_daggers = {}
 			for _, dagger in pairs(aoe.u1.dagger_list) do
 				if dagger.landed and table.contains(colliders, dagger) then
+					table.insert(obsolete_daggers, dagger)
+					dmg = dmg + R_DAMAGE_ADD
+				end
+			end
+
+			for _, dagger in pairs(obsolete_daggers) do
 					frame:remove(dagger)
 					table.remove_val(aoe.u1.dagger_list, dagger)
 					table.remove_val(colliders, dagger)
-					dmg = dmg + R_DAMAGE_ADD
-				end
 			end
 
 			for _, entity in pairs(colliders) do
