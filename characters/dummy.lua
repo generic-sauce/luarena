@@ -1,17 +1,26 @@
 local rect_mod = require('space/rect')
 local vec_mod = require('space/vec')
 
-local REGEN_INTERVAL = 20
+local REGEN_DELAY = 500
 
 return function (dummy)
-	dummy.health_counter = 0
+	dummy.regen_counter = 0
 
 	function dummy:char_tick(frame)
-		self.health_counter = (self.health_counter + 1) % REGEN_INTERVAL
-
-		if self.health_counter == 0 then
-			self.health = math.min(self.health + 1, 100)
+		if self.health < 100 then
+			self.regen_counter = self.regen_counter + 1
+			if self.regen_counter == REGEN_DELAY then
+				self.health = 100
+				self.regen_counter = 0
+			end
+		else
+			self.regen_counter = 0
 		end
+	end
+
+	function dummy:on_damage(damage)
+		self.regen_counter = 0
+		self.health = math.max(0, self.health - damage)
 	end
 
 	return dummy
