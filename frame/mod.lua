@@ -41,6 +41,15 @@ function frame_mod.initial(chars)
 	function frame:tick()
 		self:tick_tasks()
 		self:tick_collision()
+
+		if love.keyboard.isDown('d') then
+			if self.dummy then
+				self:remove(self.dummy)
+			end
+			self.dummy = require('frame/player')('dummy')
+			self:add(self.dummy)
+		end
+
 	end
 
 	function frame:draw(viewport)

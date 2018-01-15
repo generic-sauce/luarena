@@ -25,7 +25,7 @@ function new_player(char)
 	local player = {}
 
 	player.shape = rect_mod.by_center_and_size(
-		vec_mod(0, 0),
+		vec_mod(200, 200),
 		vec_mod(20, 20)
 	)
 	player.health = 100
