@@ -49,14 +49,15 @@ function new_player(char)
 	end
 
 	function player:draw(viewport)
-		viewport:draw_world_rect(self.shape, 100, 100, 100)
+		viewport:draw_world_shape(self.shape, 100, 100, 100)
 
 		local bar_offset = 10
 		local bar_height = 3
 
+		local wrapper = self.shape:wrapper()
 		viewport:draw_world_rect(rect_mod.by_left_top_and_size(
-			self.shape:left_top() - vec_mod(0, bar_offset),
-			vec_mod(self.shape:size().x * self.health/100, bar_height)
+			wrapper:left_top() - vec_mod(0, bar_offset),
+			vec_mod(wrapper:width() * self.health/100, bar_height)
 		), 255, 0, 0)
 	end
 

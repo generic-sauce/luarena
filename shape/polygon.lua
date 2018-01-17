@@ -1,3 +1,4 @@
+local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 
 local polygon_mod = {}
@@ -41,6 +42,20 @@ function polygon_mod.by_center_and_points(center_vec, points)
 
 	function polygon:center() 
 		return self.center_vec
+	end
+
+	function polygon:wrapper()
+		local left, right, top, bottom
+		for _, p in pairs(self:abs_points()) do
+			if not left or left > p.x then left = p.x end
+			if not right or right < p.x then right = p.x end
+			if not top or top > p.y then top = p.y end
+			if not bottom or bottom < p.y then bottom = p.y end
+		end
+		return rect_mod.by_left_top_and_size(
+			vec_mod(left, top),
+			vec_mod(right - left, bottom - top)
+		)
 	end
 
 	return polygon

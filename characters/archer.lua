@@ -1,6 +1,7 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
+local collision_detection_mod = require('frame/collision/detection')
 
 return function (archer)
 
@@ -25,7 +26,7 @@ return function (archer)
 
 		function arrow:tick(frame)
 			self.shape = self.shape:move_center(self.speed)
-			if not frame.map:rect():surrounds(self.shape) then
+			if not collision_detection_mod(polygon_mod.by_rect(frame.map:rect()), self.shape) then
 				frame:remove(self)
 			end
 

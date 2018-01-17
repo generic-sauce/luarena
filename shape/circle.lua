@@ -1,3 +1,4 @@
+local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 
 local circle_mod = {}
@@ -28,6 +29,13 @@ function circle_mod.by_center_and_radius(center_vec, radius)
 
 	function circle:center() 
 		return self.center_vec
+	end
+
+	function circle:wrapper()
+		return rect_mod.by_center_and_size(
+			self:center(),
+			vec_mod(self.radius * 2, self.radius * 2)
+		)
 	end
 
 	return circle
