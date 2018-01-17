@@ -33,7 +33,7 @@ return function (archer)
 		end
 
 		function arrow:draw(viewport)
-			viewport:draw_world_rect(self.shape, 0, 0, 255)
+			viewport:draw_world_shape(self.shape, 0, 0, 255)
 		end
 
 		return arrow

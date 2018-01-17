@@ -6,9 +6,9 @@ function vec_mod(x, y)
 
 	local meta = {}
 	function meta:__index(i)
-		if i == 0 then
+		if i == 1 then
 			return self.x
-		elseif i == 1 then
+		elseif i == 2 then
 			return self.y
 		else
 			assert(false, "Vec: Index '" .. i .. "' out of range")

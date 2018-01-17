@@ -20,17 +20,16 @@ local function colliding_polygons(p1, p2)
 	end
 
 	local function dot(u, v)
-		return u[0] * v[0] + u[1] * v[1] + u[2] * v[2]
+		return u[1] * v[1] + u[2] * v[2] + u[3] * v[3]
 	end
 
 	local function sub_colliding_polygons(points_a, points_b)
 		for i, u in pairs(points_a) do
-			local ni = i + 2
-			local v = points_a[ni]
+			local v = points_a[i + 1] or points_a[1]
 			local c = cross(vec3d(u), vec3d(v))
 			local found = false
 			for _, p in pairs(points_b) do
-				if dot(c, p) > -0.001 then
+				if dot(c, vec3d(p)) > -0.001 then
 					found = true
 					break
 				end
