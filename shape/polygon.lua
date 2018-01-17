@@ -77,7 +77,12 @@ function polygon_mod.by_points(points)
 end
 
 function polygon_mod.by_rect(rect)
-	return polygon_mod.by_center_and_points(rect:center(), {rect:right_top(), rect:left_top(), rect:left_bottom(), rect:right_bottom()})
+	return polygon_mod.by_center_and_points(rect:center(), {
+		rect:right_top()    - rect:center(),
+		rect:left_top()     - rect:center(),
+		rect:left_bottom()  - rect:center(),
+		rect:right_bottom() - rect:center()
+	})
 end
 
 return polygon_mod
