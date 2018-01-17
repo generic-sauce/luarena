@@ -1,5 +1,7 @@
 local collision_mod = {}
 
+local collision_detection_mod = require("frame/collision/detection")
+
 function collision_mod.call_on_exit_collider(entity, frame, collider)
 	if entity.on_exit_collider then
 		entity:on_exit_collider(frame, collider)
@@ -39,7 +41,7 @@ function collision_mod.init_frame(frame)
 		for _, e1 in pairs(self.entities) do
 			for _, e2 in pairs(self.entities) do
 				if e1 ~= e2 and e1.shape and e2.shape then
-					local colliding = e1.shape:intersects(e2.shape)
+					local colliding = collision_detection_mod(e1.shape, e2.shape)
 					if table.contains(e1.colliders, e2) and not colliding then
 						table.remove_val(e1.colliders, e2)
 						table.remove_val(e2.colliders, e1)

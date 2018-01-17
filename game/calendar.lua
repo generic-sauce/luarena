@@ -1,4 +1,4 @@
-local vec_mod = require('space/vec')
+local vec_mod = require('viewmath/vec')
 
 local calendar_mod = {} -- keeps track of the history of pressed keys for all players
 

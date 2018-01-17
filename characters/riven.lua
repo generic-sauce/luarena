@@ -1,5 +1,5 @@
-local rect_mod = require('space/rect')
-local vec_mod = require('space/vec')
+local rect_mod = require('view/rect')
+local vec_mod = require('view/vec')
 local task_mod = require('frame/task')
 
 local Q_COOLDOWN = 1000

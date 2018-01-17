@@ -1,5 +1,6 @@
-local rect_mod = require('space/rect')
-local vec_mod = require('space/vec')
+local rect_mod = require('viewmath/rect')
+local vec_mod = require('viewmath/vec')
+local polygon_mod = require('shape/polygon')
 
 return function (archer)
 
@@ -9,10 +10,10 @@ return function (archer)
 		local arrow = {}
 
 		arrow.owner = self
-		arrow.shape = rect_mod.by_center_and_size(
+		arrow.shape = polygon_mod.by_rect(rect_mod.by_center_and_size(
 			self.shape:center(),
 			vec_mod(4, 4)
-		)
+		))
 		arrow.speed = (self.inputs.mouse - self.shape:center()):normalized() * 2
 
 		function arrow:on_enter_collider(frame, e)
@@ -23,7 +24,7 @@ return function (archer)
 		end
 
 		function arrow:tick(frame)
-			self.shape = self.shape:with_center_keep_size(self.shape:center() + self.speed)
+			self.shape = self.shape:move_center(self.speed)
 			if not frame.map:rect():surrounds(self.shape) then
 				frame:remove(self)
 			end
