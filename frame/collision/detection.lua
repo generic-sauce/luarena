@@ -16,7 +16,7 @@ local function colliding_polygon_circle(p, c)
 	end
 
 	-- checks whether the circle c is completely on the right side of the line `line_start to line_end`
-	local function is_on_right_side(line_start, line_end, c)
+	local function circle_is_on_right_side(line_start, line_end, c)
 		local line_right_vec3d = cross(vec3d(line_start), vec3d(line_end))
 		line_right_vec3d[3] = 1
 
@@ -33,7 +33,7 @@ local function colliding_polygon_circle(p, c)
 		return ret
 	end
 
-	local function has_separating_axis_to(points, c)
+	local function has_separating_axis_to_circle(points, c)
 		for i, u in pairs(points) do
 			local v = points[i + 1] or points[1]
 
@@ -41,14 +41,14 @@ local function colliding_polygon_circle(p, c)
 			--		the right side of the axis means "out of the body (points_a)"
 			--		and the left side of the axis means "inside of the body (points_a)"
 
-			if is_on_right_side(u, v, c) then
+			if circle_is_on_right_side(u, v, c) then
 				return true
 			end
 		end
 		return false
 	end
 
-	local colliding = not has_separating_axis_to(p:abs_points(), c)
+	local colliding = not has_separating_axis_to_circle(p:abs_points(), c)
 	return colliding
 end
 
@@ -74,13 +74,13 @@ local function colliding_polygons(p1, p2)
 	end
 
 	-- checks on what side of a line `line_start to line_end` the point `p` is
-	local function is_on_right_side(line_start, line_end, p)
+	local function point_is_on_right_side(line_start, line_end, p)
 		local vec_from_line_start_to_p = vec3d(p - line_start)
 		local line_right_vec = cross(vec3d(line_start), vec3d(line_end))
 		return dot(vec_from_line_start_to_p, line_right_vec) >= 0
 	end
 
-	local function has_separating_axis_to(points_a, points_b)
+	local function has_separating_axis_to_point(points_a, points_b)
 		-- if there is one axis
 		for i, u in pairs(points_a) do
 			local v = points_a[i + 1] or points_a[1]
@@ -91,7 +91,7 @@ local function colliding_polygons(p1, p2)
 				-- as points_a are stored in counter clockwise order:
 				--		the right side of the axis means "out of the body (points_a)"
 				--		and the left side of the axis means "inside of the body (points_a)"
-				if not is_on_right_side(u, v, p) then
+				if not point_is_on_right_side(u, v, p) then
 					may_be_sep_axis = false
 					break
 				end
@@ -105,7 +105,9 @@ local function colliding_polygons(p1, p2)
 
 	local points_a = p1:abs_points()
 	local points_b = p2:abs_points()
-	return not (has_separating_axis_to(points_a, points_b) or has_separating_axis_to(points_b, points_a))
+	local ret = not (has_separating_axis_to_point(points_a, points_b) or has_separating_axis_to_point(points_b, points_a))
+
+	return ret
 end
 
 return function(shape1, shape2)
