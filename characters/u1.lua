@@ -3,6 +3,7 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
+local circle_mod = require('shape/circle')
 
 local collision_detection_mod = require('collision/detection')
 
@@ -23,7 +24,7 @@ local E_DAMAGE = 12
 local R_COOLDOWN = 75
 local R_DAMAGE = 15
 local R_DAMAGE_ADD = 15
-local R_RANGE = 50
+local R_RANGE = 25
 
 return function (u1)
 
@@ -258,11 +259,9 @@ return function (u1)
 		local aoe = {}
 
 		aoe.u1 = self
-		aoe.shape = polygon_mod.by_rect(
-			rect_mod.by_center_and_size(
-				u1.shape:center(),
-				vec_mod(1, 1) * R_RANGE
-			)
+		aoe.shape = circle_mod.by_center_and_radius(
+			u1.shape:center(),
+			R_RANGE
 		)
 		aoe.life_counter = 80
 
