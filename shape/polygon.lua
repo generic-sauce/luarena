@@ -1,6 +1,6 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
-local line_mod = require('viewmath/line')
+local line_mod = require('collision/line')
 
 require('misc')
 

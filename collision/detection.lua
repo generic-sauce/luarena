@@ -1,5 +1,5 @@
 local vec_mod = require("viewmath/vec")
-local line_mod = require("viewmath/line")
+local line_mod = require("collision/line")
 
 local polygon_mod = require("shape/polygon")
 
