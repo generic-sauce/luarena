@@ -1,6 +1,6 @@
 local collision_mod = {}
 
-local collision_detection_mod = require("frame/collision/detection")
+local collision_detection_mod = require("collision/detection")
 
 function collision_mod.call_on_exit_collider(entity, frame, collider)
 	if entity.on_exit_collider then

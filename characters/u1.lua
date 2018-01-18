@@ -4,7 +4,7 @@ local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
 
-local collision_detection_mod = require('frame/collision/detection')
+local collision_detection_mod = require('collision/detection')
 
 local Q_COOLDOWN = 500
 local Q_RANGE = 75
