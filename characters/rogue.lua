@@ -1,5 +1,6 @@
-local rect_mod = require('space/rect')
-local vec_mod = require('space/vec')
+local rect_mod = require('viewmath/rect')
+local vec_mod = require('viewmath/vec')
+local circle_mod = require('shape/circle')
 
 return function (rogue)
 
@@ -10,10 +11,7 @@ return function (rogue)
 		local aoe = {}
 
 		aoe.owner = self
-		aoe.shape = rect_mod.by_center_and_size(
-			self.shape:center(),
-			vec_mod(100, 100)
-		)
+		aoe.shape = circle_mod.by_center_and_radius(self.shape:center(), 100)
 		aoe.life_counter = 100
 
 		function aoe:initial_damage(frame)
@@ -34,7 +32,7 @@ return function (rogue)
 		end
 
 		function aoe:draw(viewport)
-			viewport:draw_world_rect(self.shape, 100, 100, 100, 100)
+			viewport:draw_shape(self.shape, 100, 100, 100, 100)
 		end
 
 		aoe:initial_damage(frame)
@@ -54,7 +52,7 @@ return function (rogue)
 
 			local jump = (self.inputs.mouse - self.shape:center()):cropped_to(MAX_JUMP)
 
-			self.shape = self.shape:with_center_keep_size(self.shape:center() + jump)
+			self.shape = self.shape:move_center(jump)
 			self.walk_target = nil
 		end
 

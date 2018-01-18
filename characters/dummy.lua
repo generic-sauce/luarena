@@ -1,5 +1,5 @@
-local rect_mod = require('space/rect')
-local vec_mod = require('space/vec')
+local rect_mod = require('viewmath/rect')
+local vec_mod = require('viewmath/vec')
 
 local REGEN_DELAY = 500
 

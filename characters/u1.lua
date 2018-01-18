@@ -1,7 +1,10 @@
 -- unnamed character 1
 
-local rect_mod = require('space/rect')
-local vec_mod = require('space/vec')
+local rect_mod = require('viewmath/rect')
+local vec_mod = require('viewmath/vec')
+local polygon_mod = require('shape/polygon')
+
+local collision_detection_mod = require('collision/detection')
 
 local Q_COOLDOWN = 500
 local Q_RANGE = 75
@@ -48,9 +51,11 @@ return function (u1)
 			blade.alive = true
 
 			blade.start_center = u1.shape:center()
-			blade.shape = rect_mod.by_center_and_size(
-				u1.shape:center(),
-				vec_mod(4, 4)
+			blade.shape = polygon_mod.by_rect(
+				rect_mod.by_center_and_size(
+					u1.shape:center(),
+					vec_mod(4, 4)
+				)
 			)
 			blade.speed = (u1.inputs.mouse - u1.shape:center()):normalized()
 
@@ -65,8 +70,8 @@ return function (u1)
 			function blade:tick(frame)
 				local blade = self
 
-				blade.shape = blade.shape:with_center_keep_size(blade.shape:center() + blade.speed)
-				if (blade.start_center - blade.shape:center()):length() > Q_RANGE or not frame.map:rect():surrounds(blade.shape) then
+				blade.shape = blade.shape:move_center(blade.speed)
+				if (blade.start_center - blade.shape:center()):length() > Q_RANGE or not collision_detection_mod(polygon_mod.by_rect(frame.map:rect()), blade.shape) then
 					frame:remove(blade)
 					blade.alive = false
 				end
@@ -75,7 +80,7 @@ return function (u1)
 			function blade:draw(viewport)
 				local blade = self
 
-				viewport:draw_world_rect(blade.shape, 0, 0, 255)
+				viewport:draw_shape(blade.shape, 0, 0, 255)
 			end
 
 			frame:add(blade)
@@ -114,9 +119,11 @@ return function (u1)
 			dagger.landed = false
 
 			dagger.u1 = u1
-			dagger.shape = rect_mod.by_center_and_size(
-				u1.shape:center() + (u1.inputs.mouse - u1.shape:center()):cropped_to(W_RANGE),
-				vec_mod(3, 3)
+			dagger.shape = polygon_mod.by_rect(
+				rect_mod.by_center_and_size(
+					u1.shape:center() + (u1.inputs.mouse - u1.shape:center()):cropped_to(W_RANGE),
+					vec_mod(3, 3)
+				)
 			)
 
 			frame:add(dagger)
@@ -154,12 +161,12 @@ return function (u1)
 
 				if dagger.landed then
 					-- render dagger
-					viewport:draw_world_rect(dagger.shape, 200, 200, 255)
+					viewport:draw_shape(dagger.shape, 200, 200, 255)
 				else
 					-- render shadow
 					viewport:draw_world_rect(rect_mod.by_center_and_size(
 						dagger.shape:center(),
-						dagger.shape:size() * 3
+						dagger.shape:wrapper():size() * 3
 					), 40, 40, 40, 80)
 				end
 			end
@@ -222,10 +229,10 @@ return function (u1)
 
 					local move_vec = (dash_task.dash_target - u1.shape:center())
 					if move_vec:length() < E_DASH_SPEED then
-						u1.shape = u1.shape:with_center_keep_size(dash_task.dash_target)
+						u1.shape = u1.shape:with_center(dash_task.dash_target)
 						u1:remove_task(dash_task)
 					else
-						u1.shape = u1.shape:with_center_keep_size(u1.shape:center() + move_vec:cropped_to(E_DASH_SPEED))
+						u1.shape = u1.shape:move_center(move_vec:cropped_to(E_DASH_SPEED))
 					end
 				end
 
@@ -238,7 +245,7 @@ return function (u1)
 				u1:add_task(dash_task)
 				u1:remove_task(task)
 			else
-				u1.shape = u1.shape:with_center_keep_size(u1.shape:center() + move_vec:cropped_to(WALKSPEED))
+				u1.shape = u1.shape:move_center(move_vec:cropped_to(WALKSPEED))
 			end
 		end
 
@@ -251,9 +258,11 @@ return function (u1)
 		local aoe = {}
 
 		aoe.u1 = self
-		aoe.shape = rect_mod.by_center_and_size(
-			u1.shape:center(),
-			vec_mod(1, 1) * R_RANGE
+		aoe.shape = polygon_mod.by_rect(
+			rect_mod.by_center_and_size(
+				u1.shape:center(),
+				vec_mod(1, 1) * R_RANGE
+			)
 		)
 		aoe.life_counter = 80
 
@@ -297,7 +306,7 @@ return function (u1)
 		function aoe:draw(viewport)
 			local aoe = self
 
-			viewport:draw_world_rect(self.shape, 100, 100, 100, 100)
+			viewport:draw_shape(self.shape, 100, 100, 100, 100)
 		end
 
 		aoe:initial_damage(frame)
@@ -357,13 +366,15 @@ return function (u1)
 		else
 			alpha = 255
 		end
-		viewport:draw_world_rect(self.shape, 100, 100, 100, alpha)
+		viewport:draw_shape(self.shape, 100, 100, 100, alpha)
 
 		local bar_offset = 10
 		local bar_height = 3
+
+		local wrapper = self.shape:wrapper()
 		viewport:draw_world_rect(rect_mod.by_left_top_and_size(
-			self.shape:left_top() - vec_mod(0, bar_offset),
-			vec_mod(self.shape:size().x * self.health/100, bar_height)
+			wrapper:left_top() - vec_mod(0, bar_offset),
+			vec_mod(wrapper:width() * self.health/100, bar_height)
 		), 255, 0, 0)
 	end
 

@@ -1,5 +1,5 @@
 local map_mod = require('map')
-local collision_mod = require('frame/collision')
+local collision_mod = require('collision/mod')
 local task_mod = require('frame/task')
 
 local frame_mod = {}

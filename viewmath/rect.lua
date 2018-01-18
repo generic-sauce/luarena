@@ -1,6 +1,6 @@
 -- vectors are immutable atomic data structures, never access their members directly
 
-local vec_mod = require('space/vec')
+local vec_mod = require('viewmath/vec')
 
 local rect_mod = {}
 
@@ -78,6 +78,18 @@ rect_mod.by_center_and_size = function(center, size)
 
 	function rect:left_top()
 		return vec_mod(self:left(), self:top())
+	end
+
+	function rect:left_bottom()
+		return vec_mod(self:left(), self:bottom())
+	end
+
+	function rect:right_bottom()
+		return vec_mod(self:right(), self:bottom())
+	end
+
+	function rect:right_top()
+		return vec_mod(self:right(), self:top())
 	end
 
 	function rect:width()
