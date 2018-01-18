@@ -18,6 +18,8 @@ local function colliding_polygon_circle(p, c)
 	-- checks whether the circle c is completely on the right side of the line `line_start to line_end`
 	local function is_on_right_side(line_start, line_end, c)
 		local line_right_vec3d = cross(vec3d(line_start), vec3d(line_end))
+		line_right_vec3d[3] = 1
+
 		local line_right_vec = vec_mod(line_right_vec3d[1], line_right_vec3d[2])
 
 		local move_vec = line_right_vec:with_length(c.radius)
@@ -27,12 +29,18 @@ local function colliding_polygon_circle(p, c)
 		local moved_line_end = line_end + move_vec
 
 		local vec_from_moved_line_start_to_center = vec3d(c:center() - moved_line_start)
-		return dot(vec_from_moved_line_start_to_center, line_right_vec3d) >= 0
+		local ret = dot(vec_from_moved_line_start_to_center, line_right_vec3d) >= 0
+		return ret
 	end
 
 	local function has_separating_axis_to(points, c)
 		for i, u in pairs(points) do
 			local v = points[i + 1] or points[1]
+
+			-- as points_a are stored in counter clockwise order:
+			--		the right side of the axis means "out of the body (points_a)"
+			--		and the left side of the axis means "inside of the body (points_a)"
+
 			if is_on_right_side(u, v, c) then
 				return true
 			end
@@ -40,7 +48,8 @@ local function colliding_polygon_circle(p, c)
 		return false
 	end
 
-	return not has_separating_axis_to(p:abs_points(), c)
+	local colliding = not has_separating_axis_to(p:abs_points(), c)
+	return colliding
 end
 
 local function colliding_circles(c1, c2)
