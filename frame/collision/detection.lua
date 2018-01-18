@@ -1,26 +1,10 @@
-local function vec3d(u)
-	return { u[1], u[2], 1 }
-end
-
-local function cross(u, v)
-	return {
-		u[2] * v[3] - u[3] * v[2],
-		u[3] * v[1] - u[1] * v[3],
-		u[1] * v[2] - u[2] * v[1],
-	}
-end
-
-local function dot(u, v)
-	return u[1] * v[1] + u[2] * v[2] + u[3] * v[3]
-end
+local vec_mod = require("viewmath/vec")
 
 -- checks on what side of a line `line_start to line_end` the point `p` is
 local function point_is_on_right_side(line_start, line_end, p)
-	local vec_from_line_start_to_p = vec3d(p - line_start)
-	vec_from_line_start_to_p[3] = 1
-	local line_right_vec = cross(vec3d(line_start), vec3d(line_end))
-	line_right_vec[3] = 1
-	local ret = dot(vec_from_line_start_to_p, line_right_vec) >= 0
+	local vec_from_line_start_to_p = p - line_start
+	local line_right_vec = line_start:cross(line_end)
+	local ret = vec_from_line_start_to_p:dot(line_right_vec) >= 0
 	return ret
 end
 
@@ -43,10 +27,7 @@ local function colliding_polygon_circle(p, c)
 
 	-- checks whether the circle c is completely on the right side of the line `line_start to line_end`
 	local function circle_is_on_right_side(line_start, line_end, c)
-		local line_right_vec3d = cross(vec3d(line_start), vec3d(line_end))
-		line_right_vec3d[3] = 1
-
-		local line_right_vec = vec_mod(line_right_vec3d[1], line_right_vec3d[2])
+		local line_right_vec = line_start:cross(line_end)
 
 		local move_vec = line_right_vec:with_length(c.radius)
 
@@ -54,8 +35,8 @@ local function colliding_polygon_circle(p, c)
 		local moved_line_start = line_start + move_vec
 		local moved_line_end = line_end + move_vec
 
-		local vec_from_moved_line_start_to_center = vec3d(c:center() - moved_line_start)
-		local ret = dot(vec_from_moved_line_start_to_center, line_right_vec3d) >= 0
+		local vec_from_moved_line_start_to_center = c:center() - moved_line_start
+		local ret = vec_from_moved_line_start_to_center:dot(line_right_vec) >= 0
 		return ret
 	end
 

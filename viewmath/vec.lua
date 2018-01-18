@@ -65,6 +65,17 @@ function vec_mod(x, y)
 		return self:normalized() * l
 	end
 
+	function v:dot(w)
+		return self[1] * w[1] + self[2] * w[2]
+	end
+
+	function v:cross(w)
+		return vec_mod(
+			self[2] * 1 - 1 * w[2],
+			1 * w[1] - self[1] * 1
+		)
+	end
+
 	return v
 end
 
