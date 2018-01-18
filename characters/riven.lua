@@ -1,5 +1,6 @@
-local rect_mod = require('view/rect')
-local vec_mod = require('view/vec')
+local rect_mod = require('viewmath/rect')
+local vec_mod = require('viewmath/vec')
+local polygon_mod = require('shape/polygon')
 local task_mod = require('frame/task')
 
 local Q_COOLDOWN = 1000
@@ -26,9 +27,12 @@ local E_SHIELD_SIZE = vec_mod(25, 25)
 local function generate_relative_area(entity, timeout, relative_position, size)
 	local area = {}
 	area.owner = entity
-	area.shape = rect_mod.by_center_and_size(
-		entity.shape:center() + relative_position,
-		size)
+	area.shape = polygon_mod.by_rect(
+			rect_mod.by_center_and_size(
+				entity.shape:center() + relative_position,
+				size
+			)
+	)
 	area.timeout = timeout
 
 	function area:tick(frame)
@@ -37,12 +41,12 @@ local function generate_relative_area(entity, timeout, relative_position, size)
 		if self.timeout == 0 then
 			frame:remove(self)
 		else
-			self.shape = self.shape:with_center_keep_size(entity.shape:center() + relative_position)
+			self.shape = self.shape:with_center(entity.shape:center() + relative_position)
 		end
 	end
 
 	function area:draw(viewport)
-		viewport:draw_world_rect(self.shape, 0, 0, 255)
+		viewport:draw_shape(self.shape, 0, 0, 255)
 	end
 
 	return area
@@ -90,7 +94,7 @@ local function generate_q_dash_task(dash_target)
 	function task:tick(entity, frame)
 		local move_vec = self.dash_target - entity.shape:center()
 		if move_vec:length() < Q_DASH_SPEED then
-			entity.shape = entity.shape:with_center_keep_size(self.dash_target)
+			entity.shape = entity.shape:with_center(self.dash_target)
 			entity:remove_task(self)
 		else
 			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(Q_DASH_SPEED)
@@ -168,7 +172,7 @@ local function generate_e_task(dash_target)
 	function task:tick(entity, frame)
 		local move_vec = self.dash_target - entity.shape:center()
 		if move_vec:length() < E_DASH_SPEED then
-			entity.shape = entity.shape:with_center_keep_size(self.dash_target)
+			entity.shape = entity.shape:with_center(self.dash_target)
 			entity:remove_task(self)
 		else
 			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(E_DASH_SPEED)
