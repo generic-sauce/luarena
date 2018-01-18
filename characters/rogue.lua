@@ -32,7 +32,7 @@ return function (rogue)
 		end
 
 		function aoe:draw(viewport)
-			viewport:draw_world_shape(self.shape, 100, 100, 100, 100)
+			viewport:draw_shape(self.shape, 100, 100, 100, 100)
 		end
 
 		aoe:initial_damage(frame)

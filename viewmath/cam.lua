@@ -25,7 +25,7 @@ local function new_viewport(pos, zoom)
 		love.graphics.rectangle("fill", screen_rect:left(), screen_rect:top(), screen_rect:width(), screen_rect:height())
 	end
 
-	function viewport:draw_world_shape(shape, r, g, b, a)
+	function viewport:draw_shape(shape, r, g, b, a)
 		love.graphics.setColor(r, g, b, a)
 		if shape.shape_type == "polygon" then
 			local vertices = {}

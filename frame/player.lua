@@ -49,7 +49,7 @@ function new_player(char)
 	end
 
 	function player:draw(viewport)
-		viewport:draw_world_shape(self.shape, 100, 100, 100)
+		viewport:draw_shape(self.shape, 100, 100, 100)
 
 		local bar_offset = 10
 		local bar_height = 3
