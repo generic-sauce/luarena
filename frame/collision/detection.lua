@@ -13,8 +13,8 @@ local function colliding_polygons(p1, p2)
 
 	local function cross(u, v)
 		return {
-			u[2] * v[3]    - u[3]    * v[2],
-			u[3]    * v[1] - u[1] * v[3],
+			u[2] * v[3] - u[3] * v[2],
+			u[3] * v[1] - u[1] * v[3],
 			u[1] * v[2] - u[2] * v[1]
 		}
 	end
@@ -23,24 +23,39 @@ local function colliding_polygons(p1, p2)
 		return u[1] * v[1] + u[2] * v[2] + u[3] * v[3]
 	end
 
-	local function sub_colliding_polygons(points_a, points_b)
+	-- checks on what side of a line `line_start to line_end` the point `p` is
+	local function is_on_right_side(line_start, line_end, p)
+		local vec_from_line_start_to_p = vec3d(p - line_start)
+		local line_right_vec = cross(vec3d(line_start), vec3d(line_end))
+		return dot(vec_from_line_start_to_p, line_right_vec) >= 0
+	end
+
+	local function has_separating_axis_to(points_a, points_b)
+		-- if there is one axis
 		for i, u in pairs(points_a) do
 			local v = points_a[i + 1] or points_a[1]
-			local c = cross(vec3d(u), vec3d(v))
-			local found = false
+
+			local may_be_sep_axis = true
+			-- for which all other points are on the outer side
 			for _, p in pairs(points_b) do
-				if dot(c, vec3d(p)) > -0.001 then
-					found = true
+				-- as points_a are stored in counter clockwise order:
+				--		the right side of the axis means "out of the body (points_a)"
+				--		and the left side of the axis means "inside of the body (points_a)"
+				if not is_on_right_side(u, v, p) then
+					may_be_sep_axis = false
 					break
 				end
 			end
-			if not found then
+			if may_be_sep_axis then
 				return true
 			end
 		end
 		return false
 	end
-	return not (sub_colliding_polygons(p1:abs_points(), p2:abs_points()) or sub_colliding_polygons(p2:abs_points(), p1:abs_points()))
+
+	local points_a = p1:abs_points()
+	local points_b = p2:abs_points()
+	return not (has_separating_axis_to(points_a, points_b) or has_separating_axis_to(points_b, points_a))
 end
 
 return function(shape1, shape2)
