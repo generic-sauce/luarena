@@ -15,20 +15,30 @@ function new_servermaster(chars, networker)
 		self.networker:broadcast_packet(p)
 	end
 
-	function servermaster:on_recv(p)
-		if p.tag == "inputs" then
-			local current_backtrack = #self.frame_history - p.frame_id + 1
-			self.balancer_list[p.player_id - 1]:push_value(current_backtrack)
-			self:apply_input_changes(p.inputs, p.player_id, p.frame_id)
+	function servermaster:on_recv(packets)
+		local input_packets = {}
 
-			-- packet forwarding
+		for _, p in pairs(packets) do
+			if p.tag == "inputs" then
+				table.insert(input_packets, p)
+				local current_backtrack = #self.frame_history - p.frame_id + 1
+				self.balancer_list[p.player_id - 1]:push_value(current_backtrack)
+			else
+				print("servermaster received packet of strange tag: " .. tostring(p.tag))
+			end
+		end
+
+		if #input_packets > 0 then
+			self:apply_input_changes(input_packets)
+		end
+
+		-- packet forwarding
+		for _, p in pairs(packets) do
 			for key, client in pairs(self.networker.clients) do
 				if key + 1 ~= p.player_id then
 					client:send(json.encode(p))
 				end
 			end
-		else
-			print("servermaster received packet of strange tag: " .. tostring(p.tag))
 		end
 	end
 

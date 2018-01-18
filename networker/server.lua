@@ -25,6 +25,8 @@ return function(event_handler, port)
 	end
 
 	function server:handle_events()
+		local received_packets = {}
+
 		while true do
 			local event = self.host:service()
 			if event == nil then break end
@@ -35,12 +37,14 @@ return function(event_handler, port)
 					self.event_handler:on_client_connects()
 				end
 			elseif event.type == "receive" then
-				if self.event_handler.on_recv then
-					self.event_handler:on_recv(json.decode(event.data))
-				end
+				table.insert(received_packets, json.decode(event.data))
 			else
 				print("networker/server got strange event of type: " .. event.type)
 			end
+		end
+
+		if self.event_handler.on_recv then
+			self.event_handler:on_recv(received_packets)
 		end
 	end
 

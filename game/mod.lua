@@ -41,13 +41,18 @@ function game_mod.new(chars, local_id)
 	end
 
 	-- will do calendar:apply_input_changes and backtrack
-	function game:apply_input_changes(changed_inputs, player_id, frame_id)
-		self.calendar:apply_input_changes(changed_inputs, player_id, frame_id)
-
-		if frame_id <= #self.frame_history then
-			self:backtrack(frame_id)
+	function game:apply_input_changes(input_packets)
+		local oldest_frame_id = nil
+		for _, p in pairs(input_packets) do
+			self.calendar:apply_input_changes(p.inputs, p.player_id, p.frame_id)
+			if oldest_frame_id == nil or oldest_frame_id > p.frame_id then
+				oldest_frame_id = p.frame_id
+			end
 		end
-		
+
+		if oldest_frame_id <= #self.frame_history then
+			self:backtrack(oldest_frame_id)
+		end
 	end
 
 	function game:update_local_calendar()

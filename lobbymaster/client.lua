@@ -10,7 +10,8 @@ return function(client, char, server_ip, server_port)
 	client.local_id = nil
 	client.chars = nil
 
-	function client:on_recv(p)
+	function client:on_recv(packets)
+		for _, p in pairs(packets) do
 			if p.tag == "chars" then
 				if self.local_id == nil then
 					self.local_id = #p.chars
@@ -23,6 +24,7 @@ return function(client, char, server_ip, server_port)
 			else
 				print("received strange packet with tag: " .. p.tag)
 			end
+		end
 	end
 
 

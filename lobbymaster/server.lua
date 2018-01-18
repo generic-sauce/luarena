@@ -8,14 +8,16 @@ return function(server, char, port)
 
 	server.chars = {char}
 
-	function server:on_recv(p)
-		if p.tag == "join" then
-			print("A new client joined!")
-			table.insert(self.chars, p.char)
-			self:broadcast_chars_packet()
-		else
-			print("received packet with strange tag: " .. tostring(p.tag))
-			os.exit(1)
+	function server:on_recv(packets)
+		for _, p in pairs(packets) do
+			if p.tag == "join" then
+				print("A new client joined!")
+				table.insert(self.chars, p.char)
+				self:broadcast_chars_packet()
+			else
+				print("received packet with strange tag: " .. tostring(p.tag))
+				os.exit(1)
+			end
 		end
 	end
 

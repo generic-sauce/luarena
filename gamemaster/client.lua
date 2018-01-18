@@ -12,18 +12,30 @@ function new_clientmaster(networker, chars, local_id)
 		self.networker:send_to_server(p)
 	end
 
-	function clientmaster:on_recv(p)
-		if p.tag == "inputs" then
-			local current_backtrack = #self.frame_history - p.frame_id + 1 -- may be negative
-			self.balancer:push_value(current_backtrack)
-			self:apply_input_changes(p.inputs, p.player_id, p.frame_id)
-		elseif p.tag == "avg_backtrack" then
-			local avg = self.balancer:pop_avg()
-			if p.avg_backtrack and avg then
-				self.start_time = self.start_time + FRAME_DURATION * (avg - p.avg_backtrack)/2
+	function clientmaster:on_recv(packets)
+		local input_packets = {}
+
+		for _, p in pairs(packets) do
+			if p.tag == "inputs" then
+				table.insert(input_packets, p)
+				local current_backtrack = #self.frame_history - p.frame_id + 1 -- may be negative
+				self.balancer:push_value(current_backtrack)
+			elseif p.tag == "avg_backtrack" then
+				if p.avg_backtrack ~= nil then
+					local avg = self.balancer:pop_avg()
+					if avg ~= nil then
+						local old_time = self.start_time
+						self.start_time = self.start_time + FRAME_DURATION * (avg - p.avg_backtrack)/2
+						print("start_time: " .. tostring(old_time) .. " -> " .. tostring(self.start_time))
+					end
+				end
+			else
+				print("clientmaster received packet of strange tag: " .. tostring(p.tag))
 			end
-		else
-			print("clientmaster received packet of strange tag: " .. tostring(p.tag))
+		end
+
+		if #input_packets > 0 then
+			self:apply_input_changes(input_packets)
 		end
 	end
 
