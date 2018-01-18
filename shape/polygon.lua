@@ -1,13 +1,27 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
+local line_mod = require('viewmath/line')
+
+require('misc')
 
 local polygon_mod = {}
+
+local function assert_convex_points(points)
+	for i, _ in pairs(points) do
+		local line_start = points[i]
+		local line_end = get(points, i+2)
+		local p = get(points, i+1)
+		assert(line_mod(line_start, line_end):is_right(p), "polygon is not convex!")
+	end
+end
 
 -- points are relative to the center!
 function polygon_mod.by_center_and_points(center_vec, points)
 	assert(center_vec)
 	assert(points)
 	assert(#points > 0)
+
+	assert_convex_points(points)
 
 	local polygon = {
 		center_vec = center_vec,
@@ -56,6 +70,19 @@ function polygon_mod.by_center_and_points(center_vec, points)
 			vec_mod(left, top),
 			vec_mod(right - left, bottom - top)
 		)
+	end
+
+	function polygon:contains(point)
+		local points = self:abs_points()
+
+		for i, p in pairs(points) do
+			local axis = line_mod(p, get(points, i+1))
+			if axis:is_right(point) then
+				return false
+			end
+		end
+
+		return true
 	end
 
 	return polygon

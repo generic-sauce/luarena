@@ -38,6 +38,10 @@ function circle_mod.by_center_and_radius(center_vec, radius)
 		)
 	end
 
+	function circle:contains(point)
+		return (point - self:center()):length() <= self.radius
+	end
+
 	return circle
 end
 
