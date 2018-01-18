@@ -30,7 +30,7 @@ function collision_mod.init_frame(frame)
 	function frame:find_colliders(shape)
 		local colliders = {}
 		for _, e in pairs(self.entities) do
-			if e.shape:intersects(shape) then
+			if collision_detection_mod(e.shape, shape) then
 				table.insert(colliders, e)
 			end
 		end

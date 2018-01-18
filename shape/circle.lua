@@ -9,7 +9,7 @@ function circle_mod.by_center_and_radius(center_vec, radius)
 
 	local circle = {
 		center_vec = center_vec,
-		radius = radius
+		radius = radius,
 		shape_type = "circle"
 	}
 
