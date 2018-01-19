@@ -40,9 +40,7 @@ function frame_mod.initial(chars)
 
 	function frame:tick()
 		self:tick_tasks()
-		require('profiler')("tick_collision", function(frame)
-			frame:tick_collision()
-		end, self)
+		self:tick_collision()
 		for _, entity in pairs(self.entities) do
 			entity:tick(self)
 		end
