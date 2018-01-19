@@ -72,17 +72,15 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:frame_update()
-		self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
-		self.current_frame:tick()
-		table.insert(self.frame_history, self.current_frame:clone())
+		require('profiler')("frame_update", function()
+			self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
+			self.current_frame:tick()
+			table.insert(self.frame_history, self.current_frame:clone())
+		end)
 	end
 
 	function game:update(dt)
-		if love.keyboard.isDown('b') then
-			print("backtracking to frame 2")
-			self:backtrack(2)
-		end
-
+		self:handle_debug_hotkeys()
 		self.networker:handle_events()
 		self:update_local_calendar()
 
@@ -100,6 +98,33 @@ function game_mod.new(chars, local_id)
 	function game:draw()
 		local viewport = self.cam:viewport(self.current_frame)
 		self.current_frame:draw(viewport)
+	end
+
+	function game:handle_debug_hotkeys()
+		-- b => backtrack
+		if love.keyboard.isDown('b') then
+			print("backtracking to frame 2")
+			self:backtrack(2)
+		end
+
+		-- p => print profilers
+		if love.keyboard.isDown('p') then
+			if not p_pressed then
+				for _, profiler in pairs(profilers) do
+					print("profiler-avg: \"" .. profiler.name .. "\": " .. profiler:get_avg())
+				end
+				p_pressed = true
+			end
+		else
+			p_pressed = nil
+		end
+
+		-- c => clear profilers
+		if love.keyboard.isDown('c') then
+			for _, profiler in pairs(profilers) do
+				profiler.times = {}
+			end
+		end
 	end
 
 	return game
