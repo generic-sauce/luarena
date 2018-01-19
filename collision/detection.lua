@@ -75,7 +75,7 @@ local function colliding_polygons(p1, p2)
 end
 
 return function(shape1, shape2)
-	return require("profiler")("collision_detection_mod", function()
+	return require("profiler")("collision_detection_mod", function(shape1, shape2)
 		if not shape1:wrapper():intersects(shape2:wrapper()) then
 			return false
 		end
@@ -99,5 +99,5 @@ return function(shape1, shape2)
 		else
 			assert(false)
 		end
-	end)
+	end, shape1, shape2)
 end

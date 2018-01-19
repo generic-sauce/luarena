@@ -3,7 +3,7 @@ require('misc')
 -- global list
 profilers = {}
 
-return function(name, func, verbose)
+return function(name, func, ...)
 	local profiler = nil
 	if profilers[name] then
 		profiler = profilers[name]
@@ -13,24 +13,7 @@ return function(name, func, verbose)
 		profiler.func = func
 		profiler.times = {}
 
-		if verbose then
-			profiler.verbose = true
-		else
-			profiler.verbose = false
-		end
-
 		profilers[name] = profiler
-
-		function profiler:run()
-			local start = love.timer.getTime()
-			local out = func()
-			local time = love.timer.getTime() - start
-			table.insert(self.times, time)
-			if self.verbose then
-				print("profiler \"" .. self.name .. "\": " .. time)
-			end
-			return out
-		end
 
 		function profiler:get_avg()
 			local sum = 0
@@ -61,5 +44,9 @@ return function(name, func, verbose)
 		end
 	end
 
-	return profiler:run()
+	local start = love.timer.getTime()
+	local out = profiler.func(...)
+	local time = love.timer.getTime() - start
+	table.insert(profiler.times, time)
+	return out
 end
