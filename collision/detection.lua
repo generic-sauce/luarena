@@ -75,6 +75,10 @@ local function colliding_polygons(p1, p2)
 end
 
 return function(shape1, shape2)
+	if not shape1:wrapper():intersects(shape2:wrapper()) then
+		return false
+	end
+
 	if shape1.shape_type == "polygon" then
 		if shape2.shape_type == "polygon" then
 			return colliding_polygons(shape1, shape2)
