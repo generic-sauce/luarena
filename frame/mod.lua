@@ -40,7 +40,9 @@ function frame_mod.initial(chars)
 
 	function frame:tick()
 		self:tick_tasks()
-		self:tick_collision()
+		require('profiler')("tick_collision", function(frame)
+			frame:tick_collision()
+		end, self)
 
 		if love.keyboard.isDown('d') then
 			if self.dummy then
