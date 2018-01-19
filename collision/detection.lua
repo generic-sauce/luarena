@@ -7,37 +7,24 @@ require('misc')
 
 local function colliding_polygon_circle(p, c)
 	local points = p:abs_points()
-
-	-- check whether circle center is in polygon
-	if p:contains(c:center()) then
-		return true
-	end
+	local outer_points = {}
 
 	-- check whether circle center is in range of point (= point is in range of circle)
-	for _, p in pairs(points) do
+	for i, p in pairs(points) do
 		if c:contains(p) then
 			return true
 		end
+
+		local u = get(points, i+1)
+		local v = get(points, i+2)
+		local this_axis = line_mod(p, u)
+		local next_axis = line_mod(u, v)
+
+		table.insert(outer_points, u + this_axis:right():with_length(c.radius))
+		table.insert(outer_points, u + next_axis:right():with_length(c.radius))
 	end
 
-	-- check whether circle center is in range of axis
-	for i, u in pairs(points) do
-		local v = get(points, i+1)
-		local axis = line_mod(u, v)
-		local offset = axis:right():with_length(c.radius)
-
-		local axis_polygon = polygon_mod.by_points({
-			u,
-			u + offset,
-			v + offset,
-			v
-		})
-		if axis_polygon:contains(c:center()) then
-			return true
-		end
-	end
-
-	return false
+	return polygon_mod.by_points(outer_points):contains(c:center())
 end
 
 local function colliding_circles(c1, c2)
