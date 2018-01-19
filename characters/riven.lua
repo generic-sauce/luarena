@@ -137,7 +137,6 @@ local function generate_w_task()
 			end
 		end
 
-		print("w")
 		frame:add(attack)
 	end
 
@@ -206,7 +205,6 @@ return function (character)
 				local q_task = q_tasks[1]
 
 				if q_task.dash_cooldown == 0 then
-					print("q dash")
 					q_task.dash_cooldown = Q_DASH_COOLDOWN
 					q_task.instances = math.max(0, q_task.instances - 1)
 					q_task.timeout = Q_TIMEOUT
@@ -214,7 +212,6 @@ return function (character)
 						(self.inputs.mouse - self.shape:center()):with_length(Q_DASH_DISTANCE)))
 				end
 			elseif #q_tasks == 0 and self.q_cooldown == 0 then
-				print("q")
 				self.q_cooldown = Q_COOLDOWN
 				local q_task = generate_q_task()
 				q_task.instances = math.max(0, q_task.instances - 1)
