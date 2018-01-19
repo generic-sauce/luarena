@@ -37,32 +37,28 @@ function collision_mod.init_frame(frame)
 		return colliders
 	end
 
-	function frame:update_colliders()
-		for _, e1 in pairs(self.entities) do
-			for _, e2 in pairs(self.entities) do
-				if e1 ~= e2 and e1.shape and e2.shape then
-					local colliding = collision_detection_mod(e1.shape, e2.shape)
-					if table.contains(e1.colliders, e2) and not colliding then
-						table.remove_val(e1.colliders, e2)
-						table.remove_val(e2.colliders, e1)
-						collision_mod.call_on_exit_collider(e1, self, e2)
-						collision_mod.call_on_exit_collider(e2, self, e1)
-					elseif not table.contains(e1.colliders, e2) and colliding then
-						table.insert(e1.colliders, e2)
-						table.insert(e2.colliders, e1)
-						collision_mod.call_on_enter_collider(e1, self, e2)
-						collision_mod.call_on_enter_collider(e2, self, e1)
+	function frame:tick_collision()
+		require('profiler')("tick_collision", function (frame)
+			for i, e1 in pairs(self.entities) do
+				for j = i+1, #self.entities do
+					local e2 = self.entities[j]
+					if e1.shape and e2.shape then
+						local colliding = collision_detection_mod(e1.shape, e2.shape)
+						if table.contains(e1.colliders, e2) and not colliding then
+							table.remove_val(e1.colliders, e2)
+							table.remove_val(e2.colliders, e1)
+							collision_mod.call_on_exit_collider(e1, self, e2)
+							collision_mod.call_on_exit_collider(e2, self, e1)
+						elseif not table.contains(e1.colliders, e2) and colliding then
+							table.insert(e1.colliders, e2)
+							table.insert(e2.colliders, e1)
+							collision_mod.call_on_enter_collider(e1, self, e2)
+							collision_mod.call_on_enter_collider(e2, self, e1)
+						end
 					end
 				end
 			end
-		end
-	end
-
-	function frame:tick_collision()
-		self:update_colliders()
-		for _, entity in pairs(self.entities) do
-			entity:tick(self)
-		end
+		end, self)
 	end
 end
 

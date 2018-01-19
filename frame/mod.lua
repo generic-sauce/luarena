@@ -41,6 +41,10 @@ function frame_mod.initial(chars)
 	function frame:tick()
 		self:tick_tasks()
 		self:tick_collision()
+		for _, entity in pairs(self.entities) do
+			entity:tick(self)
+		end
+
 
 		if love.keyboard.isDown('d') then
 			if self.dummy then
