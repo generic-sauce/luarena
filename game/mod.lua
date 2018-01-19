@@ -111,7 +111,7 @@ function game_mod.new(chars, local_id)
 		if love.keyboard.isDown('p') then
 			if not p_pressed then
 				for _, profiler in pairs(profilers) do
-					print("profiler-avg: \"" .. profiler.name .. "\": " .. profiler:get_avg())
+					print("profiler-avg: \"" .. profiler.name .. "\": " .. profiler:get_min() .. " <= " .. profiler:get_avg() .. " <= " .. profiler:get_max())
 				end
 				p_pressed = true
 			end

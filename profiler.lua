@@ -5,7 +5,7 @@ profilers = {}
 
 return function(name, func, verbose)
 	local profiler = nil
-	if table.contains(profilers, name) then
+	if profilers[name] then
 		profiler = profilers[name]
 	else
 		profiler = {}
@@ -38,6 +38,26 @@ return function(name, func, verbose)
 				sum = sum + t
 			end
 			return sum / #self.times
+		end
+
+		function profiler:get_min()
+			local min = nil
+			for _, t in pairs(self.times) do
+				if min == nil or t < min then
+					min = t
+				end
+			end
+			return min
+		end
+
+		function profiler:get_max()
+			local max = nil
+			for _, t in pairs(self.times) do
+				if max == nil or t > max then
+					max = t
+				end
+			end
+			return max
 		end
 	end
 
