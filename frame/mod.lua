@@ -43,6 +43,10 @@ function frame_mod.initial(chars)
 		require('profiler')("tick_collision", function(frame)
 			frame:tick_collision()
 		end, self)
+		for _, entity in pairs(self.entities) do
+			entity:tick(self)
+		end
+
 
 		if love.keyboard.isDown('d') then
 			if self.dummy then
