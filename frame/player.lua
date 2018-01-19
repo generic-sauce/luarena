@@ -1,4 +1,4 @@
-local polygon_mod = require('shape/polygon')
+local circle_mod = require('shape/circle')
 local rect_mod = require("viewmath/rect")
 local vec_mod = require('viewmath/vec')
 
@@ -25,11 +25,9 @@ end
 function new_player(char)
 	local player = {}
 
-	player.shape = polygon_mod.by_rect(
-		rect_mod.by_center_and_size(
-			vec_mod(200, 200),
-			vec_mod(20, 20)
-		)
+	player.shape = circle_mod.by_center_and_radius(
+		vec_mod(200, 200),
+		15
 	)
 	player.health = 100
 	player.inputs = { q = false, w = false, e = false, r = false, mouse = vec_mod(-2, -2), click = false, rclick = false }
