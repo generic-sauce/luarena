@@ -23,12 +23,13 @@ return function(name, func, verbose)
 
 		function profiler:run()
 			local start = love.timer.getTime()
-			func()
+			local out = func()
 			local time = love.timer.getTime() - start
 			table.insert(self.times, time)
 			if self.verbose then
 				print("profiler \"" .. self.name .. "\": " .. time)
 			end
+			return out
 		end
 
 		function profiler:get_avg()
@@ -40,5 +41,5 @@ return function(name, func, verbose)
 		end
 	end
 
-	profiler:run()
+	return profiler:run()
 end
