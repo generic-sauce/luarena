@@ -1,6 +1,6 @@
-FRAME_DURATION = 0.005 -- in seconds
+FRAME_DURATION = 0.010 -- in seconds
 INPUT_DELAY = 10
-BACKTRACK_BALANCE_INTERVAL = 2000
+BACKTRACK_BALANCE_INTERVAL = 5000
 
 local game_mod = {}
 local frame_mod = require("frame/mod")
