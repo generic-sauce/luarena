@@ -2,7 +2,6 @@
 
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
-local polygon_mod = require('shape/polygon')
 local circle_mod = require('shape/circle')
 
 local collision_detection_mod = require('collision/detection')
@@ -52,11 +51,9 @@ return function (u1)
 			blade.alive = true
 
 			blade.start_center = u1.shape:center()
-			blade.shape = polygon_mod.by_rect(
-				rect_mod.by_center_and_size(
-					u1.shape:center(),
-					vec_mod(4, 4)
-				)
+			blade.shape = circle_mod.by_center_and_radius(
+				u1.shape:center(),
+				3
 			)
 			blade.speed = (u1.inputs.mouse - u1.shape:center()):normalized()
 
@@ -72,7 +69,7 @@ return function (u1)
 				local blade = self
 
 				blade.shape = blade.shape:move_center(blade.speed)
-				if (blade.start_center - blade.shape:center()):length() > Q_RANGE or not collision_detection_mod(polygon_mod.by_rect(frame.map:rect()), blade.shape) then
+				if (blade.start_center - blade.shape:center()):length() > Q_RANGE or not blade.shape:wrapper():intersects(frame.map:rect()) then
 					frame:remove(blade)
 					blade.alive = false
 				end
@@ -120,11 +117,9 @@ return function (u1)
 			dagger.landed = false
 
 			dagger.u1 = u1
-			dagger.shape = polygon_mod.by_rect(
-				rect_mod.by_center_and_size(
-					u1.shape:center() + (u1.inputs.mouse - u1.shape:center()):cropped_to(W_RANGE),
-					vec_mod(3, 3)
-				)
+			dagger.shape = circle_mod.by_center_and_radius(
+				u1.shape:center() + (u1.inputs.mouse - u1.shape:center()):cropped_to(W_RANGE),
+				3
 			)
 
 			frame:add(dagger)
@@ -165,10 +160,12 @@ return function (u1)
 					viewport:draw_shape(dagger.shape, 200, 200, 255)
 				else
 					-- render shadow
-					viewport:draw_world_rect(rect_mod.by_center_and_size(
-						dagger.shape:center(),
-						dagger.shape:wrapper():size() * 3
-					), 40, 40, 40, 80)
+					viewport:draw_shape(
+						circle_mod.by_center_and_radius(
+							dagger.shape:center(),
+							dagger.shape.radius * 2
+						),
+					40, 40, 40, 80)
 				end
 			end
 		end
