@@ -104,6 +104,7 @@ function game_mod.new(chars, local_id)
 			print("backtracking to frame 2")
 			self:backtrack(2)
 		end
+	end
 
 	return game
 end
