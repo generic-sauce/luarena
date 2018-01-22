@@ -66,29 +66,47 @@ end
 return function(shape1, shape2)
 	profiler_mod.start("collision_detection_mod")
 
+	profiler_mod.start("collision_detection_mod - wrapper-check")
 	if not shape1:wrapper():intersects(shape2:wrapper()) then
+		profiler_mod.stop("collision_detection_mod - wrapper-check")
+		profiler_mod.stop("collision_detection_mod")
 		return false
 	end
+	profiler_mod.stop("collision_detection_mod - wrapper-check")
 
 	if shape1.shape_type == "polygon" then
 		if shape2.shape_type == "polygon" then
-			return colliding_polygons(shape1, shape2)
+			profiler_mod.start("collision_detection_mod - poly-poly")
+			local ret = colliding_polygons(shape1, shape2)
+			profiler_mod.stop("collision_detection_mod - poly-poly")
+			profiler_mod.stop("collision_detection_mod")
+			return ret
 		elseif shape2.shape_type == "circle" then
-			return colliding_polygon_circle(shape1, shape2)
+			profiler_mod.start("collision_detection_mod - poly-circle")
+			local ret = colliding_polygon_circle(shape1, shape2)
+			profiler_mod.stop("collision_detection_mod - poly-circle")
+			profiler_mod.stop("collision_detection_mod")
+			return ret
 		else
 			assert(false)
 		end
 	elseif shape1.shape_type == "circle" then
 		if shape2.shape_type == "polygon" then
-			return colliding_polygon_circle(shape2, shape1)
+			profiler_mod.start("collision_detection_mod - poly-circle")
+			local ret = colliding_polygon_circle(shape2, shape1)
+			profiler_mod.stop("collision_detection_mod - poly-circle")
+			profiler_mod.stop("collision_detection_mod")
+			return ret
 		elseif shape2.shape_type == "circle" then
-			return colliding_circles(shape1, shape2)
+			profiler_mod.start("collision_detection_mod - circle-circle")
+			local ret = colliding_circles(shape1, shape2)
+			profiler_mod.stop("collision_detection_mod - circle-circle")
+			profiler_mod.stop("collision_detection_mod")
+			return ret
 		else
 			assert(false)
 		end
 	else
 		assert(false)
 	end
-
-	profiler_mod.stop("collision_detection_mod")
 end
