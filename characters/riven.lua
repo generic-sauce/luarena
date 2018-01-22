@@ -7,22 +7,22 @@ local Q_COOLDOWN = 1000
 local Q_TIMEOUT = 500
 local Q_DASH_COOLDOWN = 70
 local Q_DASH_INSTANCES = 3
-local Q_DASH_DISTANCE = 25
+local Q_DASH_DISTANCE = 65
 local Q_DASH_SPEED = 2
-local Q_ATTACK_DAMAGE = 10
-local Q_ATTACK_SIZE = vec_mod(16, 16)
+local Q_ATTACK_DAMAGE = 20
+local Q_ATTACK_SIZE = vec_mod(32, 32)
 
 local W_COOLDOWN = 1000
-local W_ANIMATION_TIMEOUT = 20
-local W_SIZE = vec_mod(40, 40)
-local W_STUN_TIMEOUT = 40
-local W_DAMAGE = 10
+local W_ANIMATION_TIMEOUT = 40
+local W_SIZE = vec_mod(60, 60)
+local W_STUN_TIMEOUT = 60
+local W_DAMAGE = 20
 
 local E_COOLDOWN = 400
-local E_DASH_DISTANCE = 40
+local E_DASH_DISTANCE = 80
 local E_DASH_SPEED = 2
-local E_SHIELD_TIMEOUT = 70
-local E_SHIELD_SIZE = vec_mod(25, 25)
+local E_SHIELD_TIMEOUT = 100
+local E_SHIELD_SIZE = vec_mod(35, 35)
 
 local function generate_relative_area(entity, timeout, relative_position, size)
 	local area = {}
