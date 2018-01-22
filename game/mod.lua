@@ -7,6 +7,7 @@ local frame_mod = require("frame/mod")
 local calendar_mod = require("game/calendar")
 local cam_mod = require("viewmath/cam")
 local vec_mod = require('viewmath/vec')
+local profiler_mod = require('profiler')
 
 require("misc")
 
@@ -72,11 +73,13 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:frame_update()
-		require('profiler')("frame_update", function()
-			self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
-			self.current_frame:tick()
-			table.insert(self.frame_history, self.current_frame:clone())
-		end)
+		profiler_mod.start("frame_update")
+
+		self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
+		self.current_frame:tick()
+		table.insert(self.frame_history, self.current_frame:clone())
+
+		profiler_mod.stop("frame_update")
 	end
 
 	function game:update(dt)
@@ -111,7 +114,9 @@ function game_mod.new(chars, local_id)
 		if love.keyboard.isDown('p') then
 			if not p_pressed then
 				for _, profiler in pairs(profilers) do
-					print("profiler-avg: \"" .. profiler.name .. "\": " .. profiler:get_min() .. " <= " .. profiler:get_avg() .. " <= " .. profiler:get_max())
+					if #profiler.times > 0 then
+						print("profiler-avg: \"" .. profiler.name .. "\": " .. profiler:get_min() .. " <= " .. profiler:get_avg() .. " <= " .. profiler:get_max())
+					end
 				end
 				p_pressed = true
 			end
@@ -121,9 +126,7 @@ function game_mod.new(chars, local_id)
 
 		-- c => clear profilers
 		if love.keyboard.isDown('c') then
-			for _, profiler in pairs(profilers) do
-				profiler.times = {}
-			end
+			profilers = {}
 		end
 	end
 

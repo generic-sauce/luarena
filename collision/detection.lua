@@ -1,6 +1,8 @@
 local vec_mod = require("viewmath/vec")
 local line_mod = require("collision/line")
 
+local profiler_mod = require('profiler')
+
 local polygon_mod = require("shape/polygon")
 
 require('misc')
@@ -62,29 +64,31 @@ local function colliding_polygons(p1, p2)
 end
 
 return function(shape1, shape2)
-	return require("profiler")("collision_detection_mod", function(shape1, shape2)
-		if not shape1:wrapper():intersects(shape2:wrapper()) then
-			return false
-		end
+	profiler_mod.start("collision_detection_mod")
 
-		if shape1.shape_type == "polygon" then
-			if shape2.shape_type == "polygon" then
-				return colliding_polygons(shape1, shape2)
-			elseif shape2.shape_type == "circle" then
-				return colliding_polygon_circle(shape1, shape2)
-			else
-				assert(false)
-			end
-		elseif shape1.shape_type == "circle" then
-			if shape2.shape_type == "polygon" then
-				return colliding_polygon_circle(shape2, shape1)
-			elseif shape2.shape_type == "circle" then
-				return colliding_circles(shape1, shape2)
-			else
-				assert(false)
-			end
+	if not shape1:wrapper():intersects(shape2:wrapper()) then
+		return false
+	end
+
+	if shape1.shape_type == "polygon" then
+		if shape2.shape_type == "polygon" then
+			return colliding_polygons(shape1, shape2)
+		elseif shape2.shape_type == "circle" then
+			return colliding_polygon_circle(shape1, shape2)
 		else
 			assert(false)
 		end
-	end, shape1, shape2)
+	elseif shape1.shape_type == "circle" then
+		if shape2.shape_type == "polygon" then
+			return colliding_polygon_circle(shape2, shape1)
+		elseif shape2.shape_type == "circle" then
+			return colliding_circles(shape1, shape2)
+		else
+			assert(false)
+		end
+	else
+		assert(false)
+	end
+
+	profiler_mod.stop("collision_detection_mod")
 end

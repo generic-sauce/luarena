@@ -1,9 +1,11 @@
 require('misc')
 
+local profiler_mod = {}
+
 -- global list
 profilers = {}
 
-return function(name, func, ...)
+function profiler_mod.start(name)
 	local profiler = nil
 	if profilers[name] then
 		profiler = profilers[name]
@@ -12,6 +14,7 @@ return function(name, func, ...)
 		profiler.name = name
 		profiler.func = func
 		profiler.times = {}
+		profiler.start_times = {} -- is an array because of recursion!
 
 		profilers[name] = profiler
 
@@ -44,9 +47,14 @@ return function(name, func, ...)
 		end
 	end
 
-	local start = love.timer.getTime()
-	local out = profiler.func(...)
-	local time = love.timer.getTime() - start
-	table.insert(profiler.times, time)
-	return out
+	table.insert(profiler.start_times, love.timer.getTime())
 end
+
+function profiler_mod.stop(name)
+	local profiler = profilers[name]
+
+	table.insert(profiler.times, love.timer.getTime() - profiler.start_times[#profiler.start_times])
+	profiler.start_times[#profiler.start_times] = nil
+end
+
+return profiler_mod
