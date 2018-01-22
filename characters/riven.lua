@@ -28,14 +28,16 @@ local function generate_relative_area(entity, timeout, relative_position, size)
 	local area = {}
 	area.owner = entity
 	area.shape = polygon_mod.by_rect(
-			rect_mod.by_center_and_size(
-				entity.shape:center() + relative_position,
-				size
-			)
+		rect_mod.by_center_and_size(
+			entity.shape:center() + relative_position,
+			size
+		)
 	)
 	area.timeout = timeout
 
 	function area:tick(frame)
+		local entity = self.owner
+
 		self.timeout = math.max(0, self.timeout - 1)
 
 		if self.timeout == 0 then
@@ -83,6 +85,8 @@ local function generate_q_dash_task(dash_target)
 			Q_ATTACK_SIZE)
 
 		function attack:on_enter_collider(frame, entity)
+			local attack = self
+
 			if entity.damage ~= nil and entity ~= self.owner and not (entity.owner and entity.owner == attack.owner) then
 				entity:damage(Q_ATTACK_DAMAGE)
 			end
@@ -97,7 +101,7 @@ local function generate_q_dash_task(dash_target)
 			entity.shape = entity.shape:with_center(self.dash_target)
 			entity:remove_task(self)
 		else
-			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(Q_DASH_SPEED)
+			entity.shape = entity.shape:move_center(move_vec:with_length(Q_DASH_SPEED))
 		end
 	end
 
@@ -160,8 +164,7 @@ local function generate_e_task(dash_target)
 			E_SHIELD_SIZE)
 
 		function shield:damage(dmg)
-			-- TODO doesnt work multiplayer
-			frame:remove(shield)
+			frame:remove(self)
 		end
 
 		shield.owner = entity
@@ -174,7 +177,7 @@ local function generate_e_task(dash_target)
 			entity.shape = entity.shape:with_center(self.dash_target)
 			entity:remove_task(self)
 		else
-			entity.shape.center_vec = entity.shape:center() + move_vec:with_length(E_DASH_SPEED)
+			entity.shape = entity.shape:move_center(move_vec:with_length(E_DASH_SPEED))
 		end
 	end
 
