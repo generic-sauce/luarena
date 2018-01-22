@@ -35,12 +35,14 @@ function circle_mod.by_center_and_radius(center_vec, radius)
 
 	function circle:wrapper()
 		profiler_mod.start('circle:wrapper')
-		local ret = rect_mod.by_center_and_size(
-			self:center(),
-			vec_mod(self.radius * 2, self.radius * 2)
-		)
+		if not self.wrapper_cache then
+			self.wrapper_cache = rect_mod.by_center_and_size(
+				self:center(),
+				vec_mod(self.radius * 2, self.radius * 2)
+			)
+		end
 		profiler_mod.stop('circle:wrapper')
-		return ret
+		return self.wrapper_cache
 	end
 
 	function circle:contains(point)

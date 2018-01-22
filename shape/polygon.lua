@@ -64,19 +64,21 @@ function polygon_mod.by_center_and_points(center_vec, points)
 
 	function polygon:wrapper()
 		profiler_mod.start('polygon:wrapper')
-		local left, right, top, bottom
-		for _, p in pairs(self:abs_points()) do
-			if not left or left > p.x then left = p.x end
-			if not right or right < p.x then right = p.x end
-			if not top or top > p.y then top = p.y end
-			if not bottom or bottom < p.y then bottom = p.y end
+		if not self.wrapper_cache then
+			local left, right, top, bottom
+			for _, p in pairs(self:abs_points()) do
+				if not left or left > p.x then left = p.x end
+				if not right or right < p.x then right = p.x end
+				if not top or top > p.y then top = p.y end
+				if not bottom or bottom < p.y then bottom = p.y end
+			end
+			self.wrapper_cache = rect_mod.by_left_top_and_size(
+				vec_mod(left, top),
+				vec_mod(right - left, bottom - top)
+			)
 		end
-		local ret = rect_mod.by_left_top_and_size(
-			vec_mod(left, top),
-			vec_mod(right - left, bottom - top)
-		)
 		profiler_mod.stop('polygon:wrapper')
-		return ret
+		return self.wrapper_cache
 	end
 
 	function polygon:contains(point)
