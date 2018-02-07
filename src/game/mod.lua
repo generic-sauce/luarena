@@ -25,9 +25,12 @@ function game_mod.new(chars, local_id)
 
 	-- frame_id is the oldest frame to be re-calculated
 	function game:backtrack(frame_id)
+		local c = 0
 		while frame_id <= #self.frame_history do
+			c = c + 1
 			self.frame_history[#self.frame_history] = nil
 		end
+		print("backtracking " .. c)
 
 		if frame_id == 1 then
 			self.current_frame = frame_mod.initial(game.chars)
