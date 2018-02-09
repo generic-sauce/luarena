@@ -4,19 +4,14 @@ local vec_mod = require('viewmath/vec')
 
 WALKSPEED = 0.7
 
-local function generate_walk_task(walk_target)
-	assert(walk_target)
+local function generate_walk_task(direction)
+	assert(direction)
 
-	local task = {walk_target = walk_target, class = "walk"}
+	local task = {direction = direction, class = "walk"}
 
-	function task:tick(entity, frame)
-		local move_vec = self.walk_target - entity.shape:center()
-		if move_vec:length() < WALKSPEED then
-			entity.shape = entity.shape:with_center(self.walk_target)
-			entity:remove_task(self)
-		else
-			entity.shape = entity.shape:move_center(move_vec:with_length(WALKSPEED))
-		end
+	function task:init(entity, frame)
+		entity.shape = entity.shape:move_center(self.direction:with_length(WALKSPEED))
+		entity:remove_task(self)
 	end
 
 	return task
@@ -30,20 +25,42 @@ function new_player(char)
 		15
 	)
 	player.health = 100
-	player.inputs = { q = false, w = false, e = false, r = false, mouse = vec_mod(-2, -2), click = false, rclick = false }
+	player.inputs = { w = false, a = false, s = false, d = false, h = false, j = false, k = false, l = false }
 
 	function player:damage(dmg)
 		self.health = math.max(0, self.health - dmg)
 	end
 
 	function player:tick(frame)
-		if self.inputs.rclick then
-			self:add_task(generate_walk_task(self.inputs.mouse))
+		local d = self:direction()
+		if d:length() ~= 0 then
+			self:add_task(generate_walk_task(d))
 		end
 
 		if self.char_tick then
 			self:char_tick(frame)
 		end
+	end
+
+	function player:direction()
+		local d = vec_mod(0, 0)
+		if self.inputs.w then
+			d = d + vec_mod(0, -1)
+		end
+
+		if self.inputs.a then
+			d = d + vec_mod(-1, 0)
+		end
+
+		if self.inputs.s then
+			d = d + vec_mod(0, 1)
+		end
+
+		if self.inputs.d then
+			d = d + vec_mod(1, 0)
+		end
+
+		return d
 	end
 
 	function player:draw(viewport)

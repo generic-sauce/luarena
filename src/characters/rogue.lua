@@ -4,8 +4,8 @@ local circle_mod = require('shape/circle')
 
 return function (rogue)
 
-	rogue.q_cooldown = 0
-	rogue.w_cooldown = 0
+	rogue.h_cooldown = 0
+	rogue.j_cooldown = 0
 
 	function rogue:new_aoe(frame)
 		local aoe = {}
@@ -42,22 +42,21 @@ return function (rogue)
 
 
 	function rogue:char_tick(frame)
-		self.q_cooldown = math.max(0, self.q_cooldown - 1)
-		self.w_cooldown = math.max(0, self.w_cooldown - 1)
+		self.h_cooldown = math.max(0, self.h_cooldown - 1)
+		self.j_cooldown = math.max(0, self.j_cooldown - 1)
 
-		if self.inputs.q and self.q_cooldown == 0 then
+		if self.inputs.h and self.h_cooldown == 0 then
 			local MAX_JUMP = 200
 
-			self.q_cooldown = 100
+			self.h_cooldown = 100
 
-			local jump = (self.inputs.mouse - self.shape:center()):cropped_to(MAX_JUMP)
+			local jump = self:direction():with_length(MAX_JUMP)
 
 			self.shape = self.shape:move_center(jump)
-			self.walk_target = nil
 		end
 
-		if self.inputs.w and self.w_cooldown == 0 then
-			self.w_cooldown = 100
+		if self.inputs.j and self.j_cooldown == 0 then
+			self.j_cooldown = 100
 			frame:add(self:new_aoe(frame))
 		end
 	end

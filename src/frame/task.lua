@@ -9,17 +9,17 @@ local TASK_CLASSMAP = {
 	dash = {"move"},
 	stun = {},
 
-	riven_q = {"skill"},
-	riven_q_dash = {"skill", "dash"},
-	riven_w = {"skill"},
-	riven_w_stun = {"stun"},
-	riven_e = {"skill", "dash"},
+	riven_h = {"skill"},
+	riven_h_dash = {"skill", "dash"},
+	riven_j = {"skill"},
+	riven_j_stun = {"stun"},
+	riven_k = {"skill", "dash"},
 
-	u1_q = {"skill"},
-	u1_w = {"skill"},
-	u1_e_walk = {"skill", "walk"},
-	u1_e_dash = {"skill", "dash"},
-	u1_r = {"skill"}
+	u1_h = {"skill"},
+	u1_j = {"skill"},
+	u1_k_walk = {"skill", "walk"},
+	u1_k_dash = {"skill", "dash"},
+	u1_l = {"skill"}
 }
 
 local function find_superclasses(class)

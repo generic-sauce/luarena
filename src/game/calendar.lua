@@ -11,14 +11,15 @@ function calendar_mod.new(player_count, local_id)
 	calendar.playertable = {} -- Map<PlayerId, Map<Key, List<{value=<bool>, frame_id=<frame_id> }>>>
 	for i=1, player_count do
 		table.insert(calendar.playertable, {
-			q={{value=false, frame_id=1}},
 			w={{value=false, frame_id=1}},
-			e={{value=false, frame_id=1}},
-			r={{value=false, frame_id=1}},
-			mouse_x={{value=0, frame_id=1}}, -- in world-coordinates
-			mouse_y={{value=0, frame_id=1}}, -- in world-coordinates
-			click={{value=false, frame_id=1}},
-			rclick={{value=false, frame_id=1}},
+			a={{value=false, frame_id=1}},
+			s={{value=false, frame_id=1}},
+			d={{value=false, frame_id=1}},
+
+			h={{value=false, frame_id=1}},
+			j={{value=false, frame_id=1}},
+			k={{value=false, frame_id=1}},
+			l={{value=false, frame_id=1}},
 		})
 	end
 
@@ -39,40 +40,24 @@ function calendar_mod.new(player_count, local_id)
 
 	function calendar:apply_to_frame(f, frame_id)
 		for i=1, player_count do
-			f.entities[i].inputs.mouse = vec_mod(-1, -1)
-
 			local inputs = self:read_inputs(i, frame_id)
 			for key, value in pairs(inputs) do
-				if key == "mouse_x" then
-					f.entities[i].inputs.mouse = f.entities[i].inputs.mouse:with_x(value)
-				elseif key == "mouse_y" then
-					f.entities[i].inputs.mouse = f.entities[i].inputs.mouse:with_y(value)
-				else
-					f.entities[i].inputs[key] = value
-				end
+				f.entities[i].inputs[key] = value
 			end
 		end
 	end
 
 	function calendar:detect_changed_local_inputs(viewport)
 		local inputs = {}
-		inputs.q = love.keyboard.isDown('q')
 		inputs.w = love.keyboard.isDown('w')
-		inputs.e = love.keyboard.isDown('e')
-		inputs.r = love.keyboard.isDown('r')
+		inputs.a = love.keyboard.isDown('a')
+		inputs.s = love.keyboard.isDown('s')
+		inputs.d = love.keyboard.isDown('d')
 
-		local mouse = vec_mod(love.mouse.getPosition())
-		mouse = viewport:screen_to_world_vec(mouse)
-
-		inputs.mouse_x, inputs.mouse_y = mouse.x, mouse.y
-		local major, minor = love.getVersion()
-		if major == 0 and minor < 10 then
-			inputs.click = love.mouse.isDown("l")
-			inputs.rclick = love.mouse.isDown("r")
-		else
-			inputs.click = love.mouse.isDown(1)
-			inputs.rclick = love.mouse.isDown(2)
-		end
+		inputs.h = love.keyboard.isDown('h')
+		inputs.j = love.keyboard.isDown('j')
+		inputs.k = love.keyboard.isDown('k')
+		inputs.l = love.keyboard.isDown('l')
 
 		local old_inputs = self:read_inputs(self.local_id, nil)
 		local changed_inputs = {}

@@ -5,7 +5,7 @@ local collision_detection_mod = require('collision/detection')
 
 return function (archer)
 
-	archer.q_cooldown = 0
+	archer.h_cooldown = 0
 
 	function archer:new_arrow()
 		local arrow = {}
@@ -15,7 +15,7 @@ return function (archer)
 			self.shape:center(),
 			vec_mod(4, 4)
 		))
-		arrow.speed = (self.inputs.mouse - self.shape:center()):normalized() * 2
+		arrow.speed = self:direction():normalized() * 2
 
 		function arrow:on_enter_collider(frame, e)
 			if e.damage and e ~= self.owner then
@@ -40,9 +40,9 @@ return function (archer)
 	end
 
 	function archer:char_tick(frame)
-		self.q_cooldown = math.max(0, self.q_cooldown - 1)
-		if self.inputs.q and self.q_cooldown == 0 then
-			self.q_cooldown = 100
+		self.h_cooldown = math.max(0, self.h_cooldown - 1)
+		if self.inputs.h and self.h_cooldown == 0 then
+			self.h_cooldown = 100
 			frame:add(self:new_arrow())
 		end
 	end
