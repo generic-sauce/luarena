@@ -1,3 +1,5 @@
+local dev = require("dev")
+
 local backtrack_balancer_mod = require('gamemaster/backtrack_balancer')
 
 function new_clientmaster(networker, chars, local_id)
@@ -26,7 +28,7 @@ function new_clientmaster(networker, chars, local_id)
 					if avg ~= nil then
 						local old_time = self.start_time
 						self.start_time = self.start_time + FRAME_DURATION * (avg - p.avg_backtrack)/2
-						print("start_time: " .. tostring(old_time) .. " -> " .. tostring(self.start_time))
+						dev.debug("start_time: " .. tostring(old_time) .. " -> " .. tostring(self.start_time), {"network", "backtrack"})
 					end
 				end
 			else

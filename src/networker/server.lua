@@ -1,3 +1,5 @@
+local dev = require("dev")
+
 local enet = require "enet"
 require "json"
 
@@ -43,8 +45,11 @@ return function(event_handler, port)
 			end
 		end
 
-		if self.event_handler.on_recv then
-			self.event_handler:on_recv(received_packets)
+		if #received_packets > 0 then
+			dev.debug("networker/server: received " .. tostring(#received_packets) .. " packets", {"network"})
+			if self.event_handler.on_recv then
+				self.event_handler:on_recv(received_packets)
+			end
 		end
 	end
 
