@@ -34,7 +34,9 @@ function new_player(char)
 
 	function player:tick(frame)
 		local d = self:move_direction()
+
 		if d:length() ~= 0 then
+			self.direction_vec = d -- for the case that :direction() is not called
 			self:add_task(generate_walk_task(d))
 		end
 
@@ -68,7 +70,7 @@ function new_player(char)
 		local d = self:move_direction()
 
 		if d:length() ~= 0 then
-			self.direction_vec = d
+			self.direction_vec = d -- for the case that :tick() has not yet been called, but another entity reads my :direction()
 		end
 
 		return self.direction_vec
