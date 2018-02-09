@@ -17,6 +17,7 @@ return function(event_handler, server_ip, server_port)
 	client.server_host = client.host:connect(server_ip .. ":" .. server_port)
 
 	function client:send_to_server(p)
+		dev.debug("networker/client sent packet to server", {"network"})
 		local packet = json.encode(p)
 		self.server_host:send(packet)
 	end

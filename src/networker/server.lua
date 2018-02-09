@@ -21,6 +21,7 @@ return function(event_handler, port)
 	end
 
 	function server:broadcast_packet(p)
+		dev.debug("networker/server broadcasts packet", {"network"})
 		for _, client in pairs(self.clients) do
 			client:send(json.encode(p))
 		end
