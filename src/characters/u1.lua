@@ -118,7 +118,7 @@ return function (u1)
 
 			dagger.u1 = u1
 			dagger.shape = circle_mod.by_center_and_radius(
-				u1.shape:center() + u1:direction():cropped_to(J_RANGE),
+				u1.shape:center() + u1:direction():with_length(J_RANGE),
 				3
 			)
 
