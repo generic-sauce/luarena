@@ -1,7 +1,7 @@
 local vec_mod = require("viewmath/vec")
 local line_mod = require("collision/line")
 
-local profiler_mod = require('profiler')
+local dev = require('dev')
 
 local polygon_mod = require("shape/polygon")
 
@@ -64,44 +64,44 @@ local function colliding_polygons(p1, p2)
 end
 
 return function(shape1, shape2)
-	profiler_mod.start("collision_detection_mod")
+	dev.start_profiler("collision_detection_mod", {"collision"})
 
-	profiler_mod.start("collision_detection_mod - wrapper-check")
+	dev.stop_profiler("collision_detection_mod - wrapper-check", {"collision"})
 	if not shape1:wrapper():intersects(shape2:wrapper()) then
-		profiler_mod.stop("collision_detection_mod - wrapper-check")
-		profiler_mod.stop("collision_detection_mod")
+		dev.stop_profiler("collision_detection_mod - wrapper-check")
+		dev.stop_profiler("collision_detection_mod")
 		return false
 	end
-	profiler_mod.stop("collision_detection_mod - wrapper-check")
+	dev.stop_profiler("collision_detection_mod - wrapper-check")
 
 	if shape1.shape_type == "polygon" then
 		if shape2.shape_type == "polygon" then
-			profiler_mod.start("collision_detection_mod - poly-poly")
+			dev.start_profiler("collision_detection_mod - poly-poly", {"collision"})
 			local ret = colliding_polygons(shape1, shape2)
-			profiler_mod.stop("collision_detection_mod - poly-poly")
-			profiler_mod.stop("collision_detection_mod")
+			dev.stop_profiler("collision_detection_mod - poly-poly")
+			dev.stop_profiler("collision_detection_mod")
 			return ret
 		elseif shape2.shape_type == "circle" then
-			profiler_mod.start("collision_detection_mod - poly-circle")
+			dev.start_profiler("collision_detection_mod - poly-circle", {"collision"})
 			local ret = colliding_polygon_circle(shape1, shape2)
-			profiler_mod.stop("collision_detection_mod - poly-circle")
-			profiler_mod.stop("collision_detection_mod")
+			dev.stop_profiler("collision_detection_mod - poly-circle")
+			dev.stop_profiler("collision_detection_mod")
 			return ret
 		else
 			assert(false)
 		end
 	elseif shape1.shape_type == "circle" then
 		if shape2.shape_type == "polygon" then
-			profiler_mod.start("collision_detection_mod - poly-circle")
+			dev.start_profiler("collision_detection_mod - poly-circle", {"collision"})
 			local ret = colliding_polygon_circle(shape2, shape1)
-			profiler_mod.stop("collision_detection_mod - poly-circle")
-			profiler_mod.stop("collision_detection_mod")
+			dev.stop_profiler("collision_detection_mod - poly-circle")
+			dev.stop_profiler("collision_detection_mod")
 			return ret
 		elseif shape2.shape_type == "circle" then
-			profiler_mod.start("collision_detection_mod - circle-circle")
+			dev.start_profiler("collision_detection_mod - circle-circle", {"collision"})
 			local ret = colliding_circles(shape1, shape2)
-			profiler_mod.stop("collision_detection_mod - circle-circle")
-			profiler_mod.stop("collision_detection_mod")
+			dev.stop_profiler("collision_detection_mod - circle-circle")
+			dev.stop_profiler("collision_detection_mod")
 			return ret
 		else
 			assert(false)

@@ -1,6 +1,6 @@
 local collision_mod = {}
 
-local profiler_mod = require('profiler')
+local dev = require('dev')
 
 local collision_detection_mod = require("collision/detection")
 
@@ -40,7 +40,7 @@ function collision_mod.init_frame(frame)
 	end
 
 	function frame:tick_collision()
-		profiler_mod.start('tick_collision')
+		dev.start_profiler('tick_collision', {"collision"})
 		for i, e1 in pairs(self.entities) do
 			for j = i+1, #self.entities do
 				local e2 = self.entities[j]
@@ -60,7 +60,7 @@ function collision_mod.init_frame(frame)
 				end
 			end
 		end
-		profiler_mod.stop('tick_collision')
+		dev.stop_profiler('tick_collision')
 	end
 end
 

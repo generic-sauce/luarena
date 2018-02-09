@@ -1,7 +1,7 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 
-local profiler_mod = require('profiler')
+local dev = require('dev')
 
 local circle_mod = {}
 
@@ -34,14 +34,14 @@ function circle_mod.by_center_and_radius(center_vec, radius)
 	end
 
 	function circle:wrapper()
-		profiler_mod.start('circle:wrapper')
+		dev.start_profiler('circle:wrapper', {"collision"})
 		if not self.wrapper_cache then
 			self.wrapper_cache = rect_mod.by_center_and_size(
 				self:center(),
 				vec_mod(self.radius * 2, self.radius * 2)
 			)
 		end
-		profiler_mod.stop('circle:wrapper')
+		dev.stop_profiler('circle:wrapper')
 		return self.wrapper_cache
 	end
 

@@ -1,3 +1,5 @@
+local dev = require("dev")
+
 local enet = require "enet"
 require "json"
 
@@ -9,7 +11,7 @@ return function(event_handler, server_ip, server_port)
 		server_port = "3842"
 	end
 
-	print("trying to connect to " .. server_ip .. ":" .. server_port)
+	dev.debug("trying to connect to " .. server_ip .. ":" .. server_port, {"network"})
 
 	client.host = enet.host_create()
 	client.server_host = client.host:connect(server_ip .. ":" .. server_port)

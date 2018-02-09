@@ -1,14 +1,29 @@
 require('misc')
 
-local profiler_mod = {}
+local dev = {}
+
+-- freely manipulate this!
+dev.active_tags = {"network", "backtrack"}
+
+function dev.debug(string, tags)
+	if tags and #table.intersection(tags, dev.active_tags) == 0 then
+		return
+	end
+
+	print(string)
+end
 
 -- global list
-profilers = {}
+dev.profilers = {}
 
-function profiler_mod.start(name)
+function dev.start_profiler(name, tags)
+	if tags and #table.intersection(tags, dev.active_tags) == 0 then
+		return
+	end
+
 	local profiler = nil
-	if profilers[name] then
-		profiler = profilers[name]
+	if dev.profilers[name] then
+		profiler = dev.profilers[name]
 	else
 		profiler = {}
 		profiler.name = name
@@ -16,7 +31,7 @@ function profiler_mod.start(name)
 		profiler.times = {}
 		profiler.start_times = {} -- is an array because of recursion!
 
-		profilers[name] = profiler
+		dev.profilers[name] = profiler
 
 		function profiler:get_avg()
 			return self:sum() / #self.times
@@ -54,21 +69,26 @@ function profiler_mod.start(name)
 	table.insert(profiler.start_times, love.timer.getTime())
 end
 
-function profiler_mod.stop(name)
-	local profiler = profilers[name]
+function dev.stop_profiler(name)
+	-- if this profiler is inactive -> don't do anything
+	if not dev.profilers[name] then
+		return
+	end
+
+	local profiler = dev.profilers[name]
 
 	table.insert(profiler.times, love.timer.getTime() - profiler.start_times[#profiler.start_times])
 	profiler.start_times[#profiler.start_times] = nil
 end
 
-function profiler_mod.dump_all()
+function dev.dump_profilers()
 	local function format_float(f)
 		return string.format("%.5f", f)
 	end
 
 	local times_length = 0
 	local name_length = 0
-	for _, profiler in pairs(profilers) do
+	for _, profiler in pairs(dev.profilers) do
 		if #profiler.times > 0 then
 			name_length = math.max(name_length, #profiler.name)
 			times_length = math.max(times_length, #tostring(#profiler.times))
@@ -76,7 +96,7 @@ function profiler_mod.dump_all()
 	end
 
 	print("=================")
-	for _, profiler in pairs(profilers) do
+	for _, profiler in pairs(dev.profilers) do
 		if #profiler.times > 0 then
 			print("profiler: \"" .. string.format("%" .. name_length .. "s", profiler.name) .. "\": ", format_float(profiler:get_min()) .. " <= " .. format_float(profiler:get_avg()) .. " <= " .. format_float(profiler:get_max()) .. ", count=" .. string.format("%" .. times_length .. "s", #profiler.times) .. ", sum=" .. format_float(profiler:sum()))
 		end
@@ -84,4 +104,4 @@ function profiler_mod.dump_all()
 	print("=================")
 end
 
-return profiler_mod
+return dev

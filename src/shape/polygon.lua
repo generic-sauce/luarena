@@ -2,21 +2,21 @@ local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local line_mod = require('collision/line')
 
-local profiler_mod = require('profiler')
+local dev = require('dev')
 
 require('misc')
 
 local polygon_mod = {}
 
 local function assert_convex_points(points)
-	profiler_mod.start('assert_convex_points')
+	dev.start_profiler('assert_convex_points', {"collision"})
 	for i, _ in pairs(points) do
 		local line_start = points[i]
 		local line_end = get(points, i+2)
 		local p = get(points, i+1)
 		assert(line_mod(line_start, line_end):is_right(p), "polygon is not convex!")
 	end
-	profiler_mod.stop('assert_convex_points')
+	dev.stop_profiler('assert_convex_points')
 end
 
 -- points are relative to the center!
@@ -63,7 +63,7 @@ function polygon_mod.by_center_and_points(center_vec, points)
 	end
 
 	function polygon:wrapper()
-		profiler_mod.start('polygon:wrapper')
+		dev.start_profiler('polygon:wrapper', {"collision"})
 		if not self.wrapper_cache then
 			local left, right, top, bottom
 			for _, p in pairs(self:abs_points()) do
@@ -77,7 +77,7 @@ function polygon_mod.by_center_and_points(center_vec, points)
 				vec_mod(right - left, bottom - top)
 			)
 		end
-		profiler_mod.stop('polygon:wrapper')
+		dev.stop_profiler('polygon:wrapper')
 		return self.wrapper_cache
 	end
 

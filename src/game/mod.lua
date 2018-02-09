@@ -7,7 +7,7 @@ local frame_mod = require("frame/mod")
 local calendar_mod = require("game/calendar")
 local cam_mod = require("viewmath/cam")
 local vec_mod = require('viewmath/vec')
-local profiler_mod = require('profiler')
+local dev = require('dev')
 
 require("misc")
 
@@ -30,7 +30,7 @@ function game_mod.new(chars, local_id)
 			c = c + 1
 			self.frame_history[#self.frame_history] = nil
 		end
-		print("backtracking " .. c)
+		dev.debug("backtracking " .. c .. " frames", {"backtrack"})
 
 		if frame_id == 1 then
 			self.current_frame = frame_mod.initial(game.chars)
@@ -76,13 +76,13 @@ function game_mod.new(chars, local_id)
 	end
 
 	function game:frame_update()
-		profiler_mod.start("frame_update")
+		dev.start_profiler("frame_update")
 
 		self.calendar:apply_to_frame(self.current_frame, #self.frame_history + 1)
 		self.current_frame:tick()
 		table.insert(self.frame_history, self.current_frame:clone())
 
-		profiler_mod.stop("frame_update")
+		dev.stop_profiler("frame_update")
 	end
 
 	function game:update(dt)
@@ -116,7 +116,7 @@ function game_mod.new(chars, local_id)
 		-- p => print profilers
 		if love.keyboard.isDown('p') then
 			if not p_pressed then
-				profiler_mod.dump_all()
+				dev.dump_profilers()
 				p_pressed = true
 			end
 		else
@@ -125,7 +125,7 @@ function game_mod.new(chars, local_id)
 
 		-- c => clear profilers
 		if love.keyboard.isDown('c') then
-			profilers = {}
+			dev.profilers = {}
 		end
 	end
 
