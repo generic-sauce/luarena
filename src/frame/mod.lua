@@ -46,7 +46,7 @@ function frame_mod.initial(chars)
 		end
 
 
-		if love.keyboard.isDown('d') then
+		if love.keyboard.isDown('x') then
 			if self.dummy then
 				self:remove(self.dummy)
 			end

@@ -26,13 +26,14 @@ function new_player(char)
 	)
 	player.health = 100
 	player.inputs = { w = false, a = false, s = false, d = false, h = false, j = false, k = false, l = false }
+	player.direction_vec = vec_mod(1, 0)
 
 	function player:damage(dmg)
 		self.health = math.max(0, self.health - dmg)
 	end
 
 	function player:tick(frame)
-		local d = self:direction()
+		local d = self:move_direction()
 		if d:length() ~= 0 then
 			self:add_task(generate_walk_task(d))
 		end
@@ -42,7 +43,7 @@ function new_player(char)
 		end
 	end
 
-	function player:direction()
+	function player:move_direction()
 		local d = vec_mod(0, 0)
 		if self.inputs.w then
 			d = d + vec_mod(0, -1)
@@ -61,6 +62,16 @@ function new_player(char)
 		end
 
 		return d
+	end
+
+	function player:direction()
+		local d = self:move_direction()
+
+		if d:length() ~= 0 then
+			self.direction_vec = d
+		end
+
+		return self.direction_vec
 	end
 
 	function player:draw(viewport)
