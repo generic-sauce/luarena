@@ -25,12 +25,14 @@ function game_mod.new(chars, local_id)
 
 	-- frame_id is the oldest frame to be re-calculated
 	function game:backtrack(frame_id)
+		dev.start_profiler("backtrack", {"backtrack"})
+
 		local c = 0
+		local fh_size = #self.frame_history
 		while frame_id <= #self.frame_history do
 			c = c + 1
 			self.frame_history[#self.frame_history] = nil
 		end
-		dev.debug("backtracking " .. c .. " frames", {"backtrack"})
 
 		if frame_id == 1 then
 			self.current_frame = frame_mod.initial(game.chars)
@@ -42,6 +44,9 @@ function game_mod.new(chars, local_id)
 		while #self.frame_history * FRAME_DURATION < current_time - self.start_time do
 			self:frame_update()
 		end
+		dev.debug("went back " .. c .. " frames (" .. fh_size .. " -> " .. frame_id-1 .. " -> " .. #self.frame_history .. ")", {"backtrack"})
+
+		dev.stop_profiler("backtrack")
 	end
 
 	-- will do calendar:apply_input_changes and backtrack
