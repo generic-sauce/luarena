@@ -12,6 +12,7 @@ function frame_mod.initial(chars)
 	frame.map = visual_map_mod.init_collision_map(collision_map_mod.new(vec_mod(16, 16)))
 	frame.entities = {}
 	frame.chars = chars
+	frame.scores = {}
 
 	function frame:init()
 		collision_mod.init_frame(self)
@@ -19,6 +20,10 @@ function frame_mod.initial(chars)
 
 		for _, char in pairs(self.chars) do
 			self:add(require('frame/player')(char))
+		end
+
+		for i=1, #self.chars do
+			self.scores[i] = 0
 		end
 	end
 
@@ -69,6 +74,16 @@ function frame_mod.initial(chars)
 		for _, entity in pairs(self.entities) do
 			entity:draw(viewport)
 		end
+
+		-- render score
+		local str = ""
+		for i = 1, #self.chars do
+			str = str .. tostring(self.scores[i]) .. ":"
+		end
+		str = str:sub(1, -2) -- remove last ":"
+
+		love.graphics.setColor(255, 255, 255, 255)
+		love.graphics.print(str)
 	end
 
 	function frame:clone()
@@ -78,6 +93,11 @@ function frame_mod.initial(chars)
 	-- respawn
 
 	function frame:consider_respawn()
+		-- Don't do this in single player!
+		if #self.chars < 2 then
+			return
+		end
+
 		local players_alive = 0
 		for i = 1, #self.chars, 1 do
 			if not self.entities[i]:has_tasks_by_class("dead") then
@@ -93,8 +113,16 @@ function frame_mod.initial(chars)
 	function frame:respawn()
 		for i = 1, #self.chars do
 			local player = self.entities[i]
-			for _, task in pairs(player:get_tasks_by_class("dead")) do
-				player:remove_task(task)
+			local tasks = player:get_tasks_by_class("dead")
+			-- if you are dead
+			if #tasks > 0 then
+				-- you will respawn
+				for _, task in pairs(tasks) do
+					player:remove_task(task)
+				end
+			else
+				-- otherwise you get a score
+				self.scores[i] = self.scores[i] + 1
 			end
 			player.health = 100
 		end
