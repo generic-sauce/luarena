@@ -1,5 +1,6 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
+local graphics_mod = require('graphics/mod')
 
 local cam_mod = {} -- a cam is just a viewport-generator
 
@@ -17,31 +18,6 @@ local function new_viewport(pos, zoom)
 			self.pos,
 			get_screen_size() / self.zoom
 		)
-	end
-
-	function viewport:draw_world_rect(world_rect, r, g, b, a)
-		local screen_rect = self:world_to_screen_rect(world_rect)
-		love.graphics.setColor(r, g, b, a)
-		love.graphics.rectangle("fill", screen_rect:left(), screen_rect:top(), screen_rect:width(), screen_rect:height())
-	end
-
-	function viewport:draw_shape(shape, r, g, b, a)
-		love.graphics.setColor(r, g, b, a)
-		if shape.shape_type == "polygon" then
-			local vertices = {}
-			for _, p in pairs(shape:abs_points()) do
-				local v = self:world_to_screen_pos(p)
-				table.insert(vertices, v.x)
-				table.insert(vertices, v.y)
-			end
-			love.graphics.polygon("fill", vertices)
-		elseif shape.shape_type == "circle" then
-			local pos = self:world_to_screen_pos(shape:center())
-			local radius = shape.radius * self.zoom
-			love.graphics.circle("fill", pos.x, pos.y, radius)
-		else
-			assert(false)
-		end
 	end
 
 	function viewport:world_to_screen_pos(pos)
@@ -64,7 +40,7 @@ local function new_viewport(pos, zoom)
 		)
 	end
 
-	return viewport
+	return graphics_mod.init_viewport(viewport)
 end
 
 function cam_mod.fixed(pos)
