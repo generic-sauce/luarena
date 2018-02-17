@@ -24,11 +24,17 @@ function vec_mod(x, y)
 	end
 
 	function meta:__mul(other)
-		return vec_mod(self.x * other, self.y * other)
+		if type(other) ~= "table" then
+			return vec_mod(self.x * other, self.y * other)
+		end
+		return vec_mod(self.x * other.x, self.y * other.y)
 	end
 
 	function meta:__div(other)
-		return vec_mod(self.x / other, self.y / other)
+		if type(other) ~= "table" then
+			return vec_mod(self.x / other, self.y / other)
+		end
+		return vec_mod(self.x / other.x, self.y / other.y)
 	end
 
 	function meta:__tostring()
@@ -47,6 +53,14 @@ function vec_mod(x, y)
 
 	function v:with_y(y)
 		return vec_mod(self.x, y)
+	end
+
+	function v:floor()
+		return vec_mod(math.floor(self.x), math.floor(self.y))
+	end
+
+	function v:ceil()
+		return vec_mod(math.ceil(self.x), math.ceil(self.y))
 	end
 
 	function v:normalized()
