@@ -14,7 +14,8 @@ local function generate_bottom_sprite(size, collision_map)
 			local tile_pos = (vec_mod(x, y) / TEXTURE_PIXEL_SIZE):floor()
 
 			if collision_map:is_kill(tile_pos) then
-				return 0, 0, math.random() * 16 + 64, 255
+				local r = math.random()
+				return 0, r * 64 + 64, r * 64 + 128, 255
 			elseif collision_map:is_none(tile_pos) then
 				return 0, math.random() * 16 + 64, 0, 255
 			else
@@ -34,7 +35,8 @@ local function generate_top_sprite(size, collision_map)
 			--print(tile_pos)
 
 			if collision_map:is_solid(tile_pos) then
-				return math.random() * 16 + 64, 0, 0, 255
+				local r = math.random() * 16 + 64
+				return r, r, r, 255
 			else
 					assert(collision_map:get_tile(tile_pos))
 					return 0, 0, 0, 0
