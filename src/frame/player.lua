@@ -30,6 +30,13 @@ function new_player(char)
 
 	function player:damage(dmg)
 		self.health = math.max(0, self.health - dmg)
+		if self.health == 0 then
+			self:die()
+		end
+	end
+
+	function player:die()
+		self:add_task({ class = "dead" })
 	end
 
 	function player:tick(frame)
@@ -77,16 +84,18 @@ function new_player(char)
 	end
 
 	function player:draw(viewport)
-		viewport:draw_shape(self.shape, 100, 100, 100)
+		if not self:has_tasks_by_class("dead") then
+			viewport:draw_shape(self.shape, 100, 100, 100)
 
-		local bar_offset = 10
-		local bar_height = 3
+			local bar_offset = 10
+			local bar_height = 3
 
-		local wrapper = self.shape:wrapper()
-		viewport:draw_world_rect(rect_mod.by_left_top_and_size(
-			wrapper:left_top() - vec_mod(0, bar_offset),
-			vec_mod(wrapper:width() * self.health/100, bar_height)
-		), 255, 0, 0)
+			local wrapper = self.shape:wrapper()
+			viewport:draw_world_rect(rect_mod.by_left_top_and_size(
+				wrapper:left_top() - vec_mod(0, bar_offset),
+				vec_mod(wrapper:width() * self.health/100, bar_height)
+			), 255, 0, 0)
+		end
 	end
 
 	return require("characters/" .. char)(player)

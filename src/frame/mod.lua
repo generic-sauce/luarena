@@ -11,12 +11,13 @@ function frame_mod.initial(chars)
 	local frame = {}
 	frame.map = visual_map_mod.init_collision_map(collision_map_mod.new(vec_mod(16, 16)))
 	frame.entities = {}
+	frame.chars = chars
 
-	function frame:init(chars)
+	function frame:init()
 		collision_mod.init_frame(self)
 		task_mod.init_frame(self)
 
-		for _, char in pairs(chars) do
+		for _, char in pairs(self.chars) do
 			self:add(require('frame/player')(char))
 		end
 	end
@@ -56,7 +57,10 @@ function frame_mod.initial(chars)
 			self:add(self.dummy)
 		end
 
+		self:consider_respawn()
 	end
+
+	-- draw
 
 	function frame:draw(viewport)
 		assert(viewport)
@@ -71,7 +75,32 @@ function frame_mod.initial(chars)
 		return clone(self)
 	end
 
-	frame:init(chars)
+	-- respawn
+
+	function frame:consider_respawn()
+		local players_alive = 0
+		for i = 1, #self.chars, 1 do
+			if not self.entities[i]:has_tasks_by_class("dead") then
+				players_alive = players_alive + 1
+			end
+		end
+
+		if players_alive <= 1 then
+			self:respawn()
+		end
+	end
+
+	function frame:respawn()
+		for i = 1, #self.chars do
+			local player = self.entities[i]
+			for _, task in pairs(player:get_tasks_by_class("dead")) do
+				player:remove_task(task)
+			end
+			player.health = 100
+		end
+	end
+
+	frame:init()
 
 	return frame
 end

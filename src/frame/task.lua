@@ -19,7 +19,9 @@ local TASK_CLASSMAP = {
 	u1_j = {"skill"},
 	u1_k_walk = {"skill", "walk"},
 	u1_k_dash = {"skill", "dash"},
-	u1_l = {"skill"}
+	u1_l = {"skill"},
+
+	dead = {}
 }
 
 local function find_superclasses(class)
@@ -88,6 +90,9 @@ local function get_relation_partners(tasks, task, rel)
 	local partners = {}
 	for _, active_task in pairs(tasks) do
 		assert(active_task.class, "get_relation_partners(): active_task.class == nil")
+		assert(task.class)
+		assert(active_task)
+		assert(task)
 		if active_task ~= task and TASK_RELATION[active_task.class][task.class] == rel then
 			table.insert_once(partners, active_task)
 		end
