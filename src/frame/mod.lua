@@ -1,13 +1,15 @@
-local map_mod = require('map')
+local visual_map_mod = require('graphics/visual_map')
 local collision_mod = require('collision/mod')
+local collision_map_mod = require('collision/collision_map')
 local task_mod = require('frame/task')
+local vec_mod = require('viewmath/vec')
 
 local frame_mod = {}
 require("misc")
 
 function frame_mod.initial(chars)
 	local frame = {}
-	frame.map = map_mod.new()
+	frame.map = visual_map_mod.init_collision_map(collision_map_mod.new(vec_mod(16, 16)))
 	frame.entities = {}
 
 	function frame:init(chars)
