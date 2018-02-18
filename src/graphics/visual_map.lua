@@ -55,7 +55,7 @@ function visual_map_mod.init_collision_map(collision_map)
 	function visual_map:rect()
 		return rect_mod.by_left_top_and_size(
 			vec_mod(0, 0),
-			self:size()
+			self:visual_size()
 		)
 	end
 
