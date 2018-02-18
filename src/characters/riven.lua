@@ -198,7 +198,6 @@ return function (character)
 
 		if self.inputs[S1_KEY] then
 			local s1_tasks = self:get_tasks_by_class("riven_s1")
-			print(#s1_tasks)
 			assert(not (#s1_tasks > 1), stringify(s1_tasks))
 
 			if #s1_tasks == 1 then
