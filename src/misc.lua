@@ -42,6 +42,15 @@ function table.union(t1, t2) -- only call with arrays
 	return out
 end
 
+function table.shallow_copy(t)
+	local new = {}
+	for k, v in pairs(t) do
+		new[k] = v
+	end
+
+	return new
+end
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 function get(array, index)

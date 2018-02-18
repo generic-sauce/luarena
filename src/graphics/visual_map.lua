@@ -32,7 +32,6 @@ local function generate_top_sprite(size, collision_map)
 		function(x, y)
 			math.randomseed(y * size.x + x)
 			local tile_pos = (vec_mod(x, y) / TEXTURE_PIXEL_SIZE):floor()
-			--print(tile_pos)
 
 			if collision_map:is_solid(tile_pos) then
 				local r = math.random() * 16 + 64
@@ -62,21 +61,6 @@ function visual_map_mod.init_collision_map(collision_map)
 	function visual_map:draw(viewport)
 		viewport:draw_world_sprite(self.bottom_sprite, vec_mod(0, 0), self:visual_size())
 		viewport:draw_world_sprite(self.top_sprite, vec_mod(0, 0), self:visual_size())
-
-		--[[local r = self:rect()
-
-		local ground_pos = viewport:world_to_screen_pos(r:center())
-		love.graphics.draw(self.ground_texture, ground_pos.x, ground_pos.y)
-
-		local minx = math.floor(r:left() / PIXEL_SIZE) * PIXEL_SIZE
-		local maxx = (math.ceil(r:right() / PIXEL_SIZE) - 1) * PIXEL_SIZE
-		local miny = math.floor(r:top() / PIXEL_SIZE) * PIXEL_SIZE
-		local maxy = (math.ceil(r:bottom() / PIXEL_SIZE) - 1) * PIXEL_SIZE
-
-		for x=minx, maxx, PIXEL_SIZE do
-			for y=miny, maxy, PIXEL_SIZE do
-			end
-		end]]
 	end
 
 	do

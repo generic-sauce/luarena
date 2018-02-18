@@ -41,9 +41,13 @@ function collision_mod.init_frame(frame)
 
 	function frame:tick_collision()
 		dev.start_profiler('tick_collision', {"collision"})
-		for i, e1 in pairs(self.entities) do
-			for j = i+1, #self.entities do
-				local e2 = self.entities[j]
+
+		-- This is required, as the event-functions may remove/add entities, which causes problems
+		local entities = table.shallow_copy(self.entities)
+
+		for i, e1 in pairs(entities) do
+			for j = i+1, #entities do
+				local e2 = entities[j]
 				if e1.shape and e2.shape then
 					local colliding = collision_detection_mod(e1.shape, e2.shape)
 					if table.contains(e1.colliders, e2) and not colliding then
