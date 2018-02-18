@@ -28,8 +28,13 @@ function new_clientmaster(networker, chars, local_id)
 					if avg ~= nil then
 						local old_time = self.start_time
 						self.start_time = self.start_time + FRAME_DURATION * (avg - p.avg_backtrack)/2
+						dev.debug("server avg backtrack: " .. tostring(p.avg_backtrack) .. ", client avg backtrack: " .. tostring(avg), {"backtrack-balance"})
 						dev.debug("start_time: " .. tostring(old_time) .. " -> " .. tostring(self.start_time), {"network", "backtrack"})
+					else
+						dev.debug("Can't backtrack-balance as there were no *client* backtracks", {"backtrack-balance"})
 					end
+				else
+					dev.debug("Can't backtrack-balance as there were no *server* backtracks", {"backtrack-balance"})
 				end
 			else
 				print("clientmaster received packet of strange tag: " .. tostring(p.tag))
