@@ -17,7 +17,6 @@ end
 
 function graphics_mod.generate_sprite(texture, tile_size, tile_pos)
 	local texture_size = vec_mod(texture:getWidth(), texture:getHeight())
-	print(texture_size)
 	tile_size = tile_size or texture_size
 	tile_pos = tile_pos or vec_mod(0, 0)
 
