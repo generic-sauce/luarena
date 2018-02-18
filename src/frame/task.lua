@@ -75,10 +75,10 @@ end
 
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
-	{old = {"walk"}, new = {"dash", "stun"}, relation = "pause"},
-	{old = {"stun"}, new = {"walk", "skill"}, relation = "delay"},
-	{old = {"dash"}, new = {"dash"}, relation = "delay"},
-	{old = {"dash"}, new = {"walk"}, relation = "prevent"}
+	{old = {"walk"}, new = {"dash", "stun"}, relation = "cancel"},
+	{old = {"dash", "stun"}, new = {"walk"}, relation = "prevent"},
+	{old = {"stun"}, new = {"skill"}, relation = "delay"},
+	{old = {"dash"}, new = {"dash"}, relation = "delay"}
 })
 
 local function get_relation_partners(tasks, task, rel)
