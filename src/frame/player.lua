@@ -2,6 +2,16 @@ local circle_mod = require('shape/circle')
 local rect_mod = require("viewmath/rect")
 local vec_mod = require('viewmath/vec')
 
+RIGHT_KEY = 'd'
+UP_KEY = 'w'
+LEFT_KEY = 'a'
+DOWN_KEY = 's'
+
+S1_KEY = 'h'
+S2_KEY = 'j'
+S3_KEY = 'k'
+S4_KEY = 'l'
+
 WALKSPEED = 0.7
 
 local function generate_walk_task(direction)
@@ -25,7 +35,7 @@ function new_player(char)
 		15
 	)
 	player.health = 100
-	player.inputs = { w = false, a = false, s = false, d = false, h = false, j = false, k = false, l = false }
+	player.inputs = { [UP_KEY] = false, [LEFT_KEY] = false, [DOWN_KEY] = false, [RIGHT_KEY] = false, [S1_KEY] = false, [S2_KEY] = false, [S3_KEY] = false, [S4_KEY] = false }
 	player.direction_vec = vec_mod(1, 0)
 
 	function player:damage(dmg)
@@ -54,19 +64,19 @@ function new_player(char)
 
 	function player:move_direction()
 		local d = vec_mod(0, 0)
-		if self.inputs.w then
+		if self.inputs[UP_KEY] then
 			d = d + vec_mod(0, -1)
 		end
 
-		if self.inputs.a then
+		if self.inputs[LEFT_KEY] then
 			d = d + vec_mod(-1, 0)
 		end
 
-		if self.inputs.s then
+		if self.inputs[DOWN_KEY] then
 			d = d + vec_mod(0, 1)
 		end
 
-		if self.inputs.d then
+		if self.inputs[RIGHT_KEY] then
 			d = d + vec_mod(1, 0)
 		end
 

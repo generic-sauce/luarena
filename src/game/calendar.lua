@@ -11,15 +11,15 @@ function calendar_mod.new(player_count, local_id)
 	calendar.playertable = {} -- Map<PlayerId, Map<Key, List<{value=<bool>, frame_id=<frame_id> }>>>
 	for i=1, player_count do
 		table.insert(calendar.playertable, {
-			w={{value=false, frame_id=1}},
-			a={{value=false, frame_id=1}},
-			s={{value=false, frame_id=1}},
-			d={{value=false, frame_id=1}},
+			[UP_KEY]={{value=false, frame_id=1}},
+			[LEFT_KEY]={{value=false, frame_id=1}},
+			[DOWN_KEY]={{value=false, frame_id=1}},
+			[RIGHT_KEY]={{value=false, frame_id=1}},
 
-			h={{value=false, frame_id=1}},
-			j={{value=false, frame_id=1}},
-			k={{value=false, frame_id=1}},
-			l={{value=false, frame_id=1}},
+			[S1_KEY]={{value=false, frame_id=1}},
+			[S2_KEY]={{value=false, frame_id=1}},
+			[S3_KEY]={{value=false, frame_id=1}},
+			[S4_KEY]={{value=false, frame_id=1}},
 		})
 	end
 
@@ -49,15 +49,10 @@ function calendar_mod.new(player_count, local_id)
 
 	function calendar:detect_changed_local_inputs(viewport)
 		local inputs = {}
-		inputs.w = love.keyboard.isDown('w')
-		inputs.a = love.keyboard.isDown('a')
-		inputs.s = love.keyboard.isDown('s')
-		inputs.d = love.keyboard.isDown('d')
 
-		inputs.h = love.keyboard.isDown('h')
-		inputs.j = love.keyboard.isDown('j')
-		inputs.k = love.keyboard.isDown('k')
-		inputs.l = love.keyboard.isDown('l')
+		for _, v in pairs( { RIGHT_KEY, UP_KEY, LEFT_KEY, DOWN_KEY, S1_KEY, S2_KEY, S3_KEY, S4_KEY } ) do
+			inputs[v] = love.keyboard.isDown(v)
+		end
 
 		local old_inputs = self:read_inputs(self.local_id, nil)
 		local changed_inputs = {}

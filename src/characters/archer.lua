@@ -5,7 +5,7 @@ local collision_detection_mod = require('collision/detection')
 
 return function (archer)
 
-	archer.h_cooldown = 0
+	archer.s1_cooldown = 0
 
 	function archer:new_arrow()
 		local arrow = {}
@@ -40,9 +40,9 @@ return function (archer)
 	end
 
 	function archer:char_tick(frame)
-		self.h_cooldown = math.max(0, self.h_cooldown - 1)
-		if self.inputs.h and self.h_cooldown == 0 then
-			self.h_cooldown = 100
+		self.s1_cooldown = math.max(0, self.s1_cooldown - 1)
+		if self.inputs[S1_KEY] and self.s1_cooldown == 0 then
+			self.s1_cooldown = 100
 			frame:add(self:new_arrow())
 		end
 	end

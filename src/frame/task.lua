@@ -9,16 +9,16 @@ local TASK_CLASSMAP = {
 	dash = {"move"},
 	stun = {},
 
-	riven_h = {"skill"},
-	riven_h_dash = {"skill", "dash"},
-	riven_j = {"skill"},
-	riven_j_stun = {"stun"},
-	riven_k = {"skill", "dash"},
+	riven_s1 = {"skill"},
+	riven_s1_dash = {"skill", "dash"},
+	riven_s2 = {"skill"},
+	riven_s2_stun = {"stun"},
+	riven_s3 = {"skill", "dash"},
 
-	u1_h = {"skill"},
-	u1_j = {"skill"},
-	u1_k = {"skill", "dash"},
-	u1_l = {"skill"},
+	u1_s1 = {"skill"},
+	u1_s2 = {"skill"},
+	u1_s3 = {"skill", "dash"},
+	u1_s4 = {"skill"},
 
 	dead = {}
 }
