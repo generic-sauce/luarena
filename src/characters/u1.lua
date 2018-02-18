@@ -141,7 +141,7 @@ return function (u1)
 				self.landed = true
 			end
 
-			function dagger:on_enter_collision(entity, frame)
+			function dagger:on_enter_collider(frame, entity)
 				if entity ~= self.u1
 					and entity ~= self
 					and entity.damage then
