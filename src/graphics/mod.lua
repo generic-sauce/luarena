@@ -36,8 +36,9 @@ function graphics_mod.init_viewport(viewport)
 
 	function viewport:draw_world_sprite(sprite, pos, size)
 		pos = viewport:world_to_screen_pos(pos)
+		size = viewport:world_to_screen_size(size)
 		local texture_size = vec_mod(sprite.texture:getWidth(), sprite.texture:getHeight())
-		local scale = size and size / texture_size or vec_mod(1, 1)
+		local scale = size / texture_size
 		love.graphics.setColor(255, 255, 255, 255)
 		love.graphics.draw(sprite.texture, sprite.quad, pos.x, pos.y, 0, scale.x, scale.y)
 	end
