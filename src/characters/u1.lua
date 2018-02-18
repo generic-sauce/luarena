@@ -35,7 +35,10 @@ return function (u1)
 	u1.s3_cooldown = 0
 	u1.s4_cooldown = 0
 
+	u1.s1_released = true
+	u1.s2_released = true
 	u1.s3_released = true
+	u1.s4_released = true
 
 	function u1:use_s1_skill(frame)
 		local u1 = self
@@ -179,7 +182,6 @@ return function (u1)
 		task.start_point = u1.shape:center()
 		task.u1 = u1
 		u1.s3_cooldown = S3_COOLDOWN
-		u1.s3_released = false
 
 		task.direction = u1:direction()
 
@@ -306,24 +308,40 @@ return function (u1)
 		self.s3_cooldown = math.max(0, self.s3_cooldown - 1)
 		self.s4_cooldown = math.max(0, self.s4_cooldown - 1)
 
+		if not self.inputs[S1_KEY] then
+			self.s1_released = true
+		end
+
+		if not self.inputs[S2_KEY] then
+			self.s2_released = true
+		end
+
 		if not self.inputs[S3_KEY] then
 			self.s3_released = true
 		end
 
-		if self.inputs[S1_KEY] and self.s1_cooldown == 0 then
-			self:use_s1_skill(frame)
+		if not self.inputs[S4_KEY] then
+			self.s4_released = true
 		end
 
-		if self.inputs[S2_KEY] and self.s2_cooldown == 0 then
+		if self.s1_released and self.inputs[S1_KEY] and self.s1_cooldown == 0 then
+			self:use_s1_skill(frame)
+			self.s1_released = false
+		end
+
+		if self.s2_released and self.inputs[S2_KEY] and self.s2_cooldown == 0 then
 			self:use_s2_skill(frame)
+			self.s2_released = false
 		end
 
 		if self.s3_released and self.inputs[S3_KEY] and self.s3_cooldown == 0 then
 			self:use_s3_skill(frame)
+			self.s3_released = false
 		end
 
-		if self.inputs[S4_KEY] and self.s4_cooldown == 0 then
+		if self.s4_released and self.inputs[S4_KEY] and self.s4_cooldown == 0 then
 			self:use_s4_skill(frame)
+			self.s4_released = false
 		end
 	end
 

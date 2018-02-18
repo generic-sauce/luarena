@@ -75,13 +75,11 @@ end
 
 -- TASK_RELATION[<old>][<new>]
 local TASK_RELATION = build_task_relation({
-	{old = {"walk"}, new = {"walk"}, relation = "cancel"},
 	{old = {"walk"}, new = {"dash", "stun"}, relation = "pause"},
 	{old = {"stun"}, new = {"walk", "skill"}, relation = "delay"},
-	{old = {"dash"}, new = {"dash", "walk"}, relation = "delay"}
+	{old = {"dash"}, new = {"dash"}, relation = "delay"},
+	{old = {"dash"}, new = {"walk"}, relation = "prevent"}
 })
-
-assert("cancel" == TASK_RELATION['walk']['walk'])
 
 local function get_relation_partners(tasks, task, rel)
 	assert(task.class, "get_relation_partners(): task.class == nil")
