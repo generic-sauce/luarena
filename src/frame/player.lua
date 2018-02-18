@@ -7,8 +7,8 @@ UP_KEY = 'w'
 LEFT_KEY = 'a'
 DOWN_KEY = 's'
 
-S1_KEY = 'h'
-S2_KEY = 'j'
+S1_KEY = 'j'
+S2_KEY = 'i'
 S3_KEY = 'k'
 S4_KEY = 'l'
 

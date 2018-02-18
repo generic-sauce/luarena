@@ -10,13 +10,13 @@ local S1_COOLDOWN = 500
 local S1_RANGE = 75
 local S1_DAMAGE = 20
 
-local S2_COOLDOWN = 200
-local S2_RANGE = 120
+local S2_COOLDOWN = 300
+local S2_RANGE = 100
 local S2_SPEED = 3
 local S2_MAX_DAGGERS = 4
 local S2_DAMAGE = 5
 
-local S3_COOLDOWN = 300
+local S3_COOLDOWN = 400
 local S3_RANGE = 100
 local S3_SPEED = 2
 local S3_DAMAGE = 12
