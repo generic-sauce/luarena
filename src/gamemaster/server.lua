@@ -21,7 +21,7 @@ function new_servermaster(chars, networker)
 		for _, p in pairs(packets) do
 			if p.tag == "inputs" then
 				table.insert(input_packets, p)
-				local current_backtrack = #self.frame_history - p.frame_id + 1
+				local current_backtrack = self.frame_counter - p.frame_id + 1
 				self.balancer_list[p.player_id - 1]:push_value(current_backtrack)
 			else
 				print("servermaster received packet of strange tag: " .. tostring(p.tag))
@@ -43,7 +43,7 @@ function new_servermaster(chars, networker)
 	end
 
 	function servermaster:gamemaster_update()
-		if #self.frame_history % BACKTRACK_BALANCE_INTERVAL then
+		if self.frame_counter % BACKTRACK_BALANCE_INTERVAL then
 			for i, balancer in pairs(self.balancer_list) do
 				local avg = balancer:pop_avg()
 				if avg then

@@ -20,7 +20,7 @@ function new_clientmaster(networker, chars, local_id)
 		for _, p in pairs(packets) do
 			if p.tag == "inputs" then
 				table.insert(input_packets, p)
-				local current_backtrack = #self.frame_history - p.frame_id + 1 -- may be negative
+				local current_backtrack = self.frame_counter - p.frame_id + 1 -- may be negative
 				self.balancer:push_value(current_backtrack)
 			elseif p.tag == "avg_backtrack" then
 				if p.avg_backtrack ~= nil then
