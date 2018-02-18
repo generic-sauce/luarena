@@ -17,8 +17,7 @@ local TASK_CLASSMAP = {
 
 	u1_h = {"skill"},
 	u1_j = {"skill"},
-	u1_k_walk = {"skill", "walk"},
-	u1_k_dash = {"skill", "dash"},
+	u1_k = {"skill", "dash"},
 	u1_l = {"skill"},
 
 	dead = {}

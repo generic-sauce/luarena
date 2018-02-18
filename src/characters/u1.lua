@@ -10,14 +10,15 @@ local H_COOLDOWN = 500
 local H_RANGE = 75
 local H_DAMAGE = 20
 
-local J_COOLDOWN = 100
+local J_COOLDOWN = 200
 local J_RANGE = 120
+local J_SPEED = 3
 local J_MAX_DAGGERS = 4
 local J_DAMAGE = 5
 
-local K_COOLDOWN = 50
-local K_JUMP_RANGE = 100
-local K_DASH_SPEED = 2
+local K_COOLDOWN = 300
+local K_RANGE = 100
+local K_SPEED = 2
 local K_DAMAGE = 12
 
 local L_COOLDOWN = 75
@@ -33,6 +34,8 @@ return function (u1)
 	u1.j_cooldown = 0
 	u1.k_cooldown = 0
 	u1.l_cooldown = 0
+
+	u1.k_released = true
 
 	function u1:use_h_skill(frame)
 		local u1 = self
@@ -113,61 +116,57 @@ return function (u1)
 
 			local dagger = {}
 
-			dagger.timer = 70
+			dagger.start_point = u1.shape:center()
 			dagger.landed = false
+			dagger.direction = u1:direction()
+
+			if #u1.dagger_list == J_MAX_DAGGERS then
+				frame:remove(u1.dagger_list[1])
+				table.remove(u1.dagger_list, 1)
+			end
+			table.insert(u1.dagger_list, dagger)
 
 			dagger.u1 = u1
 			dagger.shape = circle_mod.by_center_and_radius(
-				u1.shape:center() + u1:direction():with_length(J_RANGE),
+				u1.shape:center(),
 				3
 			)
-
-			frame:add(dagger)
 
 			function dagger:land(frame)
 				local dagger = self
 
 				self.landed = true
-				if #self.u1.dagger_list == J_MAX_DAGGERS then
-					frame:remove(self.u1.dagger_list[1])
-					table.remove(self.u1.dagger_list, 1)
-				end
-				table.insert(self.u1.dagger_list, self)
+			end
 
-				for key, entity in pairs(frame:find_colliders(self.shape)) do
-					if entity ~= self.u1
-						and entity ~= self
-						and entity.damage then
-							entity:damage(J_DAMAGE)
-					end
+			function dagger:on_enter_collision(entity, frame)
+				if entity ~= self.u1
+					and entity ~= self
+					and entity.damage then
+						entity:damage(J_DAMAGE)
 				end
 			end
 
 			function dagger:tick(frame)
 				local dagger = self
 
-				dagger.timer = math.max(0, dagger.timer - 1)
-				if dagger.timer == 0 and not dagger.landed then
-					dagger:land(frame)
+				if (dagger.shape:center() - dagger.start_point):length() >= J_RANGE then
+					if not dagger.landed then
+						dagger:land(frame)
+					end
+				else
+					dagger.shape = dagger.shape:move_center(dagger.direction * J_SPEED)
 				end
 			end
 
 			function dagger:draw(viewport)
 				local dagger = self
 
-				if dagger.landed then
-					-- render dagger
-					viewport:draw_shape(dagger.shape, 200, 200, 255)
-				else
-					-- render shadow
-					viewport:draw_shape(
-						circle_mod.by_center_and_radius(
-							dagger.shape:center(),
-							dagger.shape.radius * 2
-						),
-					40, 40, 40, 80)
-				end
+				viewport:draw_shape(dagger.shape, 200, 200, 255)
 			end
+
+			frame:add(dagger)
+
+			u1:remove_task(task)
 		end
 
 		u1:add_task(task)
@@ -176,77 +175,46 @@ return function (u1)
 	function u1:use_k_skill(frame)
 		local u1 = self
 
-		local task = { class = "u1_k_walk" }
+		local task = { class = "u1_k" }
+		task.start_point = u1.shape:center()
+		task.u1 = u1
+		u1.k_cooldown = K_COOLDOWN
+		u1.k_released = false
+
+		task.direction = u1:direction()
 
 		function task:init(u1, frame)
 			local task = self
 
-			local pointing = u1:direction():with_length(K_JUMP_RANGE) + u1.shape:center()
-
-			local closest = nil
-			for _, dagger in pairs(u1.dagger_list) do
-				if closest == nil or (dagger.shape:center() - pointing):length() < (closest.shape:center() - pointing):length() then
-					closest = dagger
-				end
+			for _, entity in pairs(u1.colliders) do
+				task:damage_entity(entity)
 			end
+		end
 
-			if closest == nil then
-				u1:remove_task(task)
-			else
-				task.walk_target = closest.shape:center()
-				u1.k_cooldown = K_COOLDOWN
+		function task:damage_entity(entity)
+			local task = self
+
+			if table.contains(task.u1.dagger_list, entity) then
+				task.u1.k_cooldown = 0
+			elseif entity ~= u1 and entity.damage then
+				entity:damage(K_DAMAGE)
 			end
 		end
 
 		function task:tick(u1, frame)
 			local task = self
 
-			local move_vec = task.walk_target - u1.shape:center()
-			if move_vec:length() < K_JUMP_RANGE then
-				local dash_task = { class = "u1_k_dash" }
-
-				dash_task.dash_target = task.walk_target
-				dash_task.dmg_factor = (u1.shape:center() - task.walk_target):length() / K_JUMP_RANGE -- small dashes deal less damage
-
-				function dash_task:init(u1, frame)
-					local dash_task = self
-
-					for _, entity in pairs(u1.colliders) do
-						dash_task:damage_entity(entity)
-					end
-				end
-
-				function dash_task:damage_entity(entity)
-					local dash_task = self
-
-					if entity ~= u1 and entity.damage then
-						entity:damage(K_DAMAGE * dash_task.dmg_factor)
-					end
-				end
-
-				function dash_task:tick(u1, frame)
-					local dash_task = self
-
-					local move_vec = (dash_task.dash_target - u1.shape:center())
-					if move_vec:length() < K_DASH_SPEED then
-						u1.shape = u1.shape:with_center(dash_task.dash_target)
-						u1:remove_task(dash_task)
-					else
-						u1.shape = u1.shape:move_center(move_vec:cropped_to(K_DASH_SPEED))
-					end
-				end
-
-				function dash_task:on_enter_collider(u1, frame, entity)
-					local dash_task = self
-
-					dash_task:damage_entity(entity)
-				end
-
-				u1:add_task(dash_task)
+			if (task.start_point - u1.shape:center()):length() >= K_RANGE then
 				u1:remove_task(task)
 			else
-				u1.shape = u1.shape:move_center(move_vec:cropped_to(WALKSPEED)) -- TODO needs rework
+				u1.shape = u1.shape:move_center(task.direction:with_length(K_SPEED))
 			end
+		end
+
+		function task:on_enter_collider(u1, frame, entity)
+			local task = self
+
+			task:damage_entity(entity)
 		end
 
 		u1:add_task(task)
@@ -338,6 +306,10 @@ return function (u1)
 		self.k_cooldown = math.max(0, self.k_cooldown - 1)
 		self.l_cooldown = math.max(0, self.l_cooldown - 1)
 
+		if not self.inputs.k then
+			self.k_released = true
+		end
+
 		if self.inputs.h and self.h_cooldown == 0 then
 			self:use_h_skill(frame)
 		end
@@ -346,7 +318,7 @@ return function (u1)
 			self:use_j_skill(frame)
 		end
 
-		if self.inputs.k and self.k_cooldown == 0 then
+		if self.k_released and self.inputs.k and self.k_cooldown == 0 then
 			self:use_k_skill(frame)
 		end
 
