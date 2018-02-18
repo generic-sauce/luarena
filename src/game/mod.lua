@@ -36,26 +36,28 @@ function game_mod.new(chars, local_id)
 		dev.start_profiler("backtrack", {"backtrack"})
 
 		local c = 0
-		local fh_size = self.frame_counter
+		local old_frame_counter = self.frame_counter
 		while frame_id <= self.frame_counter do
 			c = c + 1
 			set(self.frame_history, self.frame_counter, NO_FRAME)
 			self.frame_counter = self.frame_counter - 1
 		end
 
+		assert(#self.frame_history == FRAME_HISTORY_LENGTH)
+
 		if frame_id == 1 then
 			self.current_frame = frame_mod.initial(game.chars)
 		else
-			local old_frame = get(self.frame_history, self.frame_counter)
-			assert(old_frame ~= NO_FRAME, "backtracking too far!")
-			self.current_frame = old_frame:clone()
+			local base_frame = get(self.frame_history, self.frame_counter)
+			assert(base_frame ~= NO_FRAME, "backtracking too far!")
+			self.current_frame = base_frame:clone()
 		end
 
 		local current_time = love.timer.getTime()
 		while self.frame_counter * FRAME_DURATION < current_time - self.start_time do
 			self:frame_update()
 		end
-		dev.debug("went back " .. c .. " frames (" .. fh_size .. " -> " .. frame_id-1 .. " -> " .. self.frame_counter .. ")", {"backtrack"})
+		dev.debug("went back " .. c .. " frames (" .. old_frame_counter .. " -> " .. frame_id-1 .. " -> " .. self.frame_counter .. ")", {"backtrack"})
 
 		dev.stop_profiler("backtrack")
 	end
@@ -96,7 +98,7 @@ function game_mod.new(chars, local_id)
 
 		self.calendar:apply_to_frame(self.current_frame, self.frame_counter + 1)
 		self.current_frame:tick()
-		set(self.frame_history, self.frame_counter, self.current_frame:clone())
+		set(self.frame_history, self.frame_counter + 1, self.current_frame:clone())
 		self.frame_counter = self.frame_counter + 1
 
 		dev.stop_profiler("frame_update")
