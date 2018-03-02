@@ -27,12 +27,13 @@ local function generate_walk_task(direction)
 	return task
 end
 
-function new_player(char)
+function new_player(char, map)
 	local player = {}
 
 	player.shape = circle_mod.by_center_and_radius(
 		vec_mod(200, 200),
-		15
+		15,
+		map
 	)
 	player.health = 100
 	player.inputs = { [UP_KEY] = false, [LEFT_KEY] = false, [DOWN_KEY] = false, [RIGHT_KEY] = false, [S1_KEY] = false, [S2_KEY] = false, [S3_KEY] = false, [S4_KEY] = false }

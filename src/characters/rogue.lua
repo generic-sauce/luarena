@@ -18,7 +18,7 @@ return function (rogue)
 		local aoe = {}
 
 		aoe.owner = self
-		aoe.shape = circle_mod.by_center_and_radius(self.shape:center(), S2_RADIUS)
+		aoe.shape = circle_mod.by_center_and_radius(self.shape:center(), S2_RADIUS, frame.map)
 		aoe.life_counter = 100
 
 		function aoe:initial_damage(frame)

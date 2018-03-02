@@ -19,7 +19,7 @@ function frame_mod.initial(chars, map_seed)
 		task_mod.init_frame(self)
 
 		for _, char in pairs(self.chars) do
-			self:add(require('frame/player')(char))
+			self:add(require('frame/player')(char, self.map))
 		end
 
 		for i=1, #self.chars do
@@ -58,7 +58,7 @@ function frame_mod.initial(chars, map_seed)
 			if self.dummy then
 				self:remove(self.dummy)
 			end
-			self.dummy = require('frame/player')('dummy')
+			self.dummy = require('frame/player')('dummy', self.map)
 			self:add(self.dummy)
 		end
 

@@ -26,7 +26,7 @@ local function colliding_polygon_circle(p, c)
 		table.insert(outer_points, u + next_axis:right():with_length(c.radius))
 	end
 
-	return polygon_mod.by_points(outer_points):contains(c:center())
+	return polygon_mod.by_points(outer_points, p.map):contains(c:center())
 end
 
 local function colliding_circles(c1, c2)

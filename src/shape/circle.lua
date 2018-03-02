@@ -5,7 +5,7 @@ local dev = require('dev')
 
 local circle_mod = {}
 
-function circle_mod.by_center_and_radius(center_vec, radius)
+function circle_mod.by_center_and_radius(center_vec, radius, map)
 	assert(center_vec)
 	assert(radius)
 
@@ -18,14 +18,16 @@ function circle_mod.by_center_and_radius(center_vec, radius)
 	function circle:with_center(center)
 		return circle_mod.by_center_and_radius(
 			center,
-			self.radius
+			self.radius,
+			self.map
 		)
 	end
 
 	function circle:move_center(center_add)
 		return circle_mod.by_center_and_radius(
 			self:center() + center_add,
-			self.radius
+			self.radius,
+			self.map
 		)
 	end
 
@@ -38,7 +40,8 @@ function circle_mod.by_center_and_radius(center_vec, radius)
 		if not self.wrapper_cache then
 			self.wrapper_cache = rect_mod.by_center_and_size(
 				self:center(),
-				vec_mod(self.radius * 2, self.radius * 2)
+				vec_mod(self.radius * 2, self.radius * 2),
+				self.map
 			)
 		end
 		dev.stop_profiler('circle:wrapper')

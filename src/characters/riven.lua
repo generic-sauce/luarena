@@ -24,14 +24,15 @@ local S3_DASH_SPEED = 2
 local S3_SHIELD_TIMEOUT = 100
 local S3_SHIELD_SIZE = vec_mod(35, 35)
 
-local function generate_relative_area(entity, timeout, relative_position, size)
+local function generate_relative_area(frame, entity, timeout, relative_position, size)
 	local area = {}
 	area.owner = entity
 	area.shape = polygon_mod.by_rect(
 		rect_mod.by_center_and_size(
 			entity.shape:center() + relative_position,
 			size
-		)
+		),
+		frame.map
 	)
 	area.timeout = timeout
 
@@ -79,6 +80,7 @@ local function generate_s1_dash_task(dash_target)
 
 	function task:init(entity, frame)
 		local attack = generate_relative_area(
+			frame,
 			entity,
 			S1_DASH_DISTANCE / S1_DASH_SPEED,
 			(self.dash_target - entity.shape:center()):with_length(10),
@@ -129,6 +131,7 @@ local function generate_s2_task()
 
 	function task:init(entity, frame)
 		local attack = generate_relative_area(
+			frame,
 			entity,
 			S2_ANIMATION_TIMEOUT,
 			vec_mod(0, 0),
@@ -158,6 +161,7 @@ local function generate_s3_task(dash_target)
 
 	function task:init(entity, frame)
 		local shield = generate_relative_area(
+			frame,
 			entity,
 			S3_SHIELD_TIMEOUT,
 			vec_mod(0, 0),

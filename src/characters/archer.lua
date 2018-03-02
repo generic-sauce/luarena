@@ -7,13 +7,14 @@ return function (archer)
 
 	archer.s1_cooldown = 0
 
-	function archer:new_arrow()
+	function archer:new_arrow(frame)
 		local arrow = {}
 
 		arrow.owner = self
 		arrow.shape = polygon_mod.by_rect(rect_mod.by_center_and_size(
 			self.shape:center(),
-			vec_mod(4, 4)
+			vec_mod(4, 4),
+			frame.map
 		))
 		arrow.speed = self:direction():normalized() * 2
 
@@ -26,7 +27,7 @@ return function (archer)
 
 		function arrow:tick(frame)
 			self.shape = self.shape:move_center(self.speed)
-			if not collision_detection_mod(polygon_mod.by_rect(frame.map:rect()), self.shape) then
+			if not collision_detection_mod(polygon_mod.by_rect(frame.map:rect(), frame), self.shape) then
 				frame:remove(self)
 			end
 
@@ -43,7 +44,7 @@ return function (archer)
 		self.s1_cooldown = math.max(0, self.s1_cooldown - 1)
 		if self.inputs[S1_KEY] and self.s1_cooldown == 0 then
 			self.s1_cooldown = 100
-			frame:add(self:new_arrow())
+			frame:add(self:new_arrow(frame))
 		end
 	end
 

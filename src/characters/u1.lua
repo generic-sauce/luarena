@@ -59,7 +59,8 @@ return function (u1)
 			blade.start_center = u1.shape:center()
 			blade.shape = circle_mod.by_center_and_radius(
 				u1.shape:center(),
-				3
+				3,
+				frame.map
 			)
 			blade.speed = blade.u1:direction()
 
@@ -132,7 +133,8 @@ return function (u1)
 			dagger.u1 = u1
 			dagger.shape = circle_mod.by_center_and_radius(
 				u1.shape:center(),
-				3
+				3,
+				frame.map
 			)
 
 			function dagger:land(frame)
@@ -230,7 +232,8 @@ return function (u1)
 		aoe.u1 = self
 		aoe.shape = circle_mod.by_center_and_radius(
 			u1.shape:center(),
-			S4_RANGE
+			S4_RANGE,
+			frame.map
 		)
 		aoe.life_counter = 80
 
