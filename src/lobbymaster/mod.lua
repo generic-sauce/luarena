@@ -22,6 +22,8 @@ local function new_client(char, server_ip, server_port)
 end
 
 function lobby_mod.create_lobby_master()
+	love.window.setMode(800, 600, {resizable=true})
+
 	if arg[2] == "server" then
 		return new_server(arg[3], arg[4])
 	elseif arg[2] == "client" then
