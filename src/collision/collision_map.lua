@@ -45,6 +45,12 @@ function generate_map(size, seed)
 		end
 	end
 
+	-- temporary (hacky) solution for the spawn tile
+	tiles[2 * size.x + 3] = collision_map_mod.TILE_NONE
+	tiles[2 * size.x + 4] = collision_map_mod.TILE_NONE
+	tiles[3 * size.x + 3] = collision_map_mod.TILE_NONE
+	tiles[3 * size.x + 4] = collision_map_mod.TILE_NONE
+
 	--local x, y = math.floor(math.random() * size.x), math.floor(math.random() * size.y)
 
 	return tiles
