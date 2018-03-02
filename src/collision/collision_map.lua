@@ -6,7 +6,9 @@ local collision_map_mod = {
 	TILE_KILL = 2,
 }
 
-function generate_map(size)
+function generate_map(size, seed)
+	assert(seed)
+
 	local tiles = {}
 
 	for y = 0, size.y - 1, 1 do
@@ -16,7 +18,7 @@ function generate_map(size)
 	end
 
 	do --river
-		math.randomseed(love.timer.getTime())
+		math.randomseed(seed)
 		local posx = math.floor(math.random() * size.x / 2) + size.x / 4
 		local width = math.floor(math.random() * 4)
 
@@ -48,10 +50,12 @@ function generate_map(size)
 	return tiles
 end
 
-function collision_map_mod.new(size)
+function collision_map_mod.new(size, seed)
+	assert(seed)
+
 	local collision_map = {
 		size_tiles = size,
-		tiles = generate_map(size)
+		tiles = generate_map(size, seed)
 	}
 
 	function collision_map:size()

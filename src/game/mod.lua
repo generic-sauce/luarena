@@ -14,9 +14,12 @@ require("misc")
 
 local NO_FRAME = {}
 
-function game_mod.new(chars, local_id)
+function game_mod.new(chars, local_id, seed)
+	assert(seed)
+
 	local game = {}
-	game.current_frame = frame_mod.initial(chars)
+	game.map_seed = seed
+	game.current_frame = frame_mod.initial(chars, game.map_seed)
 	game.cam = -- choose one:
 			cam_mod.following(local_id)
 			-- cam_mod.fixed(game.current_frame.map:rect():center())
@@ -46,7 +49,7 @@ function game_mod.new(chars, local_id)
 		assert(#self.frame_history == FRAME_HISTORY_LENGTH)
 
 		if frame_id == 1 then
-			self.current_frame = frame_mod.initial(game.chars)
+			self.current_frame = frame_mod.initial(game.chars, self.map_seed)
 		else
 			local base_frame = get(self.frame_history, self.frame_counter)
 			assert(base_frame ~= NO_FRAME, "backtracking too far!")

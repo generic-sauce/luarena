@@ -6,6 +6,7 @@ return function(server, char, port)
 		usage()
 	end
 
+	server.seed = love.timer.getTime()
 	server.chars = {char}
 
 	function server:on_recv(packets)
@@ -32,9 +33,10 @@ return function(server, char, port)
 
 	function server:go()
 		self.networker:broadcast_packet({
-			tag = "go"
+			tag = "go",
+			seed = self.seed
 		})
-		master = require("gamemaster/server")(self.chars, self.networker)
+		master = require("gamemaster/server")(self.chars, self.networker, self.seed)
 	end
 
 	function server:update(dt)

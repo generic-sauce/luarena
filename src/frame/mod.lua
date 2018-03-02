@@ -7,9 +7,9 @@ local vec_mod = require('viewmath/vec')
 local frame_mod = {}
 require("misc")
 
-function frame_mod.initial(chars)
+function frame_mod.initial(chars, map_seed)
 	local frame = {}
-	frame.map = visual_map_mod.init_collision_map(collision_map_mod.new(vec_mod(16, 16)))
+	frame.map = visual_map_mod.init_collision_map(collision_map_mod.new(vec_mod(16, 16), map_seed))
 	frame.entities = {}
 	frame.chars = chars
 	frame.scores = {}

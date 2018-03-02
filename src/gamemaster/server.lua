@@ -1,7 +1,9 @@
 local backtrack_balancer_mod = require('gamemaster/backtrack_balancer')
 
-function new_servermaster(chars, networker)
-	local servermaster = require("game/mod").new(chars, 1)
+function new_servermaster(chars, networker, seed)
+	assert(seed)
+
+	local servermaster = require("game/mod").new(chars, 1, seed)
 
 	servermaster.balancer_list = {}
 	for _=1, #chars do
