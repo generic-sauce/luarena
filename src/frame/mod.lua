@@ -3,6 +3,7 @@ local collision_mod = require('collision/mod')
 local collision_map_mod = require('collision/collision_map')
 local task_mod = require('frame/task')
 local vec_mod = require('viewmath/vec')
+local dev = require('dev')
 
 local frame_mod = {}
 require("misc")
@@ -47,11 +48,16 @@ function frame_mod.initial(chars, map_seed)
 	end
 
 	function frame:tick()
+		dev.start_profiler("frame:tick()")
+
 		self:tick_tasks()
 		self:tick_collision()
+
+		dev.start_profiler("entities:tick()")
 		for _, entity in pairs(self.entities) do
 			entity:tick(self)
 		end
+		dev.stop_profiler("entities:tick()")
 
 
 		if love.keyboard.isDown('x') then
@@ -63,6 +69,8 @@ function frame_mod.initial(chars, map_seed)
 		end
 
 		self:consider_respawn()
+
+		dev.stop_profiler("frame:tick()")
 	end
 
 	-- draw
