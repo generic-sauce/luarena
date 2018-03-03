@@ -14,6 +14,9 @@ require("misc")
 
 local NO_FRAME = {}
 
+-- A global function to return the current frame
+frame = nil
+
 function game_mod.new(chars, local_id, seed)
 	assert(seed)
 
@@ -29,6 +32,8 @@ function game_mod.new(chars, local_id, seed)
 	game.calendar = calendar_mod.new(#chars, local_id)
 	game.local_id = local_id
 	game.start_time = love.timer.getTime()
+
+	frame = function() return game.current_frame end
 
 	for i=1, FRAME_HISTORY_LENGTH do
 		game.frame_history[i] = NO_FRAME

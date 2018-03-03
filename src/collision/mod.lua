@@ -4,26 +4,26 @@ local dev = require('dev')
 
 local collision_detection_mod = require("collision/detection")
 
-function collision_mod.call_on_exit_collider(entity, frame, collider)
+function collision_mod.call_on_exit_collider(entity, collider)
 	if entity.on_exit_collider then
-		entity:on_exit_collider(frame, collider)
+		entity:on_exit_collider(collider)
 	end
 
 	for _, task in pairs(entity.tasks) do
 		if task.on_exit_collider then
-			task:on_exit_collider(entity, frame, collider)
+			task:on_exit_collider(entity, collider)
 		end
 	end
 end
 
-function collision_mod.call_on_enter_collider(entity, frame, collider)
+function collision_mod.call_on_enter_collider(entity, collider)
 	if entity.on_enter_collider then
-		entity:on_enter_collider(frame, collider)
+		entity:on_enter_collider(collider)
 	end
 
 	for _, task in pairs(entity.tasks) do
 		if task.on_enter_collider then
-			task:on_enter_collider(entity, frame, collider)
+			task:on_enter_collider(entity, collider)
 		end
 	end
 end
@@ -53,13 +53,13 @@ function collision_mod.init_frame(frame)
 					if table.contains(e1.colliders, e2) and not colliding then
 						table.remove_val(e1.colliders, e2)
 						table.remove_val(e2.colliders, e1)
-						collision_mod.call_on_exit_collider(e1, self, e2)
-						collision_mod.call_on_exit_collider(e2, self, e1)
+						collision_mod.call_on_exit_collider(e1, e2)
+						collision_mod.call_on_exit_collider(e2, e1)
 					elseif not table.contains(e1.colliders, e2) and colliding then
 						table.insert(e1.colliders, e2)
 						table.insert(e2.colliders, e1)
-						collision_mod.call_on_enter_collider(e1, self, e2)
-						collision_mod.call_on_enter_collider(e2, self, e1)
+						collision_mod.call_on_enter_collider(e1, e2)
+						collision_mod.call_on_enter_collider(e2, e1)
 					end
 				end
 			end

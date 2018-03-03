@@ -20,7 +20,7 @@ local function assert_convex_points(points)
 end
 
 -- points are relative to the center!
-function polygon_mod.by_center_and_points(center_vec, points, map)
+function polygon_mod.by_center_and_points(center_vec, points)
 	assert(center_vec)
 	assert(points)
 	assert(#points > 0)
@@ -29,7 +29,6 @@ function polygon_mod.by_center_and_points(center_vec, points, map)
 
 	local polygon = {
 		center_vec = center_vec,
-		map = map,
 
 		-- for the collision detection these points have to be counter clockwise!
 		-- should be relative to the center
@@ -40,16 +39,14 @@ function polygon_mod.by_center_and_points(center_vec, points, map)
 	function polygon:with_center(center)
 		return polygon_mod.by_center_and_points(
 			center,
-			self.points,
-			self.map
+			self.points
 		)
 	end
 
 	function polygon:move_center(center_add)
 		return polygon_mod.by_center_and_points(
 			self.center_vec + center_add,
-			self.points,
-			self.map
+			self.points
 		)
 	end
 
@@ -77,8 +74,7 @@ function polygon_mod.by_center_and_points(center_vec, points, map)
 			end
 			self.wrapper_cache = rect_mod.by_left_top_and_size(
 				vec_mod(left, top),
-				vec_mod(right - left, bottom - top),
-				self.map
+				vec_mod(right - left, bottom - top)
 			)
 		end
 		dev.stop_profiler('polygon:wrapper')
@@ -101,7 +97,7 @@ function polygon_mod.by_center_and_points(center_vec, points, map)
 	return polygon
 end
 
-function polygon_mod.by_points(points, map)
+function polygon_mod.by_points(points)
 	local sum = vec_mod(0, 0)
 	for _, v in pairs(points) do
 		sum = sum + v
@@ -113,16 +109,16 @@ function polygon_mod.by_points(points, map)
 		table.insert(rel_points, p - center)
 	end
 
-	return polygon_mod.by_center_and_points(center, rel_points, map)
+	return polygon_mod.by_center_and_points(center, rel_points)
 end
 
-function polygon_mod.by_rect(rect, map)
+function polygon_mod.by_rect(rect)
 	return polygon_mod.by_center_and_points(rect:center(), {
 		rect:right_top()    - rect:center(),
 		rect:left_top()     - rect:center(),
 		rect:left_bottom()  - rect:center(),
 		rect:right_bottom() - rect:center()
-	}, map)
+	})
 end
 
 return polygon_mod

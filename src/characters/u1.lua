@@ -40,12 +40,12 @@ return function (u1)
 	u1.s3_released = true
 	u1.s4_released = true
 
-	function u1:use_s1_skill(frame)
+	function u1:use_s1_skill()
 		local u1 = self
 
 		local task = { class = "u1_s1" }
 
-		function task:init(u1, frame)
+		function task:init(u1)
 			local task = self
 
 			u1.s1_cooldown = S1_COOLDOWN
@@ -59,12 +59,11 @@ return function (u1)
 			blade.start_center = u1.shape:center()
 			blade.shape = circle_mod.by_center_and_radius(
 				u1.shape:center(),
-				3,
-				frame.map
+				3
 			)
 			blade.speed = blade.u1:direction()
 
-			function blade:on_enter_collider(frame, e)
+			function blade:on_enter_collider(e)
 				local blade = self
 
 				if e ~= blade.u1 and e.damage then
@@ -72,12 +71,12 @@ return function (u1)
 				end
 			end
 
-			function blade:tick(frame)
+			function blade:tick()
 				local blade = self
 
 				blade.shape = blade.shape:move_center(blade.speed)
-				if (blade.start_center - blade.shape:center()):length() > S1_RANGE or not blade.shape:wrapper():intersects(frame.map:rect()) then
-					frame:remove(blade)
+				if (blade.start_center - blade.shape:center()):length() > S1_RANGE or not blade.shape:wrapper():intersects(frame().map:rect()) then
+					frame():remove(blade)
 					blade.alive = false
 				end
 			end
@@ -88,10 +87,10 @@ return function (u1)
 				viewport:draw_shape(blade.shape, 0, 0, 255)
 			end
 
-			frame:add(blade)
+			frame():add(blade)
 		end
 
-		function task:tick(entity, frame)
+		function task:tick(entity)
 			local task = self
 
 			if not task.blade.alive then
@@ -99,21 +98,21 @@ return function (u1)
 			end
 		end
 
-		function task:on_cancel(entity, frame)
+		function task:on_cancel(entity)
 			local task = self
 
-			frame:remove(task.blade)
+			frame():remove(task.blade)
 		end
 
 		u1:add_task(task)
 	end
 
-	function u1:use_s2_skill(frame)
+	function u1:use_s2_skill()
 		local u1 = self
 
 		local task = { class = "u1_s2" }
 
-		function task:init(u1, frame)
+		function task:init(u1)
 			local task = self
 
 			u1.s2_cooldown = S2_COOLDOWN
@@ -125,7 +124,7 @@ return function (u1)
 			dagger.direction = u1:direction()
 
 			if #u1.dagger_list == S2_MAX_DAGGERS then
-				frame:remove(u1.dagger_list[1])
+				frame():remove(u1.dagger_list[1])
 				table.remove(u1.dagger_list, 1)
 			end
 			table.insert(u1.dagger_list, dagger)
@@ -133,17 +132,16 @@ return function (u1)
 			dagger.u1 = u1
 			dagger.shape = circle_mod.by_center_and_radius(
 				u1.shape:center(),
-				3,
-				frame.map
+				3
 			)
 
-			function dagger:land(frame)
+			function dagger:land()
 				local dagger = self
 
 				self.landed = true
 			end
 
-			function dagger:on_enter_collider(frame, entity)
+			function dagger:on_enter_collider(entity)
 				if entity ~= self.u1
 					and entity ~= self
 					and entity.damage then
@@ -151,12 +149,12 @@ return function (u1)
 				end
 			end
 
-			function dagger:tick(frame)
+			function dagger:tick()
 				local dagger = self
 
 				if (dagger.shape:center() - dagger.start_point):length() >= S2_RANGE then
 					if not dagger.landed then
-						dagger:land(frame)
+						dagger:land()
 					end
 				else
 					dagger.shape = dagger.shape:move_center(dagger.direction * S2_SPEED)
@@ -169,7 +167,7 @@ return function (u1)
 				viewport:draw_shape(dagger.shape, 200, 200, 255)
 			end
 
-			frame:add(dagger)
+			frame():add(dagger)
 
 			u1:remove_task(task)
 		end
@@ -177,7 +175,7 @@ return function (u1)
 		u1:add_task(task)
 	end
 
-	function u1:use_s3_skill(frame)
+	function u1:use_s3_skill()
 		local u1 = self
 
 		local task = { class = "u1_s3" }
@@ -187,7 +185,7 @@ return function (u1)
 
 		task.direction = u1:direction()
 
-		function task:init(u1, frame)
+		function task:init(u1)
 			local task = self
 
 			for _, entity in pairs(u1.colliders) do
@@ -205,7 +203,7 @@ return function (u1)
 			end
 		end
 
-		function task:tick(u1, frame)
+		function task:tick(u1)
 			local task = self
 
 			if (task.start_point - u1.shape:center()):length() >= S3_RANGE then
@@ -215,7 +213,7 @@ return function (u1)
 			end
 		end
 
-		function task:on_enter_collider(u1, frame, entity)
+		function task:on_enter_collider(u1, entity)
 			local task = self
 
 			task:damage_entity(entity)
@@ -224,7 +222,7 @@ return function (u1)
 		u1:add_task(task)
 	end
 
-	function u1:mk_s4_aoe(frame)
+	function u1:mk_s4_aoe()
 		local u1 = self
 
 		local aoe = {}
@@ -232,16 +230,15 @@ return function (u1)
 		aoe.u1 = self
 		aoe.shape = circle_mod.by_center_and_radius(
 			u1.shape:center(),
-			S4_RANGE,
-			frame.map
+			S4_RANGE
 		)
 		aoe.life_counter = 80
 
-		function aoe:initial_damage(frame)
+		function aoe:initial_damage()
 			local aoe = self
 
 			local dmg = S4_DAMAGE
-			local colliders = frame:find_colliders(aoe.shape)
+			local colliders = frame():find_colliders(aoe.shape)
 			local obsolete_daggers = {}
 			for _, dagger in pairs(aoe.u1.dagger_list) do
 				if dagger.landed and table.contains(colliders, dagger) then
@@ -251,7 +248,7 @@ return function (u1)
 			end
 
 			for _, dagger in pairs(obsolete_daggers) do
-					frame:remove(dagger)
+					frame():remove(dagger)
 					table.remove_val(aoe.u1.dagger_list, dagger)
 					table.remove_val(colliders, dagger)
 			end
@@ -265,12 +262,12 @@ return function (u1)
 			end
 		end
 
-		function aoe:tick(frame)
+		function aoe:tick()
 			local aoe = self
 
 			aoe.life_counter = aoe.life_counter - 1
 			if aoe.life_counter <= 0 then
-				frame:remove(aoe)
+				frame():remove(aoe)
 			end
 		end
 
@@ -280,30 +277,30 @@ return function (u1)
 			viewport:draw_shape(self.shape, 100, 100, 100, 100)
 		end
 
-		aoe:initial_damage(frame)
+		aoe:initial_damage()
 
 		return aoe
 	end
 
 
-	function u1:use_s4_skill(frame)
+	function u1:use_s4_skill()
 		local u1 = self
 
 		local task = { class = "u1_s4" }
 
-		function task:init(u1, frame)
+		function task:init(u1)
 			local task = self
 
 			u1.s4_cooldown = S4_COOLDOWN
 
-			local aoe = u1:mk_s4_aoe(frame)
-			frame:add(aoe)
+			local aoe = u1:mk_s4_aoe()
+			frame():add(aoe)
 		end
 
 		u1:add_task(task)
 	end
 
-	function u1:char_tick(frame)
+	function u1:char_tick()
 		local u1 = self
 
 		self.s1_cooldown = math.max(0, self.s1_cooldown - 1)
@@ -328,22 +325,22 @@ return function (u1)
 		end
 
 		if self.s1_released and self.inputs[S1_KEY] and self.s1_cooldown == 0 then
-			self:use_s1_skill(frame)
+			self:use_s1_skill()
 			self.s1_released = false
 		end
 
 		if self.s2_released and self.inputs[S2_KEY] and self.s2_cooldown == 0 then
-			self:use_s2_skill(frame)
+			self:use_s2_skill()
 			self.s2_released = false
 		end
 
 		if self.s3_released and self.inputs[S3_KEY] and self.s3_cooldown == 0 then
-			self:use_s3_skill(frame)
+			self:use_s3_skill()
 			self.s3_released = false
 		end
 
 		if self.s4_released and self.inputs[S4_KEY] and self.s4_cooldown == 0 then
-			self:use_s4_skill(frame)
+			self:use_s4_skill()
 			self.s4_released = false
 		end
 	end

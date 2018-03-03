@@ -22,7 +22,7 @@ local function generate_walk_task(direction)
 
 	local task = {direction = direction, class = "walk"}
 
-	function task:init(entity, frame)
+	function task:init(entity)
 		entity.shape = entity.shape:move_center(self.direction:with_length(WALKSPEED))
 		entity:remove_task(self)
 	end
@@ -30,15 +30,12 @@ local function generate_walk_task(direction)
 	return task
 end
 
-function new_player(char, map)
-	assert(map)
-
+function new_player(char)
 	local player = {}
 
 	player.shape = circle_mod.by_center_and_radius(
 		vec_mod(200, 200),
-		15,
-		map
+		15
 	)
 	player.health = 100
 	player.inputs = { [UP_KEY] = false, [LEFT_KEY] = false, [DOWN_KEY] = false, [RIGHT_KEY] = false, [S1_KEY] = false, [S2_KEY] = false, [S3_KEY] = false, [S4_KEY] = false }
@@ -55,7 +52,7 @@ function new_player(char, map)
 		self:add_task({ class = "dead" })
 	end
 
-	function player:tick(frame)
+	function player:tick()
 		if not self:has_tasks_by_class("dead") then
 			local d = self:move_direction()
 
@@ -67,7 +64,7 @@ function new_player(char, map)
 			self:consider_drowning()
 
 			if self.char_tick then
-				self:char_tick(frame)
+				self:char_tick()
 			end
 		end
 	end
@@ -125,7 +122,6 @@ function new_player(char, map)
 		end
 
 		assert(self.shape)
-		assert(self.shape.map)
 
 		local TILE_SIZE = 64
 		local MAP_WIDTH = 16
@@ -133,17 +129,14 @@ function new_player(char, map)
 		local rect = self.shape:wrapper()
 		for x=math.floor(rect:left() / TILE_SIZE) + 1, math.ceil(rect:right() / TILE_SIZE) + 1 do
 			for y=math.floor(rect:top() / TILE_SIZE) + 1, math.ceil(rect:bottom() / TILE_SIZE) + 1 do
-				local tile_kind = self.shape.map.tiles[(y-1) * MAP_WIDTH + x]
+				local tile_kind = frame().map.tiles[(y-1) * MAP_WIDTH + x]
 
 				if tile_kind == collision_map_mod.TILE_NONE then
 					local tile_rect = rect_mod.by_left_top_and_size(
 						vec_mod((x-1) * TILE_SIZE, (y-1) * TILE_SIZE),
 						vec_mod(TILE_SIZE, TILE_SIZE)
 					)
-					local tile_shape = polygon_mod.by_rect(
-						tile_rect,
-						self.shape.map
-					)
+					local tile_shape = polygon_mod.by_rect(tile_rect)
 					if collision_detection_mod(tile_shape, self.shape) then
 						return false
 					end

@@ -24,25 +24,24 @@ local S3_DASH_SPEED = 2
 local S3_SHIELD_TIMEOUT = 100
 local S3_SHIELD_SIZE = vec_mod(35, 35)
 
-local function generate_relative_area(frame, entity, timeout, relative_position, size)
+local function generate_relative_area(entity, timeout, relative_position, size)
 	local area = {}
 	area.owner = entity
 	area.shape = polygon_mod.by_rect(
 		rect_mod.by_center_and_size(
 			entity.shape:center() + relative_position,
 			size
-		),
-		frame.map
+		)
 	)
 	area.timeout = timeout
 
-	function area:tick(frame)
+	function area:tick()
 		local entity = self.owner
 
 		self.timeout = math.max(0, self.timeout - 1)
 
 		if self.timeout == 0 then
-			frame:remove(self)
+			frame():remove(self)
 		else
 			self.shape = self.shape:with_center(entity.shape:center() + relative_position)
 		end
@@ -61,7 +60,7 @@ local function generate_s1_task()
 		dash_cooldown = S1_DASH_COOLDOWN,
 		timeout = S1_TIMEOUT}
 
-	function task:tick(entity, frame)
+	function task:tick(entity)
 		self.timeout = math.max(0, self.timeout - 1)
 		self.dash_cooldown = math.max(0, self.dash_cooldown - 1)
 
@@ -78,15 +77,14 @@ local function generate_s1_dash_task(dash_target)
 
 	local task = {class = "riven_s1_dash", dash_target = dash_target }
 
-	function task:init(entity, frame)
+	function task:init(entity)
 		local attack = generate_relative_area(
-			frame,
 			entity,
 			S1_DASH_DISTANCE / S1_DASH_SPEED,
 			(self.dash_target - entity.shape:center()):with_length(10),
 			S1_ATTACK_SIZE)
 
-		function attack:on_enter_collider(frame, entity)
+		function attack:on_enter_collider(entity)
 			local attack = self
 
 			if entity.damage ~= nil and entity ~= self.owner and not (entity.owner and entity.owner == attack.owner) then
@@ -94,10 +92,10 @@ local function generate_s1_dash_task(dash_target)
 			end
 		end
 
-		frame:add(attack)
+		frame():add(attack)
 	end
 
-	function task:tick(entity, frame)
+	function task:tick(entity)
 		local move_vec = self.dash_target - entity.shape:center()
 		if move_vec:length() < S1_DASH_SPEED then
 			entity.shape = entity.shape:with_center(self.dash_target)
@@ -114,7 +112,7 @@ local function generate_s2_stun_task()
 	local task = {class = "riven_s2_stun",
 		timeout = S2_STUN_TIMEOUT}
 
-	function task:tick(entity, frame)
+	function task:tick(entity)
 		self.timeout = math.max(0, self.timeout - 1)
 
 		if self.timeout == 0 then
@@ -129,25 +127,24 @@ local function generate_s2_task()
 	local task = {class = "riven_s2",
 		animation_timeout = S2_ANIMATION_TIMEOUT}
 
-	function task:init(entity, frame)
+	function task:init(entity)
 		local attack = generate_relative_area(
-			frame,
 			entity,
 			S2_ANIMATION_TIMEOUT,
 			vec_mod(0, 0),
 			S2_SIZE)
 
-		for _, entity in pairs(frame:find_colliders(attack.shape)) do
+		for _, entity in pairs(frame():find_colliders(attack.shape)) do
 			if entity.damage and entity ~= attack.owner and not (entity.owner and entity.owner == attack.owner) then
 				entity:damage(S2_DAMAGE)
 				entity:add_task(generate_s2_stun_task())
 			end
 		end
 
-		frame:add(attack)
+		frame():add(attack)
 	end
 
-	function task:tick(entity, frame)
+	function task:tick(entity)
 		entity:remove_task(self)
 	end
 
@@ -159,23 +156,22 @@ local function generate_s3_task(dash_target)
 
 	local task = {class = "riven_s3", dash_target = dash_target}
 
-	function task:init(entity, frame)
+	function task:init(entity)
 		local shield = generate_relative_area(
-			frame,
 			entity,
 			S3_SHIELD_TIMEOUT,
 			vec_mod(0, 0),
 			S3_SHIELD_SIZE)
 
 		function shield:damage(dmg)
-			frame:remove(self)
+			frame():remove(self)
 		end
 
 		shield.owner = entity
-		frame:add(shield)
+		frame():add(shield)
 	end
 
-	function task:tick(entity, frame)
+	function task:tick(entity)
 		local move_vec = self.dash_target - entity.shape:center()
 		if move_vec:length() < S3_DASH_SPEED then
 			entity.shape = entity.shape:with_center(self.dash_target)
