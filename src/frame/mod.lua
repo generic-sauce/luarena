@@ -93,49 +93,44 @@ function frame_mod.initial(chars, map_seed)
 	-- respawn
 
 	function frame:consider_respawn()
-		-- Don't do this in Singleplayer
-		if #self.chars == 1 then
-			local player = self.entities[1]
-			if player:has_tasks_by_class("dead") then
-				self:respawn_player(player)
-			end
-			return
-		end
-
 		local players_alive = 0
-		for i = 1, #self.chars, 1 do
+		for i = 1, #self.chars do
 			if not self.entities[i]:has_tasks_by_class("dead") then
 				players_alive = players_alive + 1
 			end
 		end
 
-		if players_alive <= 1 then
+		if (#self.chars == 1 and players_alive == 0) or (#self.chars > 1 and players_alive <= 1) then
 			self:respawn()
 		end
 	end
 
-	function frame:respawn_player(player)
-		local tasks = player:get_tasks_by_class("dead")
-		if #tasks > 0 then
-			for _, task in pairs(tasks) do
-				player:remove_task(task)
+	function frame:update_score()
+		if #self.chars == 1 then return end
+
+		for i = 1, #self.chars do
+			local player = self.entities[i]
+			if not player:has_tasks_by_class("dead") then
+				self.scores[i] = self.scores[i] + 1
 			end
 		end
+	end
+
+	function frame:respawn_player(player)
+		player.tasks = {}
+		player.inactive_tasks = {}
 		player.health = 100
 		player.shape = player.shape:with_center(vec_mod(200, 200))
 	end
 
 	function frame:respawn()
+		self:update_score()
 		for i = 1, #self.chars do
-			local player = self.entities[i]
-			local tasks = player:get_tasks_by_class("dead")
-			-- if you are dead
-			if #tasks > 0 then
-				self:respawn_player(player)
-			else
-				-- otherwise you get a score
-				self.scores[i] = self.scores[i] + 1
-			end
+			self:respawn_player(self.entities[i])
+		end
+
+		while #self.entities > #self.chars do
+			table.remove(self.entities, #self.chars + 1)
 		end
 	end
 
