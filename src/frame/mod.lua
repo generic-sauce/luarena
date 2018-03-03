@@ -95,6 +95,10 @@ function frame_mod.initial(chars, map_seed)
 	function frame:consider_respawn()
 		-- Don't do this in Singleplayer
 		if #self.chars == 1 then
+			local player = self.entities[1]
+			if player:has_tasks_by_class("dead") then
+				self:respawn_player(player)
+			end
 			return
 		end
 
@@ -110,22 +114,28 @@ function frame_mod.initial(chars, map_seed)
 		end
 	end
 
+	function frame:respawn_player(player)
+		local tasks = player:get_tasks_by_class("dead")
+		if #tasks > 0 then
+			for _, task in pairs(tasks) do
+				player:remove_task(task)
+			end
+		end
+		player.health = 100
+		player.shape = player.shape:with_center(vec_mod(200, 200))
+	end
+
 	function frame:respawn()
 		for i = 1, #self.chars do
 			local player = self.entities[i]
 			local tasks = player:get_tasks_by_class("dead")
 			-- if you are dead
 			if #tasks > 0 then
-				-- you will respawn
-				for _, task in pairs(tasks) do
-					player:remove_task(task)
-				end
+				self:respawn_player(player)
 			else
 				-- otherwise you get a score
 				self.scores[i] = self.scores[i] + 1
 			end
-			player.health = 100
-			player.shape = player.shape:with_center(vec_mod(200, 200))
 		end
 	end
 

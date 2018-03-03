@@ -155,7 +155,6 @@ function new_player(char, map)
 
 	function player:consider_drowning()
 		if self:is_drowning() then
-			print("drowned!")
 			self:die()
 		end
 	end
