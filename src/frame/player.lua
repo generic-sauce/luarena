@@ -1,6 +1,9 @@
 local circle_mod = require('shape/circle')
 local rect_mod = require("viewmath/rect")
+local polygon_mod = require('shape/polygon')
 local vec_mod = require('viewmath/vec')
+local collision_map_mod = require('collision/collision_map')
+local collision_detection_mod = require('collision/detection')
 
 RIGHT_KEY = 'd'
 UP_KEY = 'w'
@@ -28,6 +31,8 @@ local function generate_walk_task(direction)
 end
 
 function new_player(char, map)
+	assert(map)
+
 	local player = {}
 
 	player.shape = circle_mod.by_center_and_radius(
@@ -51,15 +56,19 @@ function new_player(char, map)
 	end
 
 	function player:tick(frame)
-		local d = self:move_direction()
+		if not self:has_tasks_by_class("dead") then
+			local d = self:move_direction()
 
-		if d:length() ~= 0 then
-			self.direction_vec = d -- for the case that :direction() is not called
-			self:add_task(generate_walk_task(d))
-		end
+			if d:length() ~= 0 then
+				self.direction_vec = d -- for the case that :direction() is not called
+				self:add_task(generate_walk_task(d))
+			end
 
-		if self.char_tick then
-			self:char_tick(frame)
+			self:consider_drowning()
+
+			if self.char_tick then
+				self:char_tick(frame)
+			end
 		end
 	end
 
@@ -106,6 +115,48 @@ function new_player(char, map)
 				wrapper:left_top() - vec_mod(0, bar_offset),
 				vec_mod(wrapper:width() * self.health/100, bar_height)
 			), 255, 0, 0)
+		end
+	end
+
+	-- effectively checks, whether you collide with a TILE_NONE
+	function player:is_drowning()
+		if self:has_tasks_by_class("dash") then
+			return false
+		end
+
+		assert(self.shape)
+		assert(self.shape.map)
+
+		local TILE_SIZE = 64
+		local MAP_WIDTH = 16
+
+		local rect = self.shape:wrapper()
+		for x=math.floor(rect:left() / TILE_SIZE) + 1, math.ceil(rect:right() / TILE_SIZE) + 1 do
+			for y=math.floor(rect:top() / TILE_SIZE) + 1, math.ceil(rect:bottom() / TILE_SIZE) + 1 do
+				local tile_kind = self.shape.map.tiles[(y-1) * MAP_WIDTH + x]
+
+				if tile_kind == collision_map_mod.TILE_NONE then
+					local tile_rect = rect_mod.by_left_top_and_size(
+						vec_mod((x-1) * TILE_SIZE, (y-1) * TILE_SIZE),
+						vec_mod(TILE_SIZE, TILE_SIZE)
+					)
+					local tile_shape = polygon_mod.by_rect(
+						tile_rect,
+						self.shape.map
+					)
+					if collision_detection_mod(tile_shape, self.shape) then
+						return false
+					end
+				end
+			end
+		end
+		return true
+	end
+
+	function player:consider_drowning()
+		if self:is_drowning() then
+			print("drowned!")
+			self:die()
 		end
 	end
 

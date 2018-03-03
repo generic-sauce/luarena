@@ -93,8 +93,8 @@ function frame_mod.initial(chars, map_seed)
 	-- respawn
 
 	function frame:consider_respawn()
-		-- Don't do this in single player!
-		if #self.chars < 2 then
+		-- Don't do this in Singleplayer
+		if #self.chars == 1 then
 			return
 		end
 
@@ -125,6 +125,7 @@ function frame_mod.initial(chars, map_seed)
 				self.scores[i] = self.scores[i] + 1
 			end
 			player.health = 100
+			player.shape = player.shape:with_center(vec_mod(200, 200))
 		end
 	end
 

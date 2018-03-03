@@ -12,7 +12,8 @@ function circle_mod.by_center_and_radius(center_vec, radius, map)
 	local circle = {
 		center_vec = center_vec,
 		radius = radius,
-		shape_type = "circle"
+		shape_type = "circle",
+		map = map,
 	}
 
 	function circle:with_center(center)
