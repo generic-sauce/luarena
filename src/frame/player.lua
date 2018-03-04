@@ -4,6 +4,7 @@ local polygon_mod = require('shape/polygon')
 local vec_mod = require('viewmath/vec')
 local collision_map_mod = require('collision/collision_map')
 local collision_detection_mod = require('collision/detection')
+local dev = require("dev")
 
 RIGHT_KEY = 'd'
 UP_KEY = 'w'
@@ -117,7 +118,10 @@ function new_player(char)
 
 	-- effectively checks, whether you collide with a TILE_NONE
 	function player:is_drowning()
+		dev.start_profiler("is_drowning", {"drowning"})
+
 		if self:has_tasks_by_class("dash") then
+			dev.stop_profiler("is_drowning")
 			return false
 		end
 
@@ -137,12 +141,17 @@ function new_player(char)
 						vec_mod(TILE_SIZE, TILE_SIZE)
 					)
 					local tile_shape = polygon_mod.by_rect(tile_rect)
+					dev.start_profiler("drowning collision-check", {"drowning"})
 					if collision_detection_mod(tile_shape, self.shape) then
+						dev.stop_profiler("is_drowning")
+						dev.stop_profiler("drowning collision-check")
 						return false
 					end
+					dev.stop_profiler("drowning collision-check")
 				end
 			end
 		end
+		dev.stop_profiler("is_drowning")
 		return true
 	end
 
