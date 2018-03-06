@@ -3,25 +3,25 @@ local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
 local task_mod = require('frame/task')
 
-local S1_COOLDOWN = 1000
-local S1_TIMEOUT = 500
-local S1_DASH_COOLDOWN = 70
+local S1_COOLDOWN = 5
+local S1_TIMEOUT = 2.5
+local S1_DASH_COOLDOWN = .35
 local S1_DASH_INSTANCES = 3
 local S1_DASH_DISTANCE = 65
-local S1_DASH_SPEED = 2
+local S1_DASH_SPEED = 400 -- units per second
 local S1_ATTACK_DAMAGE = 20
 local S1_ATTACK_SIZE = vec_mod(32, 32)
 
-local S2_COOLDOWN = 1000
-local S2_ANIMATION_TIMEOUT = 40
+local S2_COOLDOWN = 5
+local S2_ANIMATION_TIMEOUT = 0.2
 local S2_SIZE = vec_mod(60, 60)
-local S2_STUN_TIMEOUT = 60
+local S2_STUN_TIMEOUT = .3
 local S2_DAMAGE = 20
 
-local S3_COOLDOWN = 400
+local S3_COOLDOWN = 2
 local S3_DASH_DISTANCE = 80
-local S3_DASH_SPEED = 2
-local S3_SHIELD_TIMEOUT = 100
+local S3_DASH_SPEED = 400 -- units per second
+local S3_SHIELD_TIMEOUT = .5
 local S3_SHIELD_SIZE = vec_mod(35, 35)
 
 local function generate_relative_area(entity, timeout, relative_position, size)
@@ -38,7 +38,7 @@ local function generate_relative_area(entity, timeout, relative_position, size)
 	function area:tick()
 		local entity = self.owner
 
-		self.timeout = math.max(0, self.timeout - 1)
+		self.timeout = math.max(0, self.timeout - FRAME_DURATION)
 
 		if self.timeout == 0 then
 			frame():remove(self)
@@ -61,8 +61,8 @@ local function generate_s1_task()
 		timeout = S1_TIMEOUT}
 
 	function task:tick(entity)
-		self.timeout = math.max(0, self.timeout - 1)
-		self.dash_cooldown = math.max(0, self.dash_cooldown - 1)
+		self.timeout = math.max(0, self.timeout - FRAME_DURATION)
+		self.dash_cooldown = math.max(0, self.dash_cooldown - FRAME_DURATION)
 
 		if self.instances == 0 or self.timeout == 0 then
 			entity:remove_task(self)
@@ -97,11 +97,11 @@ local function generate_s1_dash_task(dash_target)
 
 	function task:tick(entity)
 		local move_vec = self.dash_target - entity.shape:center()
-		if move_vec:length() < S1_DASH_SPEED then
+		if move_vec:length() < S1_DASH_SPEED * FRAME_DURATION then
 			entity.shape = entity.shape:with_center(self.dash_target)
 			entity:remove_task(self)
 		else
-			entity.shape = entity.shape:move_center(move_vec:with_length(S1_DASH_SPEED))
+			entity.shape = entity.shape:move_center(move_vec:with_length(S1_DASH_SPEED * FRAME_DURATION))
 		end
 	end
 
@@ -113,7 +113,7 @@ local function generate_s2_stun_task()
 		timeout = S2_STUN_TIMEOUT}
 
 	function task:tick(entity)
-		self.timeout = math.max(0, self.timeout - 1)
+		self.timeout = math.max(0, self.timeout - FRAME_DURATION)
 
 		if self.timeout == 0 then
 			entity:remove_task(self)
@@ -173,11 +173,11 @@ local function generate_s3_task(dash_target)
 
 	function task:tick(entity)
 		local move_vec = self.dash_target - entity.shape:center()
-		if move_vec:length() < S3_DASH_SPEED then
+		if move_vec:length() < S3_DASH_SPEED * FRAME_DURATION then
 			entity.shape = entity.shape:with_center(self.dash_target)
 			entity:remove_task(self)
 		else
-			entity.shape = entity.shape:move_center(move_vec:with_length(S3_DASH_SPEED))
+			entity.shape = entity.shape:move_center(move_vec:with_length(S3_DASH_SPEED * FRAME_DURATION))
 		end
 	end
 
@@ -192,9 +192,9 @@ return function (character)
 	function character:char_tick()
 		-- TODO create s1 wait task for sub dashes
 
-		self.s1_cooldown = math.max(0, self.s1_cooldown - 1)
-		self.s2_cooldown = math.max(0, self.s2_cooldown - 1)
-		self.s3_cooldown = math.max(0, self.s3_cooldown - 1)
+		self.s1_cooldown = math.max(0, self.s1_cooldown - FRAME_DURATION)
+		self.s2_cooldown = math.max(0, self.s2_cooldown - FRAME_DURATION)
+		self.s3_cooldown = math.max(0, self.s3_cooldown - FRAME_DURATION)
 
 		if self.inputs[S1_KEY] then
 			local s1_tasks = self:get_tasks_by_class("riven_s1")
