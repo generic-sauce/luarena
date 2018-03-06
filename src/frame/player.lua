@@ -16,7 +16,7 @@ S2_KEY = 'i'
 S3_KEY = 'k'
 S4_KEY = 'l'
 
-WALKSPEED = 0.7
+WALKSPEED = 140 -- units per second
 
 local function generate_walk_task(direction)
 	assert(direction)
@@ -24,7 +24,7 @@ local function generate_walk_task(direction)
 	local task = {direction = direction, class = "walk"}
 
 	function task:init(entity)
-		entity.shape = entity.shape:move_center(self.direction:with_length(WALKSPEED))
+		entity.shape = entity.shape:move_center(self.direction:with_length(WALKSPEED * FRAME_DURATION))
 		entity:remove_task(self)
 	end
 

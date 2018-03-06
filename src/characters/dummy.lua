@@ -1,15 +1,15 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 
-local REGEN_DELAY = 500
+local REGEN_DELAY = 5 -- in seconds
 
 return function (dummy)
 	dummy.regen_counter = 0
 
 	function dummy:char_tick()
 		if self.health < 100 then
-			self.regen_counter = self.regen_counter + 1
-			if self.regen_counter == REGEN_DELAY then
+			self.regen_counter = self.regen_counter + FRAME_DURATION
+			if self.regen_counter >= REGEN_DELAY then
 				self.health = 100
 				self.regen_counter = 0
 			end
