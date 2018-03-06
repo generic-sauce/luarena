@@ -6,25 +6,26 @@ local circle_mod = require('shape/circle')
 
 local collision_detection_mod = require('collision/detection')
 
-local S1_COOLDOWN = 500
+local S1_COOLDOWN = 2.5
 local S1_RANGE = 75
 local S1_DAMAGE = 20
 
-local S2_COOLDOWN = 300
+local S2_COOLDOWN = 1.5
 local S2_RANGE = 100
-local S2_SPEED = 3
+local S2_SPEED = 600 -- units per second
 local S2_MAX_DAGGERS = 4
 local S2_DAMAGE = 5
 
-local S3_COOLDOWN = 400
+local S3_COOLDOWN = 2
 local S3_RANGE = 100
-local S3_SPEED = 2
+local S3_SPEED = 400 -- units per second
 local S3_DAMAGE = 12
 
-local S4_COOLDOWN = 75
+local S4_COOLDOWN = .375
 local S4_DAMAGE = 15
 local S4_DAMAGE_ADD = 15
 local S4_RANGE = 25
+local S4_DURATION = .4
 
 return function (u1)
 
@@ -157,7 +158,7 @@ return function (u1)
 						dagger:land()
 					end
 				else
-					dagger.shape = dagger.shape:move_center(dagger.direction * S2_SPEED)
+					dagger.shape = dagger.shape:move_center(dagger.direction * S2_SPEED * FRAME_DURATION)
 				end
 			end
 
@@ -209,7 +210,7 @@ return function (u1)
 			if (task.start_point - u1.shape:center()):length() >= S3_RANGE then
 				u1:remove_task(task)
 			else
-				u1.shape = u1.shape:move_center(task.direction:with_length(S3_SPEED))
+				u1.shape = u1.shape:move_center(task.direction:with_length(S3_SPEED * FRAME_DURATION))
 			end
 		end
 
@@ -232,7 +233,7 @@ return function (u1)
 			u1.shape:center(),
 			S4_RANGE
 		)
-		aoe.life_counter = 80
+		aoe.life_counter = S4_DURATION
 
 		function aoe:initial_damage()
 			local aoe = self
@@ -265,7 +266,7 @@ return function (u1)
 		function aoe:tick()
 			local aoe = self
 
-			aoe.life_counter = aoe.life_counter - 1
+			aoe.life_counter = aoe.life_counter - FRAME_DURATION
 			if aoe.life_counter <= 0 then
 				frame():remove(aoe)
 			end
@@ -303,10 +304,10 @@ return function (u1)
 	function u1:char_tick()
 		local u1 = self
 
-		self.s1_cooldown = math.max(0, self.s1_cooldown - 1)
-		self.s2_cooldown = math.max(0, self.s2_cooldown - 1)
-		self.s3_cooldown = math.max(0, self.s3_cooldown - 1)
-		self.s4_cooldown = math.max(0, self.s4_cooldown - 1)
+		self.s1_cooldown = math.max(0, self.s1_cooldown - FRAME_DURATION)
+		self.s2_cooldown = math.max(0, self.s2_cooldown - FRAME_DURATION)
+		self.s3_cooldown = math.max(0, self.s3_cooldown - FRAME_DURATION)
+		self.s4_cooldown = math.max(0, self.s4_cooldown - FRAME_DURATION)
 
 		if not self.inputs[S1_KEY] then
 			self.s1_released = true
