@@ -9,6 +9,7 @@ local collision_detection_mod = require('collision/detection')
 local S1_COOLDOWN = 2.5
 local S1_RANGE = 75
 local S1_DAMAGE = 20
+local S1_SPEED = 200
 
 local S2_COOLDOWN = 1.5
 local S2_RANGE = 100
@@ -62,7 +63,7 @@ return function (u1)
 				u1.shape:center(),
 				3
 			)
-			blade.speed = blade.u1:direction()
+			blade.speed = blade.u1:direction() * S1_SPEED * FRAME_DURATION
 
 			function blade:on_enter_collider(e)
 				local blade = self
