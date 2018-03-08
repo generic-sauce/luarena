@@ -125,6 +125,10 @@ function new_player(char)
 			return false
 		end
 
+		if not collision_detection_mod(self.shape, polygon_mod.by_rect(frame().map:rect())) then
+			return true
+		end
+
 		assert(self.shape)
 
 		local TILE_SIZE = 64
