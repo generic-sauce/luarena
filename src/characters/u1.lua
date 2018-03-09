@@ -350,22 +350,20 @@ return function (u1)
 	function u1:draw(viewport)
 		local u1 = self
 
+		if self:has_tasks_by_class("dead") then
+			return
+		end
+
 		local alpha = nil
 		if u1:has_tasks_by_class("u1_s1") then
 			alpha = 100
 		else
 			alpha = 255
 		end
-		viewport:draw_shape(self.shape, 100, 100, 100, alpha)
 
-		local bar_offset = 10
-		local bar_height = 3
-
-		local wrapper = self.shape:wrapper()
-		viewport:draw_world_rect(rect_mod.by_left_top_and_size(
-			wrapper:left_top() - vec_mod(0, bar_offset),
-			vec_mod(wrapper:width() * self.health/100, bar_height)
-		), 255, 0, 0)
+		viewport:draw_shape(self.shape, 100, 100, 100, alpha) -- draw_body
+		self:draw_health(viewport)
+		self:draw_skills(viewport)
 	end
 
 	function u1:damage(dmg)

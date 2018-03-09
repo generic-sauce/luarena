@@ -101,18 +101,43 @@ function new_player(char)
 		return self.direction_vec
 	end
 
+	function player:draw_body(viewport)
+		viewport:draw_shape(self.shape, 100, 100, 100)
+	end
+
+	function player:draw_health(viewport)
+		local bar_offset = 10
+		local bar_height = 3
+
+		local wrapper = self.shape:wrapper()
+		viewport:draw_world_rect(rect_mod.by_left_top_and_size(
+			wrapper:left_top() - vec_mod(0, bar_offset),
+			vec_mod(wrapper:width() * self.health/100, bar_height)
+		), 255, 0, 0)
+	end
+
+	function player:draw_skills(viewport)
+		local wrapper = self.shape:wrapper()
+		for skill=1, 4 do
+			local r, g, b
+			if self['s' .. tostring(skill) .. '_cooldown'] == 0 then
+				r, g, b = 0, 0, 255
+			else
+				r, g, b = 255, 0, 0
+			end
+
+			viewport:draw_world_rect(rect_mod.by_left_top_and_size(
+				wrapper:left_top() + vec_mod((skill-1) * (1/3) * wrapper:width() - (skill-1), -5),
+				vec_mod(3, 3)
+			), r, g, b)
+		end
+	end
+
 	function player:draw(viewport)
 		if not self:has_tasks_by_class("dead") then
-			viewport:draw_shape(self.shape, 100, 100, 100)
-
-			local bar_offset = 10
-			local bar_height = 3
-
-			local wrapper = self.shape:wrapper()
-			viewport:draw_world_rect(rect_mod.by_left_top_and_size(
-				wrapper:left_top() - vec_mod(0, bar_offset),
-				vec_mod(wrapper:width() * self.health/100, bar_height)
-			), 255, 0, 0)
+			self:draw_body(viewport)
+			self:draw_health(viewport)
+			self:draw_skills(viewport)
 		end
 	end
 
@@ -133,10 +158,18 @@ function new_player(char)
 
 		local TILE_SIZE = 64
 		local MAP_WIDTH = 16
+		local MAP_HEIGHT = 16
 
 		local rect = self.shape:wrapper()
-		for x=math.floor(rect:left() / TILE_SIZE) + 1, math.ceil(rect:right() / TILE_SIZE) + 1 do
-			for y=math.floor(rect:top() / TILE_SIZE) + 1, math.ceil(rect:bottom() / TILE_SIZE) + 1 do
+
+		local min_x = math.floor(rect:left() / TILE_SIZE) + 1
+		local max_x = math.ceil(rect:right() / TILE_SIZE) + 1
+
+		local min_y = math.floor(rect:top() / TILE_SIZE) + 1
+		local max_y = math.ceil(rect:bottom() / TILE_SIZE) + 1
+
+		for x=min_x, max_x do
+			for y=min_y, max_y do
 				local tile_kind = frame().map.tiles[(y-1) * MAP_WIDTH + x]
 
 				if tile_kind == collision_map_mod.TILE_NONE then
