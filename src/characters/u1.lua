@@ -245,7 +245,7 @@ return function (u1)
 			for _, dagger in pairs(aoe.u1.dagger_list) do
 				if dagger.landed and table.contains(colliders, dagger) then
 					table.insert(obsolete_daggers, dagger)
-					dmg = dmg + S4_DAMAGE_ADD
+					dmg = S4_DAMAGE + S4_DAMAGE_ADD -- dagger damage does not stack
 				end
 			end
 
