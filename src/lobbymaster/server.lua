@@ -42,7 +42,7 @@ return function(server, char, port)
 	function server:update(dt)
 		self.networker:handle_events()
 
-		if love.keyboard.isDown('g') then
+		if isPressed('g') then
 			self:go()
 		end
 	end

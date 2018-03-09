@@ -60,7 +60,7 @@ function frame_mod.initial(chars, map_seed)
 		dev.stop_profiler("entities:tick()")
 
 
-		if love.keyboard.isDown('x') then
+		if isPressed('x') then
 			if self.dummy then
 				self:remove(self.dummy)
 			end

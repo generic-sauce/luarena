@@ -1,3 +1,5 @@
+require('keyboard')
+
 function love.load()
 	master = require("lobbymaster/mod").create_lobby_master()
 end

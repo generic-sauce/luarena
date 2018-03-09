@@ -135,13 +135,13 @@ function game_mod.new(chars, local_id, seed)
 
 	function game:handle_debug_hotkeys()
 		-- b => backtrack
-		if love.keyboard.isDown('b') then
+		if isPressed('b') then
 			print("backtracking to frame 2")
 			self:backtrack(2)
 		end
 
 		-- p => print profilers
-		if love.keyboard.isDown('p') then
+		if isPressed('p') then
 			if not p_pressed then
 				dev.dump_profilers()
 				p_pressed = true
@@ -151,7 +151,7 @@ function game_mod.new(chars, local_id, seed)
 		end
 
 		-- c => clear profilers
-		if love.keyboard.isDown('c') then
+		if isPressed('c') then
 			dev.profilers = {}
 		end
 	end

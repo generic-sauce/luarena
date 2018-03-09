@@ -51,7 +51,7 @@ function calendar_mod.new(player_count, local_id)
 		local inputs = {}
 
 		for _, v in pairs( { RIGHT_KEY, UP_KEY, LEFT_KEY, DOWN_KEY, S1_KEY, S2_KEY, S3_KEY, S4_KEY } ) do
-			inputs[v] = love.keyboard.isDown(v)
+			inputs[v] = isPressed(v)
 		end
 
 		local old_inputs = self:read_inputs(self.local_id, nil)

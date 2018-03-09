@@ -12,9 +12,9 @@ LEFT_KEY = 'a'
 DOWN_KEY = 's'
 
 S1_KEY = 'j'
-S2_KEY = 'i'
-S3_KEY = 'k'
-S4_KEY = 'l'
+S2_KEY = 'k'
+S3_KEY = 'l'
+S4_KEY = ';'
 
 WALKSPEED = 140 -- units per second
 
