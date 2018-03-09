@@ -150,10 +150,6 @@ function new_player(char)
 			return false
 		end
 
-		if not collision_detection_mod(self.shape, polygon_mod.by_rect(frame().map:rect())) then
-			return true
-		end
-
 		assert(self.shape)
 
 		local TILE_SIZE = 64
@@ -167,6 +163,19 @@ function new_player(char)
 
 		local min_y = math.floor(rect:top() / TILE_SIZE) + 1
 		local max_y = math.ceil(rect:bottom() / TILE_SIZE) + 1
+
+		if max_x < 1 or
+		   min_x > MAP_WIDTH or
+		   max_y < 1 or
+		   min_y > MAP_HEIGHT then
+			dev.stop_profiler("is_drowning")
+			return true
+		end
+
+		min_x = math.max(min_x, 1)
+		max_x = math.min(max_x, MAP_WIDTH)
+		min_y = math.max(min_y, 1)
+		max_y = math.min(max_y, MAP_HEIGHT)
 
 		for x=min_x, max_x do
 			for y=min_y, max_y do
