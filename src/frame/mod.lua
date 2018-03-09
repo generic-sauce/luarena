@@ -15,13 +15,18 @@ function frame_mod.initial(chars, map_seed)
 	frame.chars = chars
 	frame.scores = {}
 
+	function frame:init_entities()
+		self.entities = {}
+		for _, char in pairs(self.chars) do
+			self:add(require('frame/player')(char))
+		end
+	end
+
 	function frame:init()
 		collision_mod.init_frame(self)
 		task_mod.init_frame(self)
 
-		for _, char in pairs(self.chars) do
-			self:add(require('frame/player')(char))
-		end
+		self:init_entities()
 
 		for i=1, #self.chars do
 			self.scores[i] = 0
@@ -124,22 +129,9 @@ function frame_mod.initial(chars, map_seed)
 		end
 	end
 
-	function frame:respawn_player(player)
-		player.tasks = {}
-		player.inactive_tasks = {}
-		player.health = 100
-		player.shape = player.shape:with_center(vec_mod(200, 200))
-	end
-
 	function frame:respawn()
 		self:update_score()
-		for i = 1, #self.chars do
-			self:respawn_player(self.entities[i])
-		end
-
-		while #self.entities > #self.chars do
-			table.remove(self.entities, #self.chars + 1)
-		end
+		self:init_entities()
 	end
 
 	frame:init()
