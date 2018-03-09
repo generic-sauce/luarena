@@ -6,7 +6,7 @@ local circle_mod = require('shape/circle')
 
 local collision_detection_mod = require('collision/detection')
 
-local S1_COOLDOWN = 2.5
+local S1_COOLDOWN = 6
 local S1_RANGE = 75
 local S1_DAMAGE = 20
 local S1_SPEED = 200
@@ -17,12 +17,12 @@ local S2_SPEED = 600 -- units per second
 local S2_MAX_DAGGERS = 4
 local S2_DAMAGE = 5
 
-local S3_COOLDOWN = 2
+local S3_COOLDOWN = 6
 local S3_RANGE = 100
 local S3_SPEED = 400 -- units per second
 local S3_DAMAGE = 12
 
-local S4_COOLDOWN = .375
+local S4_COOLDOWN = 1.5
 local S4_DAMAGE = 15
 local S4_DAMAGE_ADD = 15
 local S4_RANGE = 25
