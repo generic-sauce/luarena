@@ -25,7 +25,8 @@ function polygon_mod.by_center_and_points(center_vec, points)
 	assert(points)
 	assert(#points > 0)
 
-	assert_convex_points(points)
+	-- [Uncomment this line, if you have strange behaviour concerning polygons]
+	-- assert_convex_points(points)
 
 	local polygon = {
 		center_vec = center_vec,
