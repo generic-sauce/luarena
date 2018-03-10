@@ -58,8 +58,10 @@ rect_mod.by_center_and_size = function(center, size)
 	end
 
 	function rect:contains(vec)
-		print("TODO")
-		assert(false)
+		return self:left() <= vec.x
+			and self:right() >= vec.x
+			and self:top() <= vec.y
+			and self:bottom() >= vec.y
 	end
 
 	function rect:surrounds(other_rect)

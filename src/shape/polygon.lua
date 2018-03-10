@@ -112,13 +112,16 @@ function polygon_mod.by_points(points)
 	return polygon_mod.by_center_and_points(center, rel_points)
 end
 
+
 function polygon_mod.by_rect(rect)
-	return polygon_mod.by_center_and_points(rect:center(), {
+	local p = polygon_mod.by_center_and_points(rect:center(), {
 		rect:right_top()    - rect:center(),
 		rect:left_top()     - rect:center(),
 		rect:left_bottom()  - rect:center(),
 		rect:right_bottom() - rect:center()
 	})
+	p.rect = rect -- this rect may be used by some performance critical code-parts
+	return p
 end
 
 return polygon_mod

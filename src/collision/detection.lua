@@ -34,6 +34,10 @@ local function colliding_circles(c1, c2)
 end
 
 local function colliding_polygons(p1, p2)
+	if p1.rect ~= nil and p2.rect ~= nil then -- if both of them are rects, do easy collision detection
+		return p1.rect:intersects(p2.rect)
+	end
+
 	local function is_separating_axis_to_points(axis, points)
 		for _, p in pairs(points) do
 			-- as points_a are stored in counter clockwise order:
