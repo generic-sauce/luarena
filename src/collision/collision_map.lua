@@ -1,4 +1,9 @@
 local vec_mod = require('viewmath/vec')
+local rect_mod = require("viewmath/rect")
+local polygon_mod = require('shape/polygon')
+local collision_detection_mod = require('collision/detection')
+
+-- README: the top-left tile has the top-left vec_mod-coordinates (0, 0) and the tile coordinates (0, 0)
 
 local collision_map_mod = {
 	TILE_NONE = 0,
@@ -72,21 +77,68 @@ function collision_map_mod.new(size, seed)
 		return pos.x >= 0 and pos.y >= 0 and pos.x < self.size_tiles.x and pos.y < self.size_tiles.y
 	end
 
+	-- returns nil when outta map
+	function collision_map:get_tile_raw(pos)
+		if self:is_inside(pos) then
+			return self.tiles[pos.y * self.size_tiles.x + pos.x + 1]
+		end
+		return nil
+	end
+
 	function collision_map:is_none(pos)
-		return self:is_inside(pos) and self.tiles[pos.y * self.size_tiles.x + pos.x + 1] == collision_map_mod.TILE_NONE
+		return self:get_tile_raw(pos) == collision_map_mod.TILE_NONE
 	end
 
 	function collision_map:is_solid(pos)
-		return not self:is_inside(pos) or self.tiles[pos.y * self.size_tiles.x + pos.x + 1] == collision_map_mod.TILE_SOLID
+		return self:get_tile_raw(pos) == collision_map_mod.TILE_SOLID
 	end
 
 	function collision_map:is_kill(pos)
-		return self:is_inside(pos) and self.tiles[pos.y * self.size_tiles.x + pos.x + 1] == collision_map_mod.TILE_KILL
+		return self:get_tile_raw(pos) == collision_map_mod.TILE_KILL
 	end
 
 	function collision_map:get_tile(pos)
-		-- TODO: test this
-		return not self:is_inside(pos) and TILE_SOLID or self.tiles[pos.y * self.size_tiles.x + pos.x + 1]
+		return self:get_tile_raw(pos) or collision_map_mod.TILE_SOLID
+	end
+
+	function collision_map:get_intersecting_tiles(shape)
+		local TILE_SIZE = 64
+
+		local rect = shape:wrapper()
+
+		local min_x = math.floor(rect:left() / TILE_SIZE)
+		local max_x = math.ceil(rect:right() / TILE_SIZE)
+
+		local min_y = math.floor(rect:top() / TILE_SIZE)
+		local max_y = math.ceil(rect:bottom() / TILE_SIZE)
+
+		if max_x < 0 or
+		   min_x >= self.size_tiles.x or
+		   max_y < 0 or
+		   min_y >= self.size_tiles.y then
+			return {}
+		end
+
+		local out_tiles = {}
+
+		min_x = math.max(min_x, 0)
+		max_x = math.min(max_x, self.size_tiles.x-1)
+		min_y = math.max(min_y, 0)
+		max_y = math.min(max_y, self.size_tiles.y-1)
+
+		for x=min_x, max_x do
+			for y=min_y, max_y do
+				local tile_rect = rect_mod.by_left_top_and_size(
+					vec_mod(x * TILE_SIZE, y * TILE_SIZE),
+					vec_mod(TILE_SIZE, TILE_SIZE)
+				)
+				local tile_shape = polygon_mod.by_rect(tile_rect)
+				if collision_detection_mod(tile_shape, shape) then
+					table.insert(out_tiles, {x=x, y=y})
+				end
+			end
+		end
+		return out_tiles
 	end
 
 	return collision_map

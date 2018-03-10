@@ -1,9 +1,7 @@
 local circle_mod = require('shape/circle')
 local rect_mod = require("viewmath/rect")
-local polygon_mod = require('shape/polygon')
 local vec_mod = require('viewmath/vec')
 local collision_map_mod = require('collision/collision_map')
-local collision_detection_mod = require('collision/detection')
 local dev = require("dev")
 
 RIGHT_KEY = 'd'
@@ -150,54 +148,14 @@ function new_player(char)
 			return false
 		end
 
-		assert(self.shape)
-
-		local TILE_SIZE = 64
-		local MAP_WIDTH = 16
-		local MAP_HEIGHT = 16
-
-		local rect = self.shape:wrapper()
-
-		local min_x = math.floor(rect:left() / TILE_SIZE) + 1
-		local max_x = math.ceil(rect:right() / TILE_SIZE) + 1
-
-		local min_y = math.floor(rect:top() / TILE_SIZE) + 1
-		local max_y = math.ceil(rect:bottom() / TILE_SIZE) + 1
-
-		if max_x < 1 or
-		   min_x > MAP_WIDTH or
-		   max_y < 1 or
-		   min_y > MAP_HEIGHT then
-			dev.stop_profiler("is_drowning")
-			return true
-		end
-
-		min_x = math.max(min_x, 1)
-		max_x = math.min(max_x, MAP_WIDTH)
-		min_y = math.max(min_y, 1)
-		max_y = math.min(max_y, MAP_HEIGHT)
-
-		for x=min_x, max_x do
-			for y=min_y, max_y do
-				local tile_kind = frame().map.tiles[(y-1) * MAP_WIDTH + x]
-
-				if tile_kind == collision_map_mod.TILE_NONE then
-					local tile_rect = rect_mod.by_left_top_and_size(
-						vec_mod((x-1) * TILE_SIZE, (y-1) * TILE_SIZE),
-						vec_mod(TILE_SIZE, TILE_SIZE)
-					)
-					local tile_shape = polygon_mod.by_rect(tile_rect)
-					dev.start_profiler("drowning collision-check", {"drowning"})
-					if collision_detection_mod(tile_shape, self.shape) then
-						dev.stop_profiler("is_drowning")
-						dev.stop_profiler("drowning collision-check")
-						return false
-					end
-					dev.stop_profiler("drowning collision-check")
-				end
+		for _, pos in pairs(frame().map:get_intersecting_tiles(self.shape)) do
+			if frame().map:get_tile(pos) == collision_map_mod.TILE_NONE then
+				dev.stop_profiler("is_drowning", {"drowning"})
+				return false
 			end
 		end
-		dev.stop_profiler("is_drowning")
+
+		dev.stop_profiler("is_drowning", {"drowning"})
 		return true
 	end
 
