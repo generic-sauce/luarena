@@ -155,11 +155,21 @@ function new_player(char)
 
 			if #colliding_solid_tiles == 0 then break end
 
+			local actual_move = vec_mod(0, 0)
 			for _, pos in pairs(colliding_solid_tiles) do
 				local tile_center = vec_mod(pos.x, pos.y) * TILE_SIZE + vec_mod(TILE_SIZE/2, TILE_SIZE/2)
 				local direction = self.shape:center() - tile_center
-				self.shape = self.shape:move_center(direction:with_length(1))
+				actual_move = actual_move + direction:with_length(1)
 			end
+
+			-- make it axis aligned!
+			if math.abs(actual_move.x) > math.abs(actual_move.y) then
+				actual_move = actual_move:with_y(0)
+			else
+				actual_move = actual_move:with_x(0)
+			end
+
+			self.shape = self.shape:move_center(actual_move)
 
 			counter = counter + 1
 			assert(counter < 20, "deglitch counter too high!")
