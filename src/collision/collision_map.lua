@@ -89,15 +89,15 @@ function collision_map_mod.new(size, seed)
 	end
 
 	function collision_map:is_none(pos)
-		return self:get_tile_raw(pos) == collision_map_mod.TILE_NONE
+		return self:get_tile(pos) == collision_map_mod.TILE_NONE
 	end
 
 	function collision_map:is_solid(pos)
-		return self:get_tile_raw(pos) == collision_map_mod.TILE_SOLID
+		return self:get_tile(pos) == collision_map_mod.TILE_SOLID
 	end
 
 	function collision_map:is_kill(pos)
-		return self:get_tile_raw(pos) == collision_map_mod.TILE_KILL
+		return self:get_tile(pos) == collision_map_mod.TILE_KILL
 	end
 
 	function collision_map:get_tile(pos)
