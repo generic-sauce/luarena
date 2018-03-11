@@ -60,6 +60,7 @@ function new_player(char)
 				self:add_task(generate_walk_task(d))
 			end
 
+			self:consider_deglitching()
 			self:consider_drowning()
 
 			if self.char_tick then
@@ -136,6 +137,32 @@ function new_player(char)
 			self:draw_body(viewport)
 			self:draw_health(viewport)
 			self:draw_skills(viewport)
+		end
+	end
+
+	function player:consider_deglitching()
+		local TILE_SIZE = 64
+
+		local counter = 0
+
+		while true do
+			local colliding_solid_tiles = {}
+			for _, pos in pairs(frame().map:get_conceptual_intersecting_tiles(self.shape)) do
+				if frame().map:is_solid(pos) then
+					table.insert(colliding_solid_tiles, pos)
+				end
+			end
+
+			if #colliding_solid_tiles == 0 then break end
+
+			for _, pos in pairs(colliding_solid_tiles) do
+				local tile_center = vec_mod(pos.x, pos.y) * TILE_SIZE + vec_mod(TILE_SIZE/2, TILE_SIZE/2)
+				local direction = self.shape:center() - tile_center
+				self.shape = self.shape:move_center(direction:with_length(1))
+			end
+
+			counter = counter + 1
+			assert(counter < 20, "deglitch counter too high!")
 		end
 	end
 

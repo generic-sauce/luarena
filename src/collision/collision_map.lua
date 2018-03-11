@@ -56,6 +56,9 @@ function generate_map(size, seed)
 	tiles[3 * size.x + 3] = collision_map_mod.TILE_NONE
 	tiles[3 * size.x + 4] = collision_map_mod.TILE_NONE
 
+	-- temporary (hacky) solid tile
+	tiles[4 * size.x + 4] = collision_map_mod.TILE_SOLID
+
 	--local x, y = math.floor(math.random() * size.x), math.floor(math.random() * size.y)
 
 	return tiles
@@ -125,6 +128,36 @@ function collision_map_mod.new(size, seed)
 		max_x = math.min(max_x, self.size_tiles.x-1)
 		min_y = math.max(min_y, 0)
 		max_y = math.min(max_y, self.size_tiles.y-1)
+
+		for x=min_x, max_x do
+			for y=min_y, max_y do
+				local tile_rect = rect_mod.by_left_top_and_size(
+					vec_mod(x * TILE_SIZE, y * TILE_SIZE),
+					vec_mod(TILE_SIZE, TILE_SIZE)
+				)
+				local tile_shape = polygon_mod.by_rect(tile_rect)
+				if collision_detection_mod(tile_shape, shape) then
+					table.insert(out_tiles, {x=x, y=y})
+				end
+			end
+		end
+		return out_tiles
+	end
+
+	-- returns colliding tile coordinates, even if the tiles are out of map
+	-- not happy with that name, tho
+	function collision_map:get_conceptual_intersecting_tiles(shape)
+		local TILE_SIZE = 64
+
+		local rect = shape:wrapper()
+
+		local min_x = math.floor(rect:left() / TILE_SIZE)
+		local max_x = math.ceil(rect:right() / TILE_SIZE)
+
+		local min_y = math.floor(rect:top() / TILE_SIZE)
+		local max_y = math.ceil(rect:bottom() / TILE_SIZE)
+
+		local out_tiles = {}
 
 		for x=min_x, max_x do
 			for y=min_y, max_y do
