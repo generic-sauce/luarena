@@ -181,11 +181,11 @@ return function (u1)
 		local u1 = self
 
 		local task = { class = "u1_s3" }
-		task.start_point = u1.shape:center()
 		task.u1 = u1
 		u1.s3_cooldown = S3_COOLDOWN
 
 		task.direction = u1:direction()
+		task.traveled_distance = 0
 
 		function task:init(u1)
 			local task = self
@@ -208,10 +208,11 @@ return function (u1)
 		function task:tick(u1)
 			local task = self
 
-			if (task.start_point - u1.shape:center()):length() >= S3_RANGE then
+			if task.traveled_distance >= S3_RANGE then
 				u1:remove_task(task)
 			else
 				u1.shape = u1.shape:move_center(task.direction:with_length(S3_SPEED * FRAME_DURATION))
+				task.traveled_distance = task.traveled_distance + S3_SPEED * FRAME_DURATION
 			end
 		end
 
