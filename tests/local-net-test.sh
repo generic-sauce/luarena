@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ..
+
 SERVER_PORT="3838"
 DELAYMAN_PORT="3840"
 
