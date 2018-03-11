@@ -3,7 +3,7 @@ local backtrack_balancer_mod = require('gamemaster/backtrack_balancer')
 function new_servermaster(chars, networker, seed)
 	assert(seed)
 
-	local servermaster = require("game/mod").new(chars, 1, seed)
+	local servermaster = require("game/mod").new(chars, 1, seed, love.timer.getTime())
 
 	servermaster.balancer_list = {}
 	for _=1, #chars do
