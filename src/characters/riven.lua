@@ -72,16 +72,16 @@ local function generate_s1_task()
 	return task
 end
 
-local function generate_s1_dash_task(dash_target)
-	assert(dash_target ~= nil)
+local function generate_s1_dash_task(dash_direction)
+	assert(dash_direction ~= nil)
 
-	local task = {class = "riven_s1_dash", dash_target = dash_target }
+	local task = {class = "riven_s1_dash", dash_direction = dash_direction, traveled_distance = 0 }
 
 	function task:init(entity)
 		local attack = generate_relative_area(
 			entity,
 			S1_DASH_DISTANCE / S1_DASH_SPEED,
-			(self.dash_target - entity.shape:center()):with_length(10),
+			dash_direction:with_length(10),
 			S1_ATTACK_SIZE)
 
 		function attack:on_enter_collider(entity)
@@ -96,12 +96,10 @@ local function generate_s1_dash_task(dash_target)
 	end
 
 	function task:tick(entity)
-		local move_vec = self.dash_target - entity.shape:center()
-		if move_vec:length() < S1_DASH_SPEED * FRAME_DURATION then
-			entity.shape = entity.shape:with_center(self.dash_target)
+		entity.shape = entity.shape:move_center(self.dash_direction:with_length(S1_DASH_SPEED * FRAME_DURATION))
+		self.traveled_distance = self.traveled_distance + S1_DASH_SPEED * FRAME_DURATION
+		if self.traveled_distance >= S1_DASH_DISTANCE then
 			entity:remove_task(self)
-		else
-			entity.shape = entity.shape:move_center(move_vec:with_length(S1_DASH_SPEED * FRAME_DURATION))
 		end
 	end
 
@@ -151,10 +149,10 @@ local function generate_s2_task()
 	return task
 end
 
-local function generate_s3_task(dash_target)
-	assert(dash_target ~= nil)
+local function generate_s3_task(dash_direction)
+	assert(dash_direction ~= nil)
 
-	local task = {class = "riven_s3", dash_target = dash_target}
+	local task = {class = "riven_s3", dash_direction = dash_direction, traveled_distance = 0 }
 
 	function task:init(entity)
 		local shield = generate_relative_area(
@@ -172,12 +170,10 @@ local function generate_s3_task(dash_target)
 	end
 
 	function task:tick(entity)
-		local move_vec = self.dash_target - entity.shape:center()
-		if move_vec:length() < S3_DASH_SPEED * FRAME_DURATION then
-			entity.shape = entity.shape:with_center(self.dash_target)
+		entity.shape = entity.shape:move_center(self.dash_direction:with_length(S3_DASH_SPEED * FRAME_DURATION))
+		self.traveled_distance = self.traveled_distance + S3_DASH_SPEED * FRAME_DURATION
+		if self.traveled_distance >= S3_DASH_DISTANCE then
 			entity:remove_task(self)
-		else
-			entity.shape = entity.shape:move_center(move_vec:with_length(S3_DASH_SPEED * FRAME_DURATION))
 		end
 	end
 
@@ -207,16 +203,14 @@ return function (character)
 					s1_task.dash_cooldown = S1_DASH_COOLDOWN
 					s1_task.instances = math.max(0, s1_task.instances - 1)
 					s1_task.timeout = S1_TIMEOUT
-					self:add_task(generate_s1_dash_task(self.shape:center() +
-						self:direction():with_length(S1_DASH_DISTANCE)))
+					self:add_task(generate_s1_dash_task(self:direction()))
 				end
 			elseif #s1_tasks == 0 and self.s1_cooldown == 0 then
 				self.s1_cooldown = S1_COOLDOWN
 				local s1_task = generate_s1_task()
 				s1_task.instances = math.max(0, s1_task.instances - 1)
 				self:add_task(s1_task)
-				self:add_task(generate_s1_dash_task(self.shape:center() +
-					self:direction():with_length(S1_DASH_DISTANCE)))
+				self:add_task(generate_s1_dash_task(self:direction()))
 			end
 		end
 
@@ -227,8 +221,7 @@ return function (character)
 
 		if self.inputs[S3_KEY] and self.s3_cooldown == 0 then
 			self.s3_cooldown = S3_COOLDOWN
-			self:add_task(generate_s3_task(self.shape:center() +
-				self:direction():with_length(S3_DASH_DISTANCE)))
+			self:add_task(generate_s3_task(self:direction()))
 		end
 	end
 
