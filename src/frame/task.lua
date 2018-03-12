@@ -9,6 +9,8 @@ local TASK_CLASSMAP = {
 	dash = {"move"},
 	stun = {},
 
+	archer_s3 = {"skill"},
+
 	riven_s1 = {"skill"},
 	riven_s1_dash = {"skill", "dash"},
 	riven_s2 = {"skill"},
