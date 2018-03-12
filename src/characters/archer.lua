@@ -2,6 +2,7 @@ local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
 local collision_detection_mod = require('collision/detection')
+local line_mod = require('collision/line')
 
 local S1_2_COOLDOWN = 0.5
 local S1_2_RANGE = 100
@@ -21,12 +22,22 @@ return function (archer)
 		local arrow = {}
 
 		arrow.owner = self
-		arrow.shape = polygon_mod.by_rect(rect_mod.by_center_and_size(
-			self.shape:center(),
-			vec_mod(4, 4)
-		))
 		arrow.traveled_distance = 0
 		arrow.speed = self:direction():with_length(S1_2_ARROW_SPEED * FRAME_DURATION) * dir
+
+		local center = self.shape:center()
+		local front = arrow.speed:with_length(5)
+		local right = line_mod(center, center + arrow.speed):right():with_length(1)
+
+		arrow.shape = polygon_mod.by_center_and_points(
+			center,
+			{
+				vec_mod(0, 0) + front + right,
+				vec_mod(0, 0) + front - right,
+				vec_mod(0, 0) - front - right,
+				vec_mod(0, 0) - front + right
+			}
+		)
 
 		function arrow:on_enter_collider(e)
 			if e.damage and e ~= self.owner then
@@ -48,7 +59,7 @@ return function (archer)
 		end
 
 		function arrow:draw(viewport)
-			viewport:draw_shape(self.shape, 0, 0, 255)
+			viewport:draw_shape(self.shape, 150, 90, 0)
 		end
 
 		return arrow
