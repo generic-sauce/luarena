@@ -11,7 +11,7 @@ local TASK_CLASSMAP = {
 
 	archer_s1 = {"skill"},
 	archer_s2 = {"skill"},
-	archer_s3 = {"skill"},
+	archer_s3 = {"skill", "dash"},
 
 	riven_s1 = {"skill"},
 	riven_s1_dash = {"skill", "dash"},
