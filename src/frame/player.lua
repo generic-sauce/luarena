@@ -101,7 +101,15 @@ function new_player(char)
 	end
 
 	function player:draw_body(viewport)
-		viewport:draw_shape(self.shape, 100, 100, 100)
+		local r, g, b
+
+		if self.color then
+			r, g, b = self:color()
+		else
+			r, g, b = 100, 100, 100
+		end
+
+		viewport:draw_shape(self.shape, r, g, b)
 	end
 
 	function player:draw_health(viewport)

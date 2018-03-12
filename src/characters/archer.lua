@@ -18,6 +18,10 @@ return function (archer)
 	archer.s2_cooldown = 0
 	archer.s3_cooldown = 1
 
+	function archer:color()
+		return 30, 50, 20
+	end
+
 	function archer:new_arrow(dir) -- dir=1 => forward, dir=-1 => backward
 		local arrow = {}
 

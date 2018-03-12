@@ -6,6 +6,10 @@ local REGEN_DELAY = 5 -- in seconds
 return function (dummy)
 	dummy.regen_counter = 0
 
+	function dummy:color()
+		return 255, 255, 255
+	end
+
 	function dummy:char_tick()
 		if self.health < 100 then
 			self.regen_counter = self.regen_counter + FRAME_DURATION

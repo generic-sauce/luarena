@@ -348,24 +348,14 @@ return function (u1)
 		end
 	end
 
-	function u1:draw(viewport)
-		local u1 = self
-
-		if self:has_tasks_by_class("dead") then
-			return
-		end
-
-		local alpha = nil
+	function u1:color()
 		if u1:has_tasks_by_class("u1_s1") then
-			alpha = 100
+			return 160, 160, 200
 		else
-			alpha = 255
+			return 100, 100, 150
 		end
-
-		viewport:draw_shape(self.shape, 100, 100, 100, alpha) -- draw_body
-		self:draw_health(viewport)
-		self:draw_skills(viewport)
 	end
+
 
 	function u1:damage(dmg)
 		local u1 = self
