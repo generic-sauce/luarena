@@ -6,6 +6,6 @@ Yet another Lua containing working title ...
 How to run
 ----------
 
-Install love2d, lua and luajson (using \``luarocks-5.1 install luajson`\`) <br />
-Run with \``love . server <character> [<port>]`\` <br />
-or \``love . client <character> <server-ip> [<server-port>]`\`
+Install [love2d](https://love2d.org/) <br />
+Run with \``./run.sh server <character> [<port>]`\` <br />
+or \``./run.sh client <character> <server-ip> [<server-port>]`\`

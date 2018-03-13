@@ -3,7 +3,7 @@
 local lobby_mod = {}
 
 function usage()
-	print("usage:\n\tlove . server <character> [<port>]\n\tlove . client <character> <server_ip> [<server_port>]")
+	print("usage:\n\tserver <character> [<port>]\n\tclient <character> <server_ip> [<server_port>]")
 	os.exit(1)
 end
 
