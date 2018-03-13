@@ -1,7 +1,7 @@
 local dev = require("dev")
 
 local enet = require "enet"
-require "json"
+require "libs.json"
 
 return function(event_handler, port)
 	local server = {}

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd ../src
-love . $*
+cd ..
+./run.sh $*

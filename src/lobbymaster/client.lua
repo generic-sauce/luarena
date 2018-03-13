@@ -1,5 +1,5 @@
 local enet = require "enet"
-require "json"
+require "libs.json"
 
 return function(client, char, server_ip, server_port)
 	if char == nil then
