@@ -194,11 +194,11 @@ function new_player(char)
 		end
 
 		for _, pos in pairs(frame().map:get_intersecting_tiles(self.shape, function(pos) return frame().map:is_none(pos) end)) do
-			dev.stop_profiler("is_drowning", {"drowning"})
+			dev.stop_profiler("is_drowning")
 			return false
 		end
 
-		dev.stop_profiler("is_drowning", {"drowning"})
+		dev.stop_profiler("is_drowning")
 		return true
 	end
 
