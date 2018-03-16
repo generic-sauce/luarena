@@ -105,8 +105,12 @@ function collision_map_mod.new(size, seed)
 		return self:get_tile_raw(pos) or collision_map_mod.TILE_SOLID
 	end
 
-	function collision_map:get_intersecting_tiles(shape)
-		dev.start_profiler("get_intersecting_tiles", {"drowning"})
+	-- returns colliding tile coordinates, even if the tiles are out of map
+	function collision_map:get_intersecting_tiles(shape, condition)
+		dev.start_profiler("get_intersecting_tiles", {"deglitch"})
+
+		if not condition then condition = function(_) return true end end
+
 		local TILE_SIZE = 64
 
 		local rect = shape:wrapper()
@@ -117,65 +121,24 @@ function collision_map_mod.new(size, seed)
 		local min_y = math.floor(rect:top() / TILE_SIZE)
 		local max_y = math.ceil(rect:bottom() / TILE_SIZE)
 
-		if max_x < 0 or
-		   min_x >= self.size_tiles.x or
-		   max_y < 0 or
-		   min_y >= self.size_tiles.y then
-			return {}
-		end
-
 		local out_tiles = {}
-
-		min_x = math.max(min_x, 0)
-		max_x = math.min(max_x, self.size_tiles.x-1)
-		min_y = math.max(min_y, 0)
-		max_y = math.min(max_y, self.size_tiles.y-1)
 
 		for x=min_x, max_x do
 			for y=min_y, max_y do
-				local tile_rect = rect_mod.by_left_top_and_size(
-					vec_mod(x * TILE_SIZE, y * TILE_SIZE),
-					vec_mod(TILE_SIZE, TILE_SIZE)
-				)
-				local tile_shape = polygon_mod.by_rect(tile_rect)
-				if collision_detection_mod(tile_shape, shape) then
-					table.insert(out_tiles, {x=x, y=y})
+				local pos = {x=x, y=y}
+				if condition(pos) then
+					local tile_rect = rect_mod.by_left_top_and_size(
+						vec_mod(x * TILE_SIZE, y * TILE_SIZE),
+						vec_mod(TILE_SIZE, TILE_SIZE)
+					)
+					local tile_shape = polygon_mod.by_rect(tile_rect)
+					if collision_detection_mod(tile_shape, shape) then
+						table.insert(out_tiles, pos)
+					end
 				end
 			end
 		end
 		dev.stop_profiler("get_intersecting_tiles")
-		return out_tiles
-	end
-
-	-- returns colliding tile coordinates, even if the tiles are out of map
-	-- not happy with that name, tho
-	function collision_map:get_conceptual_intersecting_tiles(shape)
-		dev.start_profiler("get_conceptual_intersecting_tiles", {"deglitch"})
-		local TILE_SIZE = 64
-
-		local rect = shape:wrapper()
-
-		local min_x = math.floor(rect:left() / TILE_SIZE)
-		local max_x = math.ceil(rect:right() / TILE_SIZE)
-
-		local min_y = math.floor(rect:top() / TILE_SIZE)
-		local max_y = math.ceil(rect:bottom() / TILE_SIZE)
-
-		local out_tiles = {}
-
-		for x=min_x, max_x do
-			for y=min_y, max_y do
-				local tile_rect = rect_mod.by_left_top_and_size(
-					vec_mod(x * TILE_SIZE, y * TILE_SIZE),
-					vec_mod(TILE_SIZE, TILE_SIZE)
-				)
-				local tile_shape = polygon_mod.by_rect(tile_rect)
-				if collision_detection_mod(tile_shape, shape) then
-					table.insert(out_tiles, {x=x, y=y})
-				end
-			end
-		end
-		dev.stop_profiler("get_conceptual_intersecting_tiles")
 		return out_tiles
 	end
 

@@ -156,10 +156,8 @@ function new_player(char)
 
 		while true do
 			local colliding_solid_tiles = {}
-			for _, pos in pairs(frame().map:get_conceptual_intersecting_tiles(self.shape)) do
-				if frame().map:is_solid(pos) then
-					table.insert(colliding_solid_tiles, pos)
-				end
+			for _, pos in pairs(frame().map:get_intersecting_tiles(self.shape, function(pos) return frame().map:is_solid(pos) end)) do
+				table.insert(colliding_solid_tiles, pos)
 			end
 
 			if #colliding_solid_tiles == 0 then break end
@@ -195,7 +193,7 @@ function new_player(char)
 			return false
 		end
 
-		for _, pos in pairs(frame().map:get_intersecting_tiles(self.shape)) do
+		for _, pos in pairs(frame().map:get_intersecting_tiles(self.shape, function(pos) return frame().map:get_tile(pos) == collision_map_mod.TILE_NONE end)) do
 			if frame().map:get_tile(pos) == collision_map_mod.TILE_NONE then
 				dev.stop_profiler("is_drowning", {"drowning"})
 				return false
