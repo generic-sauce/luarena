@@ -106,10 +106,8 @@ function collision_map_mod.new(size, seed)
 	end
 
 	-- returns colliding tile coordinates, even if the tiles are out of map
-	function collision_map:get_intersecting_tiles(shape, condition)
-		dev.start_profiler("get_intersecting_tiles", {"deglitch"})
-
-		if not condition then condition = function(_) return true end end
+	function collision_map:get_intersecting_tiles(shape, condition, only_one)
+		dev.start_profiler("get_intersecting_tiles", {"deglitch", "drowning"})
 
 		local TILE_SIZE = 64
 
@@ -126,7 +124,7 @@ function collision_map_mod.new(size, seed)
 		for x=min_x, max_x do
 			for y=min_y, max_y do
 				local pos = {x=x, y=y}
-				if condition(pos) then
+				if not condition or condition(pos) then
 					local tile_rect = rect_mod.by_left_top_and_size(
 						vec_mod(x * TILE_SIZE, y * TILE_SIZE),
 						vec_mod(TILE_SIZE, TILE_SIZE)
@@ -134,10 +132,17 @@ function collision_map_mod.new(size, seed)
 					local tile_shape = polygon_mod.by_rect(tile_rect)
 					if collision_detection_mod(tile_shape, shape) then
 						table.insert(out_tiles, pos)
+
+						if only_one then
+							dev.stop_profiler("get_intersecting_tiles")
+							return out_tiles
+						end
+
 					end
 				end
 			end
 		end
+
 		dev.stop_profiler("get_intersecting_tiles")
 		return out_tiles
 	end

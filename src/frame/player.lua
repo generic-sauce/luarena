@@ -193,7 +193,7 @@ function new_player(char)
 			return false
 		end
 
-		for _, pos in pairs(frame().map:get_intersecting_tiles(self.shape, function(pos) return frame().map:is_none(pos) end)) do
+		for _, pos in pairs(frame().map:get_intersecting_tiles(self.shape, function(pos) return frame().map:is_none(pos) end, true)) do
 			dev.stop_profiler("is_drowning")
 			return false
 		end
