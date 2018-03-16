@@ -149,6 +149,7 @@ function new_player(char)
 	end
 
 	function player:consider_deglitching()
+		dev.start_profiler("consider_deglitching", {"deglitch"})
 		local TILE_SIZE = 64
 
 		local counter = 0
@@ -182,6 +183,7 @@ function new_player(char)
 			counter = counter + 1
 			assert(counter < 20, "deglitch counter too high!")
 		end
+		dev.stop_profiler("consider_deglitching")
 	end
 
 	-- effectively checks, whether you collide with a TILE_NONE

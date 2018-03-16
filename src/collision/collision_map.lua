@@ -2,6 +2,7 @@ local vec_mod = require('viewmath/vec')
 local rect_mod = require("viewmath/rect")
 local polygon_mod = require('shape/polygon')
 local collision_detection_mod = require('collision/detection')
+local dev = require('dev')
 
 -- README: the top-left tile has the top-left vec_mod-coordinates (0, 0) and the tile coordinates (0, 0)
 
@@ -105,6 +106,7 @@ function collision_map_mod.new(size, seed)
 	end
 
 	function collision_map:get_intersecting_tiles(shape)
+		dev.start_profiler("get_intersecting_tiles", {"drowning"})
 		local TILE_SIZE = 64
 
 		local rect = shape:wrapper()
@@ -141,12 +143,14 @@ function collision_map_mod.new(size, seed)
 				end
 			end
 		end
+		dev.stop_profiler("get_intersecting_tiles")
 		return out_tiles
 	end
 
 	-- returns colliding tile coordinates, even if the tiles are out of map
 	-- not happy with that name, tho
 	function collision_map:get_conceptual_intersecting_tiles(shape)
+		dev.start_profiler("get_conceptual_intersecting_tiles", {"deglitch"})
 		local TILE_SIZE = 64
 
 		local rect = shape:wrapper()
@@ -171,6 +175,7 @@ function collision_map_mod.new(size, seed)
 				end
 			end
 		end
+		dev.stop_profiler("get_conceptual_intersecting_tiles")
 		return out_tiles
 	end
 

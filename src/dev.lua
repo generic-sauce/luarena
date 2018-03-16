@@ -3,7 +3,7 @@ require('misc')
 local dev = {}
 
 -- freely manipulate this!
-dev.active_tags = {"backtrack", "drowning"}
+dev.active_tags = {"backtrack", "drowning", "deglitch"}
 
 function dev.debug(string, tags)
 	if tags and #table.intersection(tags, dev.active_tags) == 0 then
