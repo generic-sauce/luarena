@@ -4,103 +4,88 @@ local vec_mod = require('viewmath/vec')
 
 local rect_mod = {}
 
+local meta = {
+	__tostring = function(self)
+		return "rect(center=" .. tostring(self.center_vec) .. ", size=" .. tostring(self.size_vec) .. ")"
+	end,
+	__index = {
+		with_size_keep_center = function(self, size)
+			return rect_mod.by_center_and_size(
+				self:center(),
+				size
+			)
+		end,
+		with_center_keep_size = function(self, center)
+			return rect_mod.by_center_and_size(
+				center,
+				self:size()
+			)
+		end,
+		center = function(self)
+			return self.center_vec
+		end,
+		size = function(self)
+			return self.size_vec
+		end,
+		left = function(self)
+			return self:center().x - self:size().x/2
+		end,
+		right = function(self)
+			return self:center().x + self:size().x/2
+		end,
+		top = function(self)
+			return self:center().y - self:size().y/2
+		end,
+		bottom = function(self)
+			return self:center().y + self:size().y/2
+		end,
+		contains = function(self, vec)
+			return self:left() <= vec.x
+				and self:right() >= vec.x
+				and self:top() <= vec.y
+				and self:bottom() >= vec.y
+		end,
+		surrounds = function(self, other_rect)
+			return self:left() <= other_rect:left()
+				and self:right() >= other_rect:right()
+				and self:top() <= other_rect:top()
+				and self:bottom() >= other_rect:bottom()
+		end,
+		intersects = function(self, r2)
+			return self:left() <= r2:right()
+				and r2:left() <= self:right()
+				and self:top() <= r2:bottom()
+				and r2:top() <= self:bottom()
+		end,
+		left_top = function(self)
+			return vec_mod(self:left(), self:top())
+		end,
+		left_bottom = function(self)
+			return vec_mod(self:left(), self:bottom())
+		end,
+		right_bottom = function(self)
+			return vec_mod(self:right(), self:bottom())
+		end,
+		right_top = function(self)
+			return vec_mod(self:right(), self:top())
+		end,
+		width = function(self)
+			return self:size().x
+		end,
+		height = function(self)
+			return self:size().y
+		end
+	}
+}
+
 rect_mod.by_center_and_size = function(center, size)
 	assert(center)
 	assert(size)
-
-	local meta = {
-		__tostring = function(self)
-			return "rect(center=" .. tostring(self.center_vec) .. ", size=" .. tostring(self.size_vec) .. ")"
-		end
-	}
 
 	local rect = setmetatable({
 		center_vec = center,
 		size_vec = size
 	}, meta)
-
-	function rect:with_size_keep_center(size)
-		return rect_mod.by_center_and_size(
-			self:center(),
-			size
-		)
-	end
-
-	function rect:with_center_keep_size(center)
-		return rect_mod.by_center_and_size(
-			center,
-			self:size()
-		)
-	end
-
-	function rect:center() 
-		return self.center_vec
-	end
-
-	function rect:size() 
-		return self.size_vec
-	end
-
-	function rect:left()
-		return self:center().x - self:size().x/2
-	end
-
-	function rect:right()
-		return self:center().x + self:size().x/2
-	end
-
-	function rect:top()
-		return self:center().y - self:size().y/2
-	end
-
-	function rect:bottom()
-		return self:center().y + self:size().y/2
-	end
-
-	function rect:contains(vec)
-		return self:left() <= vec.x
-			and self:right() >= vec.x
-			and self:top() <= vec.y
-			and self:bottom() >= vec.y
-	end
-
-	function rect:surrounds(other_rect)
-		return self:left() <= other_rect:left()
-			and self:right() >= other_rect:right()
-			and self:top() <= other_rect:top()
-			and self:bottom() >= other_rect:bottom()
-	end
-
-	function rect:intersects(r2)
-		return self:left() <= r2:right()
-			and r2:left() <= self:right()
-			and self:top() <= r2:bottom()
-			and r2:top() <= self:bottom()
-	end
-
-	function rect:left_top()
-		return vec_mod(self:left(), self:top())
-	end
-
-	function rect:left_bottom()
-		return vec_mod(self:left(), self:bottom())
-	end
-
-	function rect:right_bottom()
-		return vec_mod(self:right(), self:bottom())
-	end
-
-	function rect:right_top()
-		return vec_mod(self:right(), self:top())
-	end
-
-	function rect:width()
-		return self:size().x
-	end
-
-	function rect:height()
-		return self:size().y
-	end
 
 	return rect
 end
