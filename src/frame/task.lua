@@ -19,10 +19,13 @@ local TASK_CLASSMAP = {
 	riven_s2_stun = {"stun"},
 	riven_s3 = {"skill", "dash"},
 
-	u1_s1 = {"skill"},
+	u1_s1 = {"skill", "untouchable"},
 	u1_s2 = {"skill"},
 	u1_s3 = {"skill", "dash"},
 	u1_s4 = {"skill"},
+
+	invulnerable = {}, -- prevents damage
+	untouchable = {"invulnerable"}, -- prevents negative effects and damage
 
 	dead = {}
 }
@@ -82,7 +85,8 @@ local TASK_RELATION = build_task_relation({
 	{old = {"walk"}, new = {"dash", "stun"}, relation = "cancel"},
 	{old = {"dash", "stun"}, new = {"walk"}, relation = "prevent"},
 	{old = {"stun"}, new = {"skill"}, relation = "delay"},
-	{old = {"dash"}, new = {"dash"}, relation = "delay"}
+	{old = {"dash"}, new = {"dash"}, relation = "delay"},
+	{old = {"untouchable"}, new = {"stun"}, relation = "prevent"}
 })
 
 local function get_relation_partners(tasks, task, rel)

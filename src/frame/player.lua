@@ -41,9 +41,11 @@ function new_player(char)
 	player.direction_vec = vec_mod(1, 0)
 
 	function player:damage(dmg)
-		self.health = math.max(0, self.health - dmg)
-		if self.health == 0 then
-			self:die()
+		if not self:has_tasks_by_class("invulnerable") then
+			self.health = math.max(0, self.health - dmg)
+			if self.health == 0 then
+				self:die()
+			end
 		end
 	end
 

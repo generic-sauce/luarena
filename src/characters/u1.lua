@@ -356,18 +356,5 @@ return function (u1)
 		end
 	end
 
-
-	function u1:damage(dmg)
-		local u1 = self
-
-		if not u1:has_tasks_by_class("u1_s1") then
-			self.health = math.max(0, self.health - dmg)
-			if u1.health == 0 then
-				self:die()
-			end
-		end
-
-	end
-
 	return u1
 end
