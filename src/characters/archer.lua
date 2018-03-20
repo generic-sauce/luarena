@@ -14,10 +14,6 @@ local S3_RANGE = 50
 
 return function (archer)
 
-	archer.s1_cooldown = 0
-	archer.s2_cooldown = 0
-	archer.s3_cooldown = 1
-
 	function archer:color()
 		return 30, 50, 20
 	end
@@ -69,16 +65,18 @@ return function (archer)
 		return arrow
 	end
 
-	function archer:execute_s1()
-		local task = { class = "archer_s1" }
+	self.skills = skill_mod.make_skills(
+		function (default_skill)
 
-		function task:init(entity)
-			frame():add(entity:new_arrow(1))
-			entity:remove_task(self)
-		end
+			local task = { class = "archer_s1" }
 
-		self:add_task(task)
-	end
+			function task:init(entity)
+				frame():add(entity:new_arrow(1))
+				entity:remove_task(self)
+			end
+
+			self:add_task(task)
+		end,
 
 	function archer:execute_s2()
 		local task = { class = "archer_s2" }
@@ -103,26 +101,6 @@ return function (archer)
 		end
 
 		self:add_task(task)
-	end
-
-	function archer:char_tick()
-		self.s1_cooldown = math.max(0, self.s1_cooldown - FRAME_DURATION)
-		self.s2_cooldown = math.max(0, self.s2_cooldown - FRAME_DURATION)
-
-		if self.inputs[S1_KEY] and self.s1_cooldown == 0 then
-			self.s1_cooldown = S1_2_COOLDOWN
-			self:execute_s1()
-		end
-
-		if self.inputs[S2_KEY] and self.s2_cooldown == 0 then
-			self.s2_cooldown = S1_2_COOLDOWN
-			self:execute_s2()
-		end
-
-		if self.inputs[S3_KEY] and self.s3_cooldown == 0 then
-			self.s3_cooldown = 1
-			self:execute_s3()
-		end
 	end
 
 	return archer

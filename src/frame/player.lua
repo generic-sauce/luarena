@@ -39,6 +39,7 @@ function new_player(char)
 	player.health = 100
 	player.inputs = { [UP_KEY] = false, [LEFT_KEY] = false, [DOWN_KEY] = false, [RIGHT_KEY] = false, [S1_KEY] = false, [S2_KEY] = false, [S3_KEY] = false, [S4_KEY] = false }
 	player.direction_vec = vec_mod(1, 0)
+	player.char = char
 
 	function player:damage(dmg)
 		if not self:has_tasks_by_class("invulnerable") then
@@ -62,6 +63,8 @@ function new_player(char)
 		end
 
 		if not self:has_tasks_by_class("dead") then
+			self:tick_skills()
+
 			self:consider_deglitching()
 			self:consider_drowning()
 
@@ -126,19 +129,8 @@ function new_player(char)
 	end
 
 	function player:draw_skills(viewport)
-		local wrapper = self.shape:wrapper()
-		for skill=1, 4 do
-			local r, g, b
-			if self['s' .. tostring(skill) .. '_cooldown'] == 0 then
-				r, g, b = 0, 0, 255
-			else
-				r, g, b = 255, 0, 0
-			end
-
-			viewport:draw_world_rect(rect_mod.by_left_top_and_size(
-				wrapper:left_top() + vec_mod((skill-1) * (1/3) * wrapper:width() - (skill-1), -5),
-				vec_mod(3, 3)
-			), r, g, b)
+		for _, skill in pairs(self.skills) do
+			skill:draw(viewport)
 		end
 	end
 
@@ -207,6 +199,12 @@ function new_player(char)
 	function player:consider_drowning()
 		if self:is_drowning() then
 			self:die()
+		end
+	end
+
+	function player:tick_skills()
+		for _, skill in pairs(self.skills) do
+			skill:tick()
 		end
 	end
 
