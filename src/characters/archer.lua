@@ -20,6 +20,9 @@ return function (archer)
 	end
 
 	function archer:new_arrow(dir) -- dir=1 => forward, dir=-1 => backward
+		assert(dir == 1 or dir == -1)
+		assert(self)
+
 		local arrow = {}
 
 		arrow.owner = self
@@ -66,54 +69,45 @@ return function (archer)
 		return arrow
 	end
 
+	function archer:shoot_arrow(dir)
+		frame():add(self:new_arrow(dir))
+	end
+
 	archer.skills = {
-		(function (skill1)
-			skill_mod.append_function(skill1.task, "init", function(self)
-				frame():add(self.owner:new_arrow(1))
-				self.owner:remove_task(self)
-			end)
+		(function()
+			local skill = skill_mod.make_blank_skill(archer, 1)
+			skill_mod.with_cooldown(skill, S1_2_COOLDOWN)
+			skill_mod.with_fresh_key(skill)
+			skill_mod.with_instant(skill, function(self) self.owner:shoot_arrow(1) end)
+			return skill
+		end)(),
 
-			return skill1
-		end)(skill_mod.with_fresh_key(
-				skill_mod.with_cooldown(
-					skill_mod.make_blank_skill(archer, 1),
-					S1_2_COOLDOWN
-				)
-			)
-		),
+		(function()
+			local skill = skill_mod.make_blank_skill(archer, 2)
+			skill_mod.with_cooldown(skill, S1_2_COOLDOWN)
+			skill_mod.with_fresh_key(skill)
+			skill_mod.with_instant(skill, function(self) self.owner:shoot_arrow(-1) end)
+			return skill
+		end)(),
 
-		(function (skill2)
-			skill_mod.append_function(skill2.task, "init", function(self)
-				frame():add(self.owner:new_arrow(-1))
-				self.owner:remove_task(self)
-			end)
+		(function ()
+			local skill = skill_mod.make_blank_skill(archer, 3)
+			skill.ready = false
 
-			return skill2
-		end)(skill_mod.with_fresh_key(
-				skill_mod.with_cooldown(
-					skill_mod.make_blank_skill(archer, 2),
-					S1_2_COOLDOWN
-				)
-			)
-		),
-
-		(function (skill3)
-			skill3.ready = false
-
-			skill_mod.append_function(skill3.task, "init", function(self)
+			skill_mod.append_function(skill.task, "init", function(self)
 				self.traveled_distance = 0
 				self.dash_direction = self.owner:direction()
 			end)
 
-			skill_mod.append_function(skill3, "go_condition", function(self)
+			skill_mod.append_function(skill, "go_condition", function(self)
 				return self.ready
 			end)
 
-			skill_mod.append_function(skill3, "go", function(self)
+			skill_mod.append_function(skill, "go", function(self)
 				self.ready = false
 			end)
 
-			skill_mod.append_function(skill3.task, "tick", function(self)
+			skill_mod.append_function(skill.task, "tick", function(self)
 				self.owner.shape = self.owner.shape:move_center(self.dash_direction:with_length(S3_SPEED * FRAME_DURATION))
 				self.traveled_distance = self.traveled_distance + S3_SPEED * FRAME_DURATION
 				if self.traveled_distance >= S3_RANGE then
@@ -121,7 +115,7 @@ return function (archer)
 				end
 			end)
 
-			function skill3:draw(viewport)
+			function skill:draw(viewport)
 				local r, g, b = 255, 0, 0
 				if self.ready then
 					r, g, b = 0, 255, 0
@@ -130,8 +124,8 @@ return function (archer)
 				viewport:draw_world_rect(self:render_rect(), r, g, b)
 			end
 
-			return skill3
-		end)(skill_mod.make_blank_skill(archer, 3))
+			return skill
+		end)()
 	}
 
 	return archer

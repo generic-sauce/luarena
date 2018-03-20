@@ -1,6 +1,7 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local circle_mod = require('shape/circle')
+local skill_mod = require('frame/skill')
 
 local S1_COOLDOWN = 3
 local S1_RANGE = 200
@@ -11,9 +12,6 @@ local S2_RADIUS = 40
 local S2_DURATION = 1
 
 return function (rogue)
-
-	rogue.s1_cooldown = 0
-	rogue.s2_cooldown = 0
 
 	function rogue:new_aoe()
 		local aoe = {}
@@ -48,24 +46,29 @@ return function (rogue)
 		return aoe
 	end
 
+	rogue.skills = {
+		(function(skill)
+			local skill = skill_mod.make_blank_skill(rogue, 1)
+			skill_mod.with_cooldown(skill, S1_COOLDOWN)
+			skill_mod.with_fresh_key(skill)
+			skill_mod.with_instant(skill, function(self)
+				local jump = self.owner:direction():with_length(S1_RANGE)
+				self.owner.shape = self.owner.shape:move_center(jump)
+			end)
 
-	function rogue:char_tick()
-		self.s1_cooldown = math.max(0, self.s1_cooldown - FRAME_DURATION)
-		self.s2_cooldown = math.max(0, self.s2_cooldown - FRAME_DURATION)
+			return skill
+		end)(),
+		(function(skill)
+			local skill = skill_mod.make_blank_skill(rogue, 2)
+			skill_mod.with_cooldown(skill, S2_COOLDOWN)
+			skill_mod.with_fresh_key(skill)
+			skill_mod.with_instant(skill, function(self)
+				frame():add(self.owner:new_aoe())
+			end)
 
-		if self.inputs[S1_KEY] and self.s1_cooldown <= 0 then
-			self.s1_cooldown = S1_COOLDOWN
-
-			local jump = self:direction():with_length(S1_RANGE)
-
-			self.shape = self.shape:move_center(jump)
-		end
-
-		if self.inputs[S2_KEY] and self.s2_cooldown <= 0 then
-			self.s2_cooldown = S2_COOLDOWN
-			frame():add(self:new_aoe())
-		end
-	end
+			return skill
+		end)()
+	}
 
 	return rogue
 end

@@ -157,4 +157,11 @@ function skill_mod.with_cooldown(skill, cooldown)
 	return skill
 end
 
+function skill_mod.with_instant(skill, init)
+	skill_mod.append_function(skill.task, "init", init)
+	skill_mod.append_function(skill.task, "init", function(self) self.owner:remove_task(self) end)
+
+	return skill
+end
+
 return skill_mod
