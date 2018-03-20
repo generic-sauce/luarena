@@ -84,7 +84,7 @@ function skill_mod.make_blank_skill(player, num)
 	end
 
 	function skill:go()
-		local task = clone(self.task)
+		local task = clone(self.task) -- TODO FIXME this removes all references :/
 		self.owner:add_task(task)
 	end
 
