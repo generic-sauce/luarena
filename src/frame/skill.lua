@@ -63,7 +63,6 @@ function skill_mod.make_blank_skill(player, num)
 
 	local skill = {}
 	skill.task = {}
-	skill.task.skill = skill
 	skill.owner = player
 	skill.num = num
 	skill.task.class = skill.owner.char .. "_s" .. tostring(skill.num)
@@ -84,7 +83,10 @@ function skill_mod.make_blank_skill(player, num)
 	end
 
 	function skill:go()
-		local task = clone(self.task) -- TODO FIXME this removes all references :/
+		local task = clone(self.task)
+		task.skill = self
+		task.owner = self.owner
+
 		self.owner:add_task(task)
 	end
 

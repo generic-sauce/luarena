@@ -80,8 +80,7 @@ return function (archer)
 					S1_2_COOLDOWN
 				)
 			)
-		)--[[,
-
+		),
 
 		(function (skill2)
 			skill_mod.append_function(skill2.task, "init", function(self)
@@ -113,7 +112,7 @@ return function (archer)
 
 				return skill3
 			end)
-		end)(skill_mod.make_blank_skill(archer, 3))]]
+		end)(skill_mod.make_blank_skill(archer, 3))
 	}
 
 	return archer
