@@ -76,7 +76,8 @@ return function (archer)
 			return skill1
 		end)(skill_mod.with_fresh_key(
 				skill_mod.with_cooldown(
-					skill_mod.make_blank_skill(archer, 1)
+					skill_mod.make_blank_skill(archer, 1),
+					S1_2_COOLDOWN
 				)
 			)
 		),
@@ -88,7 +89,13 @@ return function (archer)
 			end)
 
 			return skill2
-		end)(skill_mod.make_blank_skill(archer, 2)),
+		end)(skill_mod.with_fresh_key(
+				skill_mod.with_cooldown(
+					skill_mod.make_blank_skill(archer, 2),
+					S1_2_COOLDOWN
+				)
+			)
+		),
 
 		(function (skill3)
 			skill_mod.append_function(skill3.task, "init", function(self)

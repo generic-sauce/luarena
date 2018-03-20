@@ -11,15 +11,15 @@ function calendar_mod.new(player_count, local_id)
 	calendar.playertable = {} -- Map<PlayerId, Map<Key, List<{value=<bool>, frame_id=<frame_id> }>>>
 	for i=1, player_count do
 		table.insert(calendar.playertable, {
-			[UP_KEY]={{value=false, frame_id=1}},
-			[LEFT_KEY]={{value=false, frame_id=1}},
-			[DOWN_KEY]={{value=false, frame_id=1}},
-			[RIGHT_KEY]={{value=false, frame_id=1}},
+			[KEYS.up]={{value=false, frame_id=1}},
+			[KEYS.left]={{value=false, frame_id=1}},
+			[KEYS.down]={{value=false, frame_id=1}},
+			[KEYS.right]={{value=false, frame_id=1}},
 
-			[S1_KEY]={{value=false, frame_id=1}},
-			[S2_KEY]={{value=false, frame_id=1}},
-			[S3_KEY]={{value=false, frame_id=1}},
-			[S4_KEY]={{value=false, frame_id=1}},
+			[KEYS.skills[1]]={{value=false, frame_id=1}},
+			[KEYS.skills[2]]={{value=false, frame_id=1}},
+			[KEYS.skills[3]]={{value=false, frame_id=1}},
+			[KEYS.skills[4]]={{value=false, frame_id=1}},
 		})
 	end
 
@@ -50,7 +50,7 @@ function calendar_mod.new(player_count, local_id)
 	function calendar:detect_changed_local_inputs(viewport)
 		local inputs = {}
 
-		for _, v in pairs( { RIGHT_KEY, UP_KEY, LEFT_KEY, DOWN_KEY, S1_KEY, S2_KEY, S3_KEY, S4_KEY } ) do
+		for _, v in pairs( { KEYS.right, KEYS.up, KEYS.left, KEYS.down, KEYS.skills[1], KEYS.skills[2], KEYS.skills[3], KEYS.skills[4] } ) do
 			inputs[v] = isPressed(v)
 		end
 

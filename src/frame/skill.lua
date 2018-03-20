@@ -5,44 +5,41 @@ local rect_mod = require('viewmath/rect')
 require('misc')
 
 local listify_function = function(obj, name)
-	if type(obj[name]) == 'function' then
+	if obj[name .. "_list"] == nil then
 		obj[name .. "_list"] = {obj[name]}
 		obj[name] = function (self, ...)
-			for _, f in pairs(obj[name .. '_list']) do
+			for _, f in pairs(self[name .. '_list']) do -- TODO name is closured!
 				f(self, ...)
 			end
 		end
 	end
 end
 
-local fold_listified = function(obj, name, lambda, start)
-	if type(obj[name] == "nil") then
-		return start
-	elseif type(obj[name] == "function") then
+local eval_and_function = function(obj, name)
+	if type(obj[name]) == "nil" then
+		return true
+	elseif obj[name .. '_list'] ~= nil and type(obj[name]) == 'function' then
+		for i, f in pairs(obj[name .. '_list']) do
+			if not f(obj) then
+				return false
+			end
+		end
+		return true
+	elseif type(obj[name]) == 'function' then
 		return obj[name]()
-	elseif type(obj[name]) == 'table' then
-		return fold(lambda, obj[name], start)
 	else
 		assert(false)
 	end
 
 end
 
-local fold = function(lambda, list, start)
-	local out = start
-	for _, x in pairs(list) do
-		out = lambda(out, x)
-	end
-	return out
-end
-
 function skill_mod.append_function(obj, name, new_function)
 	if type(obj[name]) == 'nil' then
 		obj[name] = new_function
 	elseif type(obj[name]) == 'function' then
-		listify_function(obj, name)
-		table.insert(obj[name .. "_list"], new_function)
-	elseif type(obj[name] == 'table') then
+		if obj[name .. '_list'] == nil then
+			listify_function(obj, name)
+		end
 		table.insert(obj[name .. "_list"], new_function)
 	else
 		assert(false, "can't append to obj[name] of type " .. type(obj[name]))
@@ -74,7 +71,7 @@ function skill_mod.make_blank_skill(player, num)
 	end
 
 	function skill:is_pressed()
-		return isPressed('S' .. tostring(self.num) .. '_KEY')
+		return isPressed(KEYS.skills[self.num])
 	end
 
 	function skill:go()
@@ -85,8 +82,7 @@ function skill_mod.make_blank_skill(player, num)
 	skill.go_condition = skill.is_pressed
 
 	function skill:tick()
-		local and_lambda = function(a, b) return a and b end
-		if fold_listified(self, "go_condition", and_lambda, true) then
+		if eval_and_function(self, "go_condition") then
 			self:go()
 		end
 	end

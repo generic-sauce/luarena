@@ -4,15 +4,13 @@ local vec_mod = require('viewmath/vec')
 local collision_map_mod = require('collision/collision_map')
 local dev = require("dev")
 
-RIGHT_KEY = 'd'
-UP_KEY = 'w'
-LEFT_KEY = 'a'
-DOWN_KEY = 's'
-
-S1_KEY = 'j'
-S2_KEY = 'k'
-S3_KEY = 'l'
-S4_KEY = ';'
+KEYS = {
+	right = 'd',
+	up = 'w',
+	left = 'a',
+	down = 's',
+	skills = {'j', 'k', 'l', ';'}
+}
 
 WALKSPEED = 140 -- units per second
 
@@ -37,7 +35,7 @@ function new_player(char)
 		15
 	)
 	player.health = 100
-	player.inputs = { [UP_KEY] = false, [LEFT_KEY] = false, [DOWN_KEY] = false, [RIGHT_KEY] = false, [S1_KEY] = false, [S2_KEY] = false, [S3_KEY] = false, [S4_KEY] = false }
+	player.inputs = { [KEYS.up] = false, [KEYS.left] = false, [KEYS.down] = false, [KEYS.right] = false, [KEYS.skills[1]] = false, [KEYS.skills[2]] = false, [KEYS.skills[3]] = false, [KEYS.skills[4]] = false }
 	player.direction_vec = vec_mod(1, 0)
 	player.char = char
 
@@ -76,19 +74,19 @@ function new_player(char)
 
 	function player:move_direction()
 		local d = vec_mod(0, 0)
-		if self.inputs[UP_KEY] then
+		if self.inputs[KEYS.up] then
 			d = d + vec_mod(0, -1)
 		end
 
-		if self.inputs[LEFT_KEY] then
+		if self.inputs[KEYS.left] then
 			d = d + vec_mod(-1, 0)
 		end
 
-		if self.inputs[DOWN_KEY] then
+		if self.inputs[KEYS.down] then
 			d = d + vec_mod(0, 1)
 		end
 
-		if self.inputs[RIGHT_KEY] then
+		if self.inputs[KEYS.right] then
 			d = d + vec_mod(1, 0)
 		end
 
