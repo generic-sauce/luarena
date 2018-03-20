@@ -45,7 +45,7 @@ return function (archer)
 				e:damage(S1_2_DAMAGE)
 				frame():remove(self)
 
-				self.owner.s3_cooldown = 0 -- reset dash!
+				self.owner.skills[3].ready = true -- reset dash!
 			end
 		end
 
@@ -98,20 +98,39 @@ return function (archer)
 		),
 
 		(function (skill3)
+			skill3.ready = false
+
 			skill_mod.append_function(skill3.task, "init", function(self)
 				self.traveled_distance = 0
 				self.dash_direction = self.owner:direction()
 			end)
 
+			skill_mod.append_function(skill3, "go_condition", function(self)
+				return self.ready
+			end)
+
+			skill_mod.append_function(skill3, "go", function(self)
+				self.ready = false
+			end)
+
 			skill_mod.append_function(skill3.task, "tick", function(self)
-				self.owner.shape = entity.shape:move_center(self.dash_direction:with_length(S3_SPEED * FRAME_DURATION))
+				self.owner.shape = self.owner.shape:move_center(self.dash_direction:with_length(S3_SPEED * FRAME_DURATION))
 				self.traveled_distance = self.traveled_distance + S3_SPEED * FRAME_DURATION
 				if self.traveled_distance >= S3_RANGE then
 					self.owner:remove_task(self)
 				end
-
-				return skill3
 			end)
+
+			function skill3:draw(viewport)
+				local r, g, b = 255, 0, 0
+				if self.ready then
+					r, g, b = 0, 255, 0
+				end
+
+				viewport:draw_world_rect(self:render_rect(), r, g, b)
+			end
+
+			return skill3
 		end)(skill_mod.make_blank_skill(archer, 3))
 	}
 

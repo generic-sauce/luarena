@@ -31,7 +31,7 @@ local eval_and_function = function(obj, name)
 		end
 		return true
 	elseif type(obj[name]) == 'function' then
-		return obj[name]()
+		return obj[name](obj)
 	else
 		assert(false)
 	end
