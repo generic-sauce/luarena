@@ -54,14 +54,14 @@ function new_player(char)
 	end
 
 	function player:tick()
+		local d = self:move_direction()
+
+		if d:length() ~= 0 then
+			self.direction_vec = d -- for the case that :direction() is not called
+			self:add_task(generate_walk_task(d))
+		end
+
 		if not self:has_tasks_by_class("dead") then
-			local d = self:move_direction()
-
-			if d:length() ~= 0 then
-				self.direction_vec = d -- for the case that :direction() is not called
-				self:add_task(generate_walk_task(d))
-			end
-
 			self:consider_deglitching()
 			self:consider_drowning()
 
