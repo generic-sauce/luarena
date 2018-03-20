@@ -114,28 +114,34 @@ return function (character)
 		(function()
 			local skill = {}
 			skill.owner = character
+			skill.cooldown = 0
+			skill.dash_cooldown = 0
 
 			function skill:draw() end
 
 			function skill:tick()
-				local s1_tasks = self.owner:get_tasks_by_class("riven_s1")
-				assert(not (#s1_tasks > 1), stringify(s1_tasks))
+				self.cooldown = math.max(0, self.cooldown - FRAME_DURATION)
+				if self.owner.inputs[KEYS.skills[1]] then
+					local s1_tasks = self.owner:get_tasks_by_class("riven_s1")
+					assert(not (#s1_tasks > 1), stringify(s1_tasks, 3))
 
-				if #s1_tasks == 1 then
-					local s1_task = s1_tasks[1]
+					if #s1_tasks == 1 then
+						local s1_task = s1_tasks[1]
 
-					if s1_task.dash_cooldown == 0 then
-						s1_task.dash_cooldown = S1_DASH_COOLDOWN
+						if s1_task.dash_cooldown == 0 then
+							s1_task.dash_cooldown = S1_DASH_COOLDOWN
+							s1_task.instances = math.max(0, s1_task.instances - 1)
+							s1_task.timeout = S1_TIMEOUT
+							self.owner:add_task(generate_s1_dash_task(self.owner:direction()))
+						end
+					elseif #s1_tasks == 0 and self.cooldown == 0 then
+						self.cooldown = S1_COOLDOWN
+						local s1_task = generate_s1_task()
 						s1_task.instances = math.max(0, s1_task.instances - 1)
-						s1_task.timeout = S1_TIMEOUT
+						self.owner:add_task(s1_task)
 						self.owner:add_task(generate_s1_dash_task(self.owner:direction()))
+						self.cooldown = S1_COOLDOWN
 					end
-				elseif #s1_tasks == 0 and self.s1_cooldown == 0 then
-					self.s1_cooldown = S1_COOLDOWN
-					local s1_task = generate_s1_task()
-					s1_task.instances = math.max(0, s1_task.instances - 1)
-					self:add_task(s1_task)
-					self:add_task(generate_s1_dash_task(self:direction()))
 				end
 			end
 
