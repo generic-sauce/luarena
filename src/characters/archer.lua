@@ -72,6 +72,8 @@ return function (archer)
 				frame():add(self.owner:new_arrow(1))
 				self.owner:remove_task(self)
 			end)
+
+			return skill1
 		end)(skill_mod.with_fresh_key(
 				skill_mod.with_cooldown(
 					skill_mod.make_blank_skill(archer, 1)
@@ -84,6 +86,8 @@ return function (archer)
 				frame():add(self.owner:new_arrow(-1))
 				self.owner:remove_task(self)
 			end)
+
+			return skill2
 		end)(skill_mod.make_blank_skill(archer, 2)),
 
 		(function (skill3)
@@ -98,6 +102,8 @@ return function (archer)
 				if self.traveled_distance >= S3_RANGE then
 					self.owner:remove_task(self)
 				end
+
+				return skill3
 			end)
 		end)(skill_mod.make_blank_skill(archer, 3))
 	}

@@ -42,6 +42,8 @@ function skill_mod.append_function(obj, name, new_function)
 	elseif type(obj[name]) == 'function' then
 		listify_function(obj, name)
 		table.insert(obj[name .. "_list"], new_function)
+	elseif type(obj[name] == 'table') then
+		table.insert(obj[name .. "_list"], new_function)
 	else
 		assert(false, "can't append to obj[name] of type " .. type(obj[name]))
 	end
