@@ -96,13 +96,13 @@ end
 
 function skill_mod.with_fresh_key(skill)
 	skill.fresh = true
-	append_function(skill, "tick", function(self)
+	skill_mod.append_function(skill, "tick", function(self)
 		if not self.fresh and not self:is_pressed() then
 			self.fresh = true
 		end
 	end)
 
-	append_function(skill.task, "init", function(self)
+	skill_mod.append_function(skill.task, "init", function(self)
 		self.skill.fresh = false
 	end)
 
@@ -110,7 +110,9 @@ function skill_mod.with_fresh_key(skill)
 		return self.fresh and self:is_pressed()
 	end
 
-	append_function(skill, "go_condition", skill.is_fresh_pressed)
+	skill_mod.append_function(skill, "go_condition", skill.is_fresh_pressed)
+
+	return skill
 end
 
 function skill_mod.with_cooldown(skill, cooldown)
@@ -121,8 +123,8 @@ function skill_mod.with_cooldown(skill, cooldown)
 		self.cooldown = math.max(0, self.cooldown - FRAME_DURATION)
 	end
 
-	append_function(skill, "go_condition", function(self) return self.cooldown == 0 end)
-	append_function(skill, "tick", self.tick_cooldown)
+	skill_mod.append_function(skill, "go_condition", function(self) return self.cooldown == 0 end)
+	skill_mod.append_function(skill, "tick", skill.tick_cooldown)
 
 	function skill:draw_cooldown(viewport)
 		local rect = self:render_rect()
@@ -141,7 +143,7 @@ function skill_mod.with_cooldown(skill, cooldown)
 		end
 	end
 
-	self.draw = self.draw_cooldown -- This way, self.draw can be overwritten, yet self.draw_cooldown can still be used
+	skill.draw = skill.draw_cooldown -- This way, self.draw can be overwritten, yet self.draw_cooldown can still be used
 
 	return skill
 end
