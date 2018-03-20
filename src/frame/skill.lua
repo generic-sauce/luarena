@@ -43,6 +43,10 @@ function skill_mod.make_blank_skill(player, num)
 		return rect
 	end
 
+	function skill:is_pressed()
+		return isPressed('S' .. tostring(self.num) .. '_KEY')
+	end
+
 	return skill
 end
 
