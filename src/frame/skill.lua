@@ -5,6 +5,9 @@ local rect_mod = require('viewmath/rect')
 require('misc')
 
 local listify_function = function(obj, name)
+	assert(type(obj) == 'table')
+	assert(type(name) == 'string')
+
 	if obj[name .. "_list"] == nil then
 		obj[name .. "_list"] = {obj[name]}
 		obj[name] = function (self, ...)
@@ -16,10 +19,12 @@ local listify_function = function(obj, name)
 end
 
 local eval_and_function = function(obj, name)
+	assert(type(name) == 'string')
+
 	if type(obj[name]) == "nil" then
 		return true
 	elseif obj[name .. '_list'] ~= nil and type(obj[name]) == 'function' then
-		for i, f in pairs(obj[name .. '_list']) do
+		for _, f in pairs(obj[name .. '_list']) do
 			if not f(obj) then
 				return false
 			end
@@ -34,6 +39,10 @@ local eval_and_function = function(obj, name)
 end
 
 function skill_mod.append_function(obj, name, new_function)
+	assert(type(obj) == 'table')
+	assert(type(name) == 'string')
+	assert(type(new_function) == 'function')
+
 	if type(obj[name]) == 'nil' then
 		obj[name] = new_function
 	elseif type(obj[name]) == 'function' then
@@ -122,6 +131,8 @@ function skill_mod.with_cooldown(skill, cooldown)
 	end
 
 	skill_mod.append_function(skill, "go_condition", function(self) return self.cooldown == 0 end)
+	skill_mod.append_function(skill, "go", function(self) self.cooldown = self.max_cooldown end)
+
 	skill_mod.append_function(skill, "tick", skill.tick_cooldown)
 
 	function skill:draw_cooldown(viewport)
