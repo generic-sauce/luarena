@@ -2,6 +2,7 @@ local skill_mod = {}
 
 local vec_mod = require('viewmath/vec')
 local rect_mod = require('viewmath/rect')
+require('misc')
 
 local listify_function = function(obj, name)
 	if type(obj[name]) == 'function' then
@@ -13,7 +14,28 @@ local listify_function = function(obj, name)
 		end
 	end
 end
-		
+
+local fold_listified = function(obj, name, lambda, start)
+	if type(obj[name] == "nil") then
+		return start
+	elseif type(obj[name] == "function") then
+		return obj[name]()
+	elseif type(obj[name]) == 'table' then
+		return fold(lambda, obj[name], start)
+	else
+		assert(false)
+	end
+
+end
+
+local fold = function(lambda, list, start)
+	local out = start
+	for _, x in pairs(list) do
+		out = lambda(out, x)
+	end
+	return out
+end
+
 function skill_mod.append_function(obj, name, new_function)
 	if type(obj[name]) == 'nil' then
 		obj[name] = new_function
@@ -25,9 +47,12 @@ function skill_mod.append_function(obj, name, new_function)
 	end
 end
 
+-- basics
+
 function skill_mod.make_blank_skill(player, num)
 	local skill = {}
 	skill.task = {}
+	skill.task.skill = skill
 	skill.player = player
 	skill.num = num
 	skill.task.class = self.player.char .. "_s" .. tostring(self.num)
@@ -47,17 +72,43 @@ function skill_mod.make_blank_skill(player, num)
 		return isPressed('S' .. tostring(self.num) .. '_KEY')
 	end
 
+	function skill:go()
+		local task = clone(self.task)
+		self.player:add_task(task)
+	end
+
+	skill.go_condition = skill.is_pressed
+
+	function skill:tick()
+		local and_lambda = function(a, b) return a and b end
+		if fold_listified(self, "go_condition", and_lambda, true) then
+			self:go()
+		end
+	end
+
 	return skill
 end
 
-function skill_mod.make_default_skill(player, num)
-	local skill = skill_mod.make_blank_skill(player, num)
-	skill = skill_mod.with_cooldown(skill, nil) -- to be set by the user
+-- add ons
 
-	return skill
+function skill_mod.with_fresh_key(skill)
+	skill.fresh = true
+	append_function(skill, "tick", function(self)
+		if not self.fresh and not self:is_pressed() then
+			self.fresh = true
+		end
+	end)
+
+	append_function(skill.task, "init", function(self)
+		self.skill.fresh = false
+	end)
+
+	function skill:is_fresh_pressed()
+		return self.fresh and self:is_pressed()
+	end
+
+	append_function(skill, "go_condition", skill.is_fresh_pressed)
 end
-
--- TODO key-press stuff
 
 function skill_mod.with_cooldown(skill, cooldown)
 	skill.max_cooldown = cooldown
@@ -67,6 +118,7 @@ function skill_mod.with_cooldown(skill, cooldown)
 		self.cooldown = math.max(0, self.cooldown - FRAME_DURATION)
 	end
 
+	append_function(skill, "go_condition", function(self) return self.cooldown == 0 end)
 	append_function(skill, "tick", self.tick_cooldown)
 
 	function skill:draw_cooldown(viewport)
