@@ -143,14 +143,12 @@ function skill_mod.with_cooldown(skill, cooldown)
 		if self.cooldown == 0 then
 			viewport:draw_world_rect(rect, 0, 255, 0)
 		else
-			viewport:draw_world_rect(rect, 255, 0, 0)
+			viewport:draw_world_rect(rect, 0, 0, 255)
 
 			local height = rect:height() * (self.cooldown / self.max_cooldown)
-			local blue_rect = rect_mod.by_left_top_and_size(
-				rect:left_top():add_y(rect:height() - height),
-				vec_mod(rect:width(), height)
-			)
-			viewport:draw_world_rect(rect, 0, 0, 255)
+			local red_rect = rect_mod.by_left_top_and_size(rect:left_top(), vec_mod(rect:width(), height))
+
+			viewport:draw_world_rect(red_rect, 255, 0, 0)
 		end
 	end
 
