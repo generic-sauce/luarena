@@ -158,6 +158,7 @@ function task_mod.init_entity(entity)
 	entity.inactive_tasks = {}
 
 	function entity:add_task(task)
+		task.owner = self
 		table.insert(self.inactive_tasks, {task=task, status="delay"})
 	end
 

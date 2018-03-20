@@ -50,17 +50,20 @@ end
 -- basics
 
 function skill_mod.make_blank_skill(player, num)
+	assert(type(player) == "table", "wrong player argument in make_blank_skill")
+	assert(type(num) == "number", "wrong num argument in make_blank_skill")
+
 	local skill = {}
 	skill.task = {}
 	skill.task.skill = skill
-	skill.player = player
+	skill.owner = player
 	skill.num = num
-	skill.task.class = self.player.char .. "_s" .. tostring(self.num)
+	skill.task.class = skill.owner.char .. "_s" .. tostring(skill.num)
 
 	function skill:render_rect()
 		-- TODO Make this function work with > 4 skills
 
-		local wrapper = self.player.shape:wrapper()
+		local wrapper = self.owner.shape:wrapper()
 		local rect = rect_mod.by_left_top_and_size(
 			wrapper:left_top() + vec_mod((self.num-1) * (1/3) * wrapper:width() - (self.num-1), -5),
 			vec_mod(3, 3)
@@ -74,7 +77,7 @@ function skill_mod.make_blank_skill(player, num)
 
 	function skill:go()
 		local task = clone(self.task)
-		self.player:add_task(task)
+		self.owner:add_task(task)
 	end
 
 	skill.go_condition = skill.is_pressed

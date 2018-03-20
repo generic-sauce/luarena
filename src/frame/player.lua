@@ -138,7 +138,6 @@ function new_player(char)
 		if not self:has_tasks_by_class("dead") then
 			self:draw_body(viewport)
 			self:draw_health(viewport)
-			self:draw_skills(viewport)
 		end
 	end
 

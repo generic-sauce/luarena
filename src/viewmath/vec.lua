@@ -20,6 +20,7 @@ meta.__index = {
 	end,
 	with_y = function(self, y)
 		return vec_mod(self.x, y)
+	end,
 
 	add_x = function(self, x)
 		return vec_mod(self.x + x, self.y)

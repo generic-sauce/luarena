@@ -27,5 +27,7 @@ return function (dummy)
 		self.health = math.max(0, self.health - dmg)
 	end
 
+	dummy.skills = {}
+
 	return dummy
 end

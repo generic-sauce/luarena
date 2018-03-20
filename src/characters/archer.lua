@@ -3,6 +3,7 @@ local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
 local collision_detection_mod = require('collision/detection')
 local line_mod = require('collision/line')
+local skill_mod = require('frame/skill')
 
 local S1_2_COOLDOWN = 0.5
 local S1_2_RANGE = 100
@@ -65,43 +66,36 @@ return function (archer)
 		return arrow
 	end
 
-	self.skills = skill_mod.make_skills(
-		function (default_skill)
+	archer.skills = {
+		(function (skill1)
+			skill_mod.append_function(skill1.task, "init", function(self)
+				frame():add(self.owner:new_arrow(1))
+				self.owner:remove_task(self)
+			end)
+		end)(skill_mod.make_blank_skill(archer, 1)),
 
-			local task = { class = "archer_s1" }
+		(function (skill2)
+			skill_mod.append_function(skill2.task, "init", function(self)
+				frame():add(self.owner:new_arrow(-1))
+				self.owner:remove_task(self)
+			end)
+		end)(skill_mod.make_blank_skill(archer, 2)),
 
-			function task:init(entity)
-				frame():add(entity:new_arrow(1))
-				entity:remove_task(self)
-			end
+		(function (skill3)
+			skill_mod.append_function(skill3.task, "init", function(self)
+				self.traveled_distance = 0
+				self.dash_direction = self.owner:direction()
+			end)
 
-			self:add_task(task)
-		end,
-
-	function archer:execute_s2()
-		local task = { class = "archer_s2" }
-
-		function task:init(entity)
-			frame():add(entity:new_arrow(-1))
-			entity:remove_task(self)
-		end
-
-		self:add_task(task)
-	end
-
-	function archer:execute_s3()
-		local task = { class = "archer_s3", dash_direction = self:direction(), traveled_distance = 0 }
-
-		function task:tick(entity)
-			entity.shape = entity.shape:move_center(self.dash_direction:with_length(S3_SPEED * FRAME_DURATION))
-			self.traveled_distance = self.traveled_distance + S3_SPEED * FRAME_DURATION
-			if self.traveled_distance >= S3_RANGE then
-				entity:remove_task(self)
-			end
-		end
-
-		self:add_task(task)
-	end
+			skill_mod.append_function(skill3.task, "tick", function(self)
+				self.owner.shape = entity.shape:move_center(self.dash_direction:with_length(S3_SPEED * FRAME_DURATION))
+				self.traveled_distance = self.traveled_distance + S3_SPEED * FRAME_DURATION
+				if self.traveled_distance >= S3_RANGE then
+					self.owner:remove_task(self)
+				end
+			end)
+		end)(skill_mod.make_blank_skill(archer, 3))
+	}
 
 	return archer
 end
