@@ -2,6 +2,7 @@ local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
 local task_mod = require('frame/task')
+local skill_mod = require('frame/skill')
 
 local S1_COOLDOWN = 5
 local S1_TIMEOUT = 2.5
@@ -106,124 +107,95 @@ local function generate_s1_dash_task(dash_direction)
 	return task
 end
 
-local function generate_s2_stun_task()
-	local task = {class = "riven_s2_stun",
-		timeout = S2_STUN_TIMEOUT}
-
-	function task:tick(entity)
-		self.timeout = math.max(0, self.timeout - FRAME_DURATION)
-
-		if self.timeout == 0 then
-			entity:remove_task(self)
-		end
-	end
-
-	return task
-end
-
-local function generate_s2_task()
-	local task = {class = "riven_s2",
-		animation_timeout = S2_ANIMATION_TIMEOUT}
-
-	function task:init(entity)
-		local attack = generate_relative_area(
-			entity,
-			S2_ANIMATION_TIMEOUT,
-			vec_mod(0, 0),
-			S2_SIZE)
-
-		for _, entity in pairs(frame():find_colliders(attack.shape)) do
-			if entity.damage and entity ~= attack.owner and not (entity.owner and entity.owner == attack.owner) then
-				entity:damage(S2_DAMAGE)
-				entity:add_task(generate_s2_stun_task())
-			end
-		end
-
-		frame():add(attack)
-	end
-
-	function task:tick(entity)
-		entity:remove_task(self)
-	end
-
-	return task
-end
-
-local function generate_s3_task(dash_direction)
-	assert(dash_direction ~= nil)
-
-	local task = {class = "riven_s3", dash_direction = dash_direction, traveled_distance = 0 }
-
-	function task:init(entity)
-		local shield = generate_relative_area(
-			entity,
-			S3_SHIELD_TIMEOUT,
-			vec_mod(0, 0),
-			S3_SHIELD_SIZE)
-
-		function shield:damage(dmg)
-			frame():remove(self)
-		end
-
-		shield.owner = entity
-		frame():add(shield)
-	end
-
-	function task:tick(entity)
-		entity.shape = entity.shape:move_center(self.dash_direction:with_length(S3_DASH_SPEED * FRAME_DURATION))
-		self.traveled_distance = self.traveled_distance + S3_DASH_SPEED * FRAME_DURATION
-		if self.traveled_distance >= S3_DASH_DISTANCE then
-			entity:remove_task(self)
-		end
-	end
-
-	return task
-end
+-- TODO create s1 wait task for sub dashes
 
 return function (character)
-	character.s1_cooldown = 0
-	character.s2_cooldown = 0
-	character.s3_cooldown = 0
+	character.skills = {
+		(function()
+			local skill = {}
+			skill.owner = character
 
-	function character:char_tick()
-		-- TODO create s1 wait task for sub dashes
+			function skill:draw() end
 
-		self.s1_cooldown = math.max(0, self.s1_cooldown - FRAME_DURATION)
-		self.s2_cooldown = math.max(0, self.s2_cooldown - FRAME_DURATION)
-		self.s3_cooldown = math.max(0, self.s3_cooldown - FRAME_DURATION)
+			function skill:tick()
+				local s1_tasks = self.owner:get_tasks_by_class("riven_s1")
+				assert(not (#s1_tasks > 1), stringify(s1_tasks))
 
-		if self.inputs[S1_KEY] then
-			local s1_tasks = self:get_tasks_by_class("riven_s1")
-			assert(not (#s1_tasks > 1), stringify(s1_tasks))
+				if #s1_tasks == 1 then
+					local s1_task = s1_tasks[1]
 
-			if #s1_tasks == 1 then
-				local s1_task = s1_tasks[1]
-
-				if s1_task.dash_cooldown == 0 then
-					s1_task.dash_cooldown = S1_DASH_COOLDOWN
+					if s1_task.dash_cooldown == 0 then
+						s1_task.dash_cooldown = S1_DASH_COOLDOWN
+						s1_task.instances = math.max(0, s1_task.instances - 1)
+						s1_task.timeout = S1_TIMEOUT
+						self.owner:add_task(generate_s1_dash_task(self.owner:direction()))
+					end
+				elseif #s1_tasks == 0 and self.s1_cooldown == 0 then
+					self.s1_cooldown = S1_COOLDOWN
+					local s1_task = generate_s1_task()
 					s1_task.instances = math.max(0, s1_task.instances - 1)
-					s1_task.timeout = S1_TIMEOUT
+					self:add_task(s1_task)
 					self:add_task(generate_s1_dash_task(self:direction()))
 				end
-			elseif #s1_tasks == 0 and self.s1_cooldown == 0 then
-				self.s1_cooldown = S1_COOLDOWN
-				local s1_task = generate_s1_task()
-				s1_task.instances = math.max(0, s1_task.instances - 1)
-				self:add_task(s1_task)
-				self:add_task(generate_s1_dash_task(self:direction()))
 			end
-		end
 
-		if self.inputs[S2_KEY] and self.s2_cooldown == 0 then
-			self.s2_cooldown = S2_COOLDOWN
-			self:add_task(generate_s2_task())
-		end
+			return skill
+		end)(),
 
-		if self.inputs[S3_KEY] and self.s3_cooldown == 0 then
-			self.s3_cooldown = S3_COOLDOWN
-			self:add_task(generate_s3_task(self:direction()))
-		end
-	end
+		(function()
+			local skill = skill_mod.make_blank_skill(character, 2)
+			skill_mod.with_cooldown(skill, S2_COOLDOWN)
+
+			skill_mod.append_function(skill.task, "init", function(self)
+				local attack = generate_relative_area(
+					character,
+					S2_ANIMATION_TIMEOUT,
+					vec_mod(0, 0),
+					S2_SIZE)
+
+				for _, entity in pairs(frame():find_colliders(attack.shape)) do
+					if entity.damage and entity ~= attack.owner and not (entity.owner and entity.owner == attack.owner) then
+						entity:damage(S2_DAMAGE)
+					end
+				end
+				frame():add(attack)
+			end)
+
+			return skill
+		end)(),
+
+		(function()
+			local skill = skill_mod.make_blank_skill(character, 3)
+			skill_mod.with_cooldown(skill, S3_COOLDOWN)
+
+			skill_mod.append_function(skill.task, "init", function(self)
+				self.traveled_distance = 0
+				self.dash_direction = self.owner:direction()
+				local shield = generate_relative_area(
+					character,
+					S3_SHIELD_TIMEOUT,
+					vec_mod(0, 0),
+					S3_SHIELD_SIZE)
+
+				function shield:damage(dmg)
+					frame():remove(self)
+				end
+
+				shield.owner = self.owner
+				frame():add(shield)
+			end)
+
+			skill_mod.append_function(skill.task, "tick", function(self)
+				self.owner.shape = self.owner.shape:move_center(self.dash_direction:with_length(S3_DASH_SPEED * FRAME_DURATION))
+				self.traveled_distance = self.traveled_distance + S3_DASH_SPEED * FRAME_DURATION
+				if self.traveled_distance >= S3_DASH_DISTANCE then
+					self.owner:remove_task(self)
+				end
+			end)
+
+			return skill
+		end)()
+	}
 
 	return character
 end
