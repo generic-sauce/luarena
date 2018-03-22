@@ -5,6 +5,7 @@ local vec_mod = require('viewmath/vec')
 local circle_mod = require('shape/circle')
 
 local collision_detection_mod = require('collision/detection')
+local skill_mod = require('frame/skill')
 
 local S1_COOLDOWN = 6
 local S1_RANGE = 75
@@ -32,198 +33,6 @@ return function (u1)
 
 	u1.dagger_list = {}
 
-	u1.s1_cooldown = 0
-	u1.s2_cooldown = 0
-	u1.s3_cooldown = 0
-	u1.s4_cooldown = 0
-
-	u1.s1_released = true
-	u1.s2_released = true
-	u1.s3_released = true
-	u1.s4_released = true
-
-	function u1:use_s1_skill()
-		local u1 = self
-
-		local task = { class = "u1_s1" }
-
-		function task:init(u1)
-			local task = self
-
-			u1.s1_cooldown = S1_COOLDOWN
-
-			local blade = {}
-			task.blade = blade
-
-			blade.u1 = u1
-			blade.alive = true
-
-			blade.start_center = u1.shape:center()
-			blade.shape = circle_mod.by_center_and_radius(
-				u1.shape:center(),
-				3
-			)
-			blade.speed = blade.u1:direction() * S1_SPEED * FRAME_DURATION
-
-			function blade:on_enter_collider(e)
-				local blade = self
-
-				if e ~= blade.u1 and e.damage then
-					e:damage(S1_DAMAGE)
-				end
-			end
-
-			function blade:tick()
-				local blade = self
-
-				blade.shape = blade.shape:move_center(blade.speed)
-				if (blade.start_center - blade.shape:center()):length() > S1_RANGE or not blade.shape:wrapper():intersects(frame().map:rect()) then
-					frame():remove(blade)
-					blade.alive = false
-				end
-			end
-
-			function blade:draw(viewport)
-				local blade = self
-
-				viewport:draw_shape(blade.shape, 0, 0, 255)
-			end
-
-			frame():add(blade)
-		end
-
-		function task:tick(entity)
-			local task = self
-
-			if not task.blade.alive then
-				entity:remove_task(task)
-			end
-		end
-
-		function task:on_cancel(entity)
-			local task = self
-
-			frame():remove(task.blade)
-		end
-
-		u1:add_task(task)
-	end
-
-	function u1:use_s2_skill()
-		local u1 = self
-
-		local task = { class = "u1_s2" }
-
-		function task:init(u1)
-			local task = self
-
-			u1.s2_cooldown = S2_COOLDOWN
-
-			local dagger = {}
-
-			dagger.start_point = u1.shape:center()
-			dagger.landed = false
-			dagger.direction = u1:direction()
-
-			if #u1.dagger_list == S2_MAX_DAGGERS then
-				frame():remove(u1.dagger_list[1])
-				table.remove(u1.dagger_list, 1)
-			end
-			table.insert(u1.dagger_list, dagger)
-
-			dagger.u1 = u1
-			dagger.shape = circle_mod.by_center_and_radius(
-				u1.shape:center(),
-				3
-			)
-
-			function dagger:land()
-				local dagger = self
-
-				self.landed = true
-			end
-
-			function dagger:on_enter_collider(entity)
-				if entity ~= self.u1
-					and entity ~= self
-					and entity.damage then
-						entity:damage(S2_DAMAGE)
-				end
-			end
-
-			function dagger:tick()
-				local dagger = self
-
-				if (dagger.shape:center() - dagger.start_point):length() >= S2_RANGE then
-					if not dagger.landed then
-						dagger:land()
-					end
-				else
-					dagger.shape = dagger.shape:move_center(dagger.direction * S2_SPEED * FRAME_DURATION)
-				end
-			end
-
-			function dagger:draw(viewport)
-				local dagger = self
-
-				viewport:draw_shape(dagger.shape, 200, 200, 255)
-			end
-
-			frame():add(dagger)
-
-			u1:remove_task(task)
-		end
-
-		u1:add_task(task)
-	end
-
-	function u1:use_s3_skill()
-		local u1 = self
-
-		local task = { class = "u1_s3" }
-		task.u1 = u1
-		u1.s3_cooldown = S3_COOLDOWN
-
-		task.direction = u1:direction()
-		task.traveled_distance = 0
-
-		function task:init(u1)
-			local task = self
-
-			for _, entity in pairs(u1.colliders) do
-				task:damage_entity(entity)
-			end
-		end
-
-		function task:damage_entity(entity)
-			local task = self
-
-			if table.contains(task.u1.dagger_list, entity) then
-				task.u1.s3_cooldown = 0
-			elseif entity ~= u1 and entity.damage then
-				entity:damage(S3_DAMAGE)
-			end
-		end
-
-		function task:tick(u1)
-			local task = self
-
-			if task.traveled_distance >= S3_RANGE then
-				u1:remove_task(task)
-			else
-				u1.shape = u1.shape:move_center(task.direction:with_length(S3_SPEED * FRAME_DURATION))
-				task.traveled_distance = task.traveled_distance + S3_SPEED * FRAME_DURATION
-			end
-		end
-
-		function task:on_enter_collider(u1, entity)
-			local task = self
-
-			task:damage_entity(entity)
-		end
-
-		u1:add_task(task)
-	end
 
 	function u1:mk_s4_aoe()
 		local u1 = self
@@ -285,69 +94,6 @@ return function (u1)
 		return aoe
 	end
 
-
-	function u1:use_s4_skill()
-		local u1 = self
-
-		local task = { class = "u1_s4" }
-
-		function task:init(u1)
-			local task = self
-
-			u1.s4_cooldown = S4_COOLDOWN
-
-			local aoe = u1:mk_s4_aoe()
-			frame():add(aoe)
-		end
-
-		u1:add_task(task)
-	end
-
-	function u1:char_tick()
-		local u1 = self
-
-		self.s1_cooldown = math.max(0, self.s1_cooldown - FRAME_DURATION)
-		self.s2_cooldown = math.max(0, self.s2_cooldown - FRAME_DURATION)
-		self.s3_cooldown = math.max(0, self.s3_cooldown - FRAME_DURATION)
-		self.s4_cooldown = math.max(0, self.s4_cooldown - FRAME_DURATION)
-
-		if not self.inputs[S1_KEY] then
-			self.s1_released = true
-		end
-
-		if not self.inputs[S2_KEY] then
-			self.s2_released = true
-		end
-
-		if not self.inputs[S3_KEY] then
-			self.s3_released = true
-		end
-
-		if not self.inputs[S4_KEY] then
-			self.s4_released = true
-		end
-
-		if self.s1_released and self.inputs[S1_KEY] and self.s1_cooldown == 0 then
-			self:use_s1_skill()
-			self.s1_released = false
-		end
-
-		if self.s2_released and self.inputs[S2_KEY] and self.s2_cooldown == 0 then
-			self:use_s2_skill()
-			self.s2_released = false
-		end
-
-		if self.s3_released and self.inputs[S3_KEY] and self.s3_cooldown == 0 then
-			self:use_s3_skill()
-			self.s3_released = false
-		end
-
-		if self.s4_released and self.inputs[S4_KEY] and self.s4_cooldown == 0 then
-			self:use_s4_skill()
-			self.s4_released = false
-		end
-	end
-
 	function u1:color()
 		if u1:has_tasks_by_class("u1_s1") then
 			return 160, 160, 200
@@ -355,6 +101,197 @@ return function (u1)
 			return 100, 100, 150
 		end
 	end
+
+	u1.skills = {
+		(function()
+			local skill = skill_mod.make_blank_skill(u1, 1)
+			skill_mod.with_cooldown(skill, S1_COOLDOWN)
+			skill_mod.with_fresh_key(skill)
+
+			skill_mod.append_function(skill.task, "init", function (self)
+				local task = self
+
+				local blade = {}
+				task.blade = blade
+
+				blade.owner = self.owner
+				blade.alive = true
+
+				blade.start_center = self.owner.shape:center()
+				blade.shape = circle_mod.by_center_and_radius(
+					u1.shape:center(),
+					3
+				)
+				blade.speed = self.owner:direction() * S1_SPEED * FRAME_DURATION
+
+				function blade:on_enter_collider(e)
+					local blade = self
+
+					if e ~= blade.owner and e.damage then
+						e:damage(S1_DAMAGE)
+					end
+				end
+
+				function blade:tick()
+					local blade = self
+
+					blade.shape = blade.shape:move_center(blade.speed)
+					if (blade.start_center - blade.shape:center()):length() > S1_RANGE or not blade.shape:wrapper():intersects(frame().map:rect()) then
+						frame():remove(blade)
+						blade.alive = false
+					end
+				end
+
+				function blade:draw(viewport)
+					local blade = self
+
+					viewport:draw_shape(blade.shape, 0, 0, 255)
+				end
+
+				frame():add(blade)
+			end)
+
+			skill_mod.append_function(skill.task, "tick", function (self)
+				local task = self
+
+				if not task.blade.alive then
+					self.owner:remove_task(task)
+				end
+			end)
+
+			skill_mod.append_function(skill.task, "on_cancel", function (self)
+				local task = self
+
+				frame():remove(task.blade)
+			end)
+
+			return skill
+		end)(),
+
+		(function()
+			local skill = skill_mod.make_blank_skill(u1, 2)
+			skill_mod.with_cooldown(skill, S2_COOLDOWN)
+			skill_mod.with_fresh_key(skill)
+			skill_mod.with_instant(skill, function(self)
+				local task = self
+
+				u1.s2_cooldown = S2_COOLDOWN
+
+				local dagger = {}
+
+				dagger.start_point = u1.shape:center()
+				dagger.landed = false
+				dagger.direction = u1:direction()
+
+				if #u1.dagger_list == S2_MAX_DAGGERS then
+					frame():remove(u1.dagger_list[1])
+					table.remove(u1.dagger_list, 1)
+				end
+				table.insert(u1.dagger_list, dagger)
+
+				dagger.u1 = u1
+				dagger.shape = circle_mod.by_center_and_radius(
+					u1.shape:center(),
+					3
+				)
+
+				function dagger:land()
+					local dagger = self
+
+					self.landed = true
+				end
+
+				function dagger:on_enter_collider(entity)
+					if entity ~= self.u1
+						and entity ~= self
+						and entity.damage then
+							entity:damage(S2_DAMAGE)
+					end
+				end
+
+				function dagger:tick()
+					local dagger = self
+
+					if (dagger.shape:center() - dagger.start_point):length() >= S2_RANGE then
+						if not dagger.landed then
+							dagger:land()
+						end
+					else
+						dagger.shape = dagger.shape:move_center(dagger.direction * S2_SPEED * FRAME_DURATION)
+					end
+				end
+
+				function dagger:draw(viewport)
+					local dagger = self
+
+					viewport:draw_shape(dagger.shape, 200, 200, 255)
+				end
+
+				frame():add(dagger)
+			end)
+
+			return skill
+		end)(),
+
+		(function()
+			local skill = skill_mod.make_blank_skill(u1, 3)
+			skill_mod.with_cooldown(skill, S3_COOLDOWN)
+			skill_mod.with_fresh_key(skill)
+
+			skill_mod.append_function(skill.task, "init", function(self)
+				local task = self
+
+				task.direction = self.owner:direction()
+				task.traveled_distance = 0
+
+				for _, entity in pairs(self.owner.colliders) do
+					task:damage_entity(entity)
+				end
+			end)
+
+			function skill.task:damage_entity(entity)
+				local task = self
+
+				if table.contains(self.owner.dagger_list, entity) then
+					self.skill.cooldown = 0
+				elseif entity ~= self.owner and entity.damage then
+					entity:damage(S3_DAMAGE)
+				end
+			end
+
+			skill_mod.append_function(skill.task, "tick", function(self)
+				local task = self
+
+				if task.traveled_distance >= S3_RANGE then
+					self.owner:remove_task(task)
+				else
+					self.owner.shape = self.owner.shape:move_center(task.direction:with_length(S3_SPEED * FRAME_DURATION))
+					task.traveled_distance = task.traveled_distance + S3_SPEED * FRAME_DURATION
+				end
+			end)
+
+
+			function skill.task:on_enter_collider(owner, entity)
+				local task = self
+
+				task:damage_entity(entity)
+			end
+
+			return skill
+		end)(),
+
+		(function()
+			local skill = skill_mod.make_blank_skill(u1, 4)
+			skill_mod.with_cooldown(skill, S4_COOLDOWN)
+			skill_mod.with_fresh_key(skill)
+			skill_mod.with_instant(skill, function(self)
+				local aoe = self.owner:mk_s4_aoe()
+				frame():add(aoe)
+			end)
+
+			return skill
+		end)()
+	}
 
 	return u1
 end
