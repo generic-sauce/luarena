@@ -120,10 +120,19 @@ function new_player(char)
 		local bar_height = 3
 
 		local wrapper = self.shape:wrapper()
-		viewport:draw_world_rect(rect_mod.by_left_top_and_size(
+
+		local border = rect_mod.by_left_top_and_size(
 			wrapper:left_top() - vec_mod(0, bar_offset),
-			vec_mod(wrapper:width() * self.health/100, bar_height)
-		), 255, 0, 0)
+			vec_mod(wrapper:width() + 2, bar_height + 2)
+        )
+
+		local health_bar = rect_mod.by_left_top_and_size(
+            border:left_top() + vec_mod(1, 1),
+            vec_mod(wrapper:width() * self.health/100, bar_height)
+        )
+
+        viewport:draw_world_rect(border, 20, 20, 20)
+        viewport:draw_world_rect(health_bar, 200, 0, 0)
 	end
 
 	function player:draw_skills(viewport)
