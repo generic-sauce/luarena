@@ -73,7 +73,7 @@ function skill_mod.make_blank_skill(player, num)
 		local wrapper = self.owner.shape:wrapper()
 		local rect = rect_mod.by_left_top_and_size(
 			wrapper:left_top() + vec_mod((self.num-1) * (1/3) * wrapper:width() - (self.num-1), -5),
-			vec_mod(3, 3)
+			vec_mod(5, 5)
 		)
 		return rect
 	end
@@ -138,17 +138,24 @@ function skill_mod.with_cooldown(skill, cooldown)
 	skill_mod.append_function(skill, "tick", skill.tick_cooldown)
 
 	function skill:draw_cooldown(viewport)
+        local SIZE_REDUCTION = 2
+
 		local rect = self:render_rect()
+        local inner_rect = rect_mod.by_center_and_size(
+            rect:center(),
+            rect:size() - vec_mod(SIZE_REDUCTION, SIZE_REDUCTION)
+        )
 
+		viewport:draw_world_rect(rect, 20, 20, 20) -- border
 		if self.cooldown == 0 then
-			viewport:draw_world_rect(rect, 0, 255, 0)
+			viewport:draw_world_rect(inner_rect, 0, 200, 0)
 		else
-			viewport:draw_world_rect(rect, 0, 0, 255)
+			viewport:draw_world_rect(inner_rect, 70, 70, 255)
 
-			local height = rect:height() * (self.cooldown / self.max_cooldown)
-			local red_rect = rect_mod.by_left_top_and_size(rect:left_top(), vec_mod(rect:width(), height))
+			local height = inner_rect:height() * (self.cooldown / self.max_cooldown)
+			local red_rect = rect_mod.by_left_top_and_size(inner_rect:left_top(), vec_mod(inner_rect:width(), height))
 
-			viewport:draw_world_rect(red_rect, 255, 0, 0)
+			viewport:draw_world_rect(red_rect, 200, 0, 0)
 		end
 	end
 
