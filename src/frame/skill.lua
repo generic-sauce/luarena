@@ -4,6 +4,8 @@ local vec_mod = require('viewmath/vec')
 local rect_mod = require('viewmath/rect')
 require('misc')
 
+local BORDER_R, BORDER_G, BORDER_B = 20, 20, 20
+
 local listify_function = function(obj, name)
 	assert(type(obj) == 'table')
 	assert(type(name) == 'string')
@@ -16,6 +18,12 @@ local listify_function = function(obj, name)
 			end
 		end
 	end
+end
+
+-- draws the border, and returns the smaller inner rect
+local function border_rect(rect, viewport)
+	viewport:draw_world_rect(rect, BORDER_R, BORDER_G, BORDER_B)
+	return rect_mod.by_center_and_size(rect:center(), rect:size() - vec_mod(2, 2))
 end
 
 local eval_and_function = function(obj, name)
@@ -140,21 +148,14 @@ function skill_mod.with_cooldown(skill, cooldown)
 	function skill:draw_cooldown(viewport)
         local SIZE_REDUCTION = 2
 
-		local rect = self:render_rect()
-        local inner_rect = rect_mod.by_center_and_size(
-            rect:center(),
-            rect:size() - vec_mod(SIZE_REDUCTION, SIZE_REDUCTION)
-        )
+		local rect = border_rect(self:render_rect(), viewport)
 
-		viewport:draw_world_rect(rect, 20, 20, 20) -- border
 		if self.cooldown == 0 then
-			viewport:draw_world_rect(inner_rect, 0, 200, 0)
+			viewport:draw_world_rect(rect, 0, 200, 0)
 		else
-			viewport:draw_world_rect(inner_rect, 70, 70, 255)
+			viewport:draw_world_rect(rect, 70, 70, 255)
 
-			local height = inner_rect:height() * (self.cooldown / self.max_cooldown)
-			local red_rect = rect_mod.by_left_top_and_size(inner_rect:left_top(), vec_mod(inner_rect:width(), height))
-
+			local red_rect = rect:scale_keep_left_top(vec_mod(1, self.cooldown / self.max_cooldown))
 			viewport:draw_world_rect(red_rect, 200, 0, 0)
 		end
 	end

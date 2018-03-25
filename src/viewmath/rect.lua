@@ -74,7 +74,23 @@ local meta = {
 		end,
 		height = function(self)
 			return self:size().y
-		end
+		end,
+
+		scale_keep_center = function(self, scale_vec)
+			local v = vec_mod(scale_vec.x * self:size().x, scale_vec.y * self:size().y)
+			return rect_mod.by_center_and_size(
+				self:center(),
+				v
+			)
+		end,
+
+		scale_keep_left_top = function(self, scale_vec)
+			local v = vec_mod(scale_vec.x * self:size().x, scale_vec.y * self:size().y)
+			return rect_mod.by_left_top_and_size(
+				self:left_top(),
+				v
+			)
+		end,
 	}
 }
 
