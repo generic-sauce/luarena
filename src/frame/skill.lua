@@ -6,33 +6,47 @@ require('misc')
 
 local BORDER_R, BORDER_G, BORDER_B = 20, 20, 20
 
+-- this object should contain self.list, self.obj attributes
+skill_mod.append_func_meta = {
+	__call = function(self, ...)
+			for _, f in pairs(self.list) do
+				f(self.obj, ...)
+			end
+		end
+}
+
+local function make_append_func(obj)
+	assert(type(obj) == "table")
+	return setmetatable({list = {}, obj = obj}, skill_mod.append_func_meta)
+end
+
+local function is_append_func(t)
+	return type(t) == "table" and type(t.list) ~= nil and type(t.obj) ~= nil
+end
+
 local listify_function = function(obj, name)
 	assert(type(obj) == 'table')
 	assert(type(name) == 'string')
 
-	if obj[name .. "_list"] == nil then
-		obj[name .. "_list"] = {obj[name]}
-		obj[name] = function (self, ...)
-			for _, f in pairs(self[name .. '_list']) do -- TODO name is closured!
-				f(self, ...)
-			end
-		end
+	if type(obj[name]) == 'function' then
+		local f = make_append_func(obj)
+		table.insert(f.list, obj[name])
+		obj[name] = f
+	elseif type(obj[name]) == "nil" then
+		obj[name] = make_append_func(obj)
+	else
+		assert(false)
 	end
 end
 
--- draws the border, and returns the smaller inner rect
-function skill_mod.icon_rect_border(rect, viewport)
-	viewport:draw_world_rect(rect, BORDER_R, BORDER_G, BORDER_B)
-	return rect_mod.by_center_and_size(rect:center(), rect:size() - vec_mod(2, 2))
-end
-
 local eval_and_function = function(obj, name)
+	assert(type(obj) == 'table')
 	assert(type(name) == 'string')
 
 	if type(obj[name]) == "nil" then
 		return true
-	elseif obj[name .. '_list'] ~= nil and type(obj[name]) == 'function' then
-		for _, f in pairs(obj[name .. '_list']) do
+	elseif is_append_func(obj[name]) then
+		for _, f in pairs(obj[name].list) do
 			if not f(obj) then
 				return false
 			end
@@ -41,7 +55,7 @@ local eval_and_function = function(obj, name)
 	elseif type(obj[name]) == 'function' then
 		return obj[name](obj)
 	else
-		assert(false)
+		assert(false, "can't call eval_and_function to obj[\"" .. name .. "\"] of type " .. type(obj[name]))
 	end
 
 end
@@ -54,10 +68,10 @@ function skill_mod.append_function(obj, name, new_function)
 	if type(obj[name]) == 'nil' then
 		obj[name] = new_function
 	elseif type(obj[name]) == 'function' then
-		if obj[name .. '_list'] == nil then
-			listify_function(obj, name)
-		end
-		table.insert(obj[name .. "_list"], new_function)
+		listify_function(obj, name)
+		table.insert(obj[name].list, new_function)
+	elseif is_append_func(obj[name]) then
+		table.insert(obj[name].list, new_function)
 	else
 		assert(false, "can't append to obj[name] of type " .. type(obj[name]))
 	end
@@ -111,6 +125,12 @@ end
 
 -- add ons
 
+-- draws the border, and returns the smaller inner rect
+function skill_mod.icon_rect_border(rect, viewport)
+	viewport:draw_world_rect(rect, BORDER_R, BORDER_G, BORDER_B)
+	return rect_mod.by_center_and_size(rect:center(), rect:size() - vec_mod(2, 2))
+end
+
 function skill_mod.with_fresh_key(skill)
 	skill.fresh = true
 	skill_mod.append_function(skill, "tick", function(self)
@@ -146,8 +166,6 @@ function skill_mod.with_cooldown(skill, cooldown)
 	skill_mod.append_function(skill, "tick", skill.tick_cooldown)
 
 	function skill:draw_cooldown(viewport)
-        local SIZE_REDUCTION = 2
-
 		local rect = skill_mod.icon_rect_border(self:icon_rect(), viewport)
 
 		if self.cooldown == 0 then
