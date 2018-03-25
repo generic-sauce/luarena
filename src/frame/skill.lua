@@ -21,7 +21,7 @@ local listify_function = function(obj, name)
 end
 
 -- draws the border, and returns the smaller inner rect
-local function border_rect(rect, viewport)
+function skill_mod.icon_rect_border(rect, viewport)
 	viewport:draw_world_rect(rect, BORDER_R, BORDER_G, BORDER_B)
 	return rect_mod.by_center_and_size(rect:center(), rect:size() - vec_mod(2, 2))
 end
@@ -75,7 +75,7 @@ function skill_mod.make_blank_skill(player, num)
 	skill.num = num
 	skill.task.class = skill.owner.char .. "_s" .. tostring(skill.num)
 
-	function skill:render_rect()
+	function skill:icon_rect()
 		-- TODO Make this function work with > 4 skills
 
 		local wrapper = self.owner.shape:wrapper()
@@ -148,7 +148,7 @@ function skill_mod.with_cooldown(skill, cooldown)
 	function skill:draw_cooldown(viewport)
         local SIZE_REDUCTION = 2
 
-		local rect = border_rect(self:render_rect(), viewport)
+		local rect = skill_mod.icon_rect_border(self:icon_rect(), viewport)
 
 		if self.cooldown == 0 then
 			viewport:draw_world_rect(rect, 0, 200, 0)

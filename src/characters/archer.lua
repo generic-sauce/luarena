@@ -121,7 +121,7 @@ return function (archer)
 					r, g, b = 0, 255, 0
 				end
 
-				viewport:draw_world_rect(self:render_rect(), r, g, b)
+				viewport:draw_world_rect(self:icon_rect(), r, g, b)
 			end
 
 			return skill
