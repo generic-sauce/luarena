@@ -33,7 +33,6 @@ return function (u1)
 
 	u1.dagger_list = {}
 
-
 	function u1:mk_s4_aoe()
 		local u1 = self
 

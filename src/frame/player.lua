@@ -9,7 +9,10 @@ KEYS = {
 	up = 'w',
 	left = 'a',
 	down = 's',
-	skills = {'j', 'k', 'l', ';'}
+	skill1 = 'j',
+	skill2 = 'k',
+	skill3 = 'l',
+	skill4 = ';'
 }
 
 WALKSPEED = 140 -- units per second
@@ -35,7 +38,7 @@ function new_player(char)
 		15
 	)
 	player.health = 100
-	player.inputs = { [KEYS.up] = false, [KEYS.left] = false, [KEYS.down] = false, [KEYS.right] = false, [KEYS.skills[1]] = false, [KEYS.skills[2]] = false, [KEYS.skills[3]] = false, [KEYS.skills[4]] = false }
+	player.inputs = { up = false, left = false, down = false, right = false, skill1 = false, skill2 = false, skill3 = false, skill4 = false }
 	player.direction_vec = vec_mod(1, 0)
 	player.char = char
 
@@ -74,19 +77,19 @@ function new_player(char)
 
 	function player:move_direction()
 		local d = vec_mod(0, 0)
-		if self.inputs[KEYS.up] then
+		if self.inputs.up then
 			d = d + vec_mod(0, -1)
 		end
 
-		if self.inputs[KEYS.left] then
+		if self.inputs.left then
 			d = d + vec_mod(-1, 0)
 		end
 
-		if self.inputs[KEYS.down] then
+		if self.inputs.down then
 			d = d + vec_mod(0, 1)
 		end
 
-		if self.inputs[KEYS.right] then
+		if self.inputs.right then
 			d = d + vec_mod(1, 0)
 		end
 

@@ -11,15 +11,15 @@ function calendar_mod.new(player_count, local_id)
 	calendar.playertable = {} -- Map<PlayerId, Map<Key, List<{value=<bool>, frame_id=<frame_id> }>>>
 	for i=1, player_count do
 		table.insert(calendar.playertable, {
-			[KEYS.up]={{value=false, frame_id=1}},
-			[KEYS.left]={{value=false, frame_id=1}},
-			[KEYS.down]={{value=false, frame_id=1}},
-			[KEYS.right]={{value=false, frame_id=1}},
+			up={{value=false, frame_id=1}},
+			left={{value=false, frame_id=1}},
+			down={{value=false, frame_id=1}},
+			right={{value=false, frame_id=1}},
 
-			[KEYS.skills[1]]={{value=false, frame_id=1}},
-			[KEYS.skills[2]]={{value=false, frame_id=1}},
-			[KEYS.skills[3]]={{value=false, frame_id=1}},
-			[KEYS.skills[4]]={{value=false, frame_id=1}},
+			skill1={{value=false, frame_id=1}},
+			skill2={{value=false, frame_id=1}},
+			skill3={{value=false, frame_id=1}},
+			skill4={{value=false, frame_id=1}},
 		})
 	end
 
@@ -50,8 +50,8 @@ function calendar_mod.new(player_count, local_id)
 	function calendar:detect_changed_local_inputs(viewport)
 		local inputs = {}
 
-		for _, v in pairs( { KEYS.right, KEYS.up, KEYS.left, KEYS.down, KEYS.skills[1], KEYS.skills[2], KEYS.skills[3], KEYS.skills[4] } ) do
-			inputs[v] = isPressed(v)
+		for _, v in pairs({ "right", "up", "left", "down", "skill1", "skill2", "skill3", "skill4" }) do
+			inputs[v] = isPressed(KEYS[v])
 		end
 
 		local old_inputs = self:read_inputs(self.local_id, nil)

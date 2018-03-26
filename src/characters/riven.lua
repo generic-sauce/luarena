@@ -121,7 +121,7 @@ return function (character)
 
 			function skill:tick()
 				self.cooldown = math.max(0, self.cooldown - FRAME_DURATION)
-				if self.owner.inputs[KEYS.skills[1]] then
+				if self.owner.inputs.skill1 then
 					local s1_tasks = self.owner:get_tasks_by_class("riven_s1")
 					assert(not (#s1_tasks > 1), stringify(s1_tasks, 3))
 

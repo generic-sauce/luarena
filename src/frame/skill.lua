@@ -101,7 +101,7 @@ function skill_mod.make_blank_skill(player, num)
 	end
 
 	function skill:is_pressed()
-		return isPressed(KEYS.skills[self.num])
+		return self.owner.inputs["skill" .. tostring(self.num)]
 	end
 
 	function skill:go()
