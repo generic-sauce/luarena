@@ -127,6 +127,9 @@ end
 
 -- draws the border, and returns the smaller inner rect
 function skill_mod.icon_rect_border(rect, viewport)
+	assert(rect)
+	assert(viewport)
+
 	viewport:draw_world_rect(rect, BORDER_R, BORDER_G, BORDER_B)
 	return rect_mod.by_center_and_size(rect:center(), rect:size() - vec_mod(2, 2))
 end

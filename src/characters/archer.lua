@@ -121,7 +121,8 @@ return function (archer)
 					r, g, b = 0, 255, 0
 				end
 
-				viewport:draw_world_rect(self:icon_rect(), r, g, b)
+				local rect = skill_mod.icon_rect_border(self:icon_rect(), viewport)
+				viewport:draw_world_rect(rect, r, g, b)
 			end
 
 			return skill
