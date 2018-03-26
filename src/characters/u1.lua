@@ -34,13 +34,11 @@ return function (u1)
 	u1.dagger_list = {}
 
 	function u1:mk_s4_aoe()
-		local u1 = self
-
 		local aoe = {}
 
-		aoe.u1 = self
+		aoe.owner = self
 		aoe.shape = circle_mod.by_center_and_radius(
-			u1.shape:center(),
+			aoe.owner.shape:center(),
 			S4_RANGE
 		)
 		aoe.life_counter = S4_DURATION
@@ -51,7 +49,7 @@ return function (u1)
 			local dmg = S4_DAMAGE
 			local colliders = frame():find_colliders(aoe.shape)
 			local obsolete_daggers = {}
-			for _, dagger in pairs(aoe.u1.dagger_list) do
+			for _, dagger in pairs(aoe.owner.dagger_list) do
 				if dagger.landed and table.contains(colliders, dagger) then
 					table.insert(obsolete_daggers, dagger)
 					dmg = S4_DAMAGE + S4_DAMAGE_ADD -- dagger damage does not stack
@@ -60,13 +58,13 @@ return function (u1)
 
 			for _, dagger in pairs(obsolete_daggers) do
 					frame():remove(dagger)
-					table.remove_val(aoe.u1.dagger_list, dagger)
+					table.remove_val(aoe.owner.dagger_list, dagger)
 					table.remove_val(colliders, dagger)
 			end
 
 			for _, entity in pairs(colliders) do
 				if entity ~= aoe
-					and entity ~= aoe.u1
+					and entity ~= aoe.owner
 					and entity.damage then
 						entity:damage(dmg)
 				end
@@ -94,7 +92,7 @@ return function (u1)
 	end
 
 	function u1:color()
-		if u1:has_tasks_by_class("u1_s1") then
+		if self:has_tasks_by_class("u1_s1") then
 			return 160, 160, 200
 		else
 			return 100, 100, 150
@@ -118,7 +116,7 @@ return function (u1)
 
 				blade.start_center = self.owner.shape:center()
 				blade.shape = circle_mod.by_center_and_radius(
-					u1.shape:center(),
+					self.owner.shape:center(),
 					3
 				)
 				blade.speed = self.owner:direction() * S1_SPEED * FRAME_DURATION
@@ -174,23 +172,23 @@ return function (u1)
 			skill_mod.with_instant(skill, function(self)
 				local task = self
 
-				u1.s2_cooldown = S2_COOLDOWN
+				self.owner.s2_cooldown = S2_COOLDOWN
 
 				local dagger = {}
 
-				dagger.start_point = u1.shape:center()
+				dagger.owner = self.owner
+				dagger.start_point = self.owner.shape:center()
 				dagger.landed = false
-				dagger.direction = u1:direction()
+				dagger.direction = self.owner:direction()
 
-				if #u1.dagger_list == S2_MAX_DAGGERS then
-					frame():remove(u1.dagger_list[1])
-					table.remove(u1.dagger_list, 1)
+				if #self.owner.dagger_list == S2_MAX_DAGGERS then
+					frame():remove(self.owner.dagger_list[1])
+					table.remove(self.owner.dagger_list, 1)
 				end
-				table.insert(u1.dagger_list, dagger)
+				table.insert(self.owner.dagger_list, dagger)
 
-				dagger.u1 = u1
 				dagger.shape = circle_mod.by_center_and_radius(
-					u1.shape:center(),
+					self.owner.shape:center(),
 					3
 				)
 
@@ -201,7 +199,7 @@ return function (u1)
 				end
 
 				function dagger:on_enter_collider(entity)
-					if entity ~= self.u1
+					if entity ~= self.owner
 						and entity ~= self
 						and entity.damage then
 							entity:damage(S2_DAMAGE)
