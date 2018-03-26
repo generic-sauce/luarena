@@ -193,4 +193,25 @@ function skill_mod.with_instant(skill, init)
 	return skill
 end
 
+function skill_mod.with_dash(skill, range)
+	skill.task.dash_traveled_distance = 0
+	skill.task.dash_range = range
+
+	skill_mod.append_function(skill.task, "tick", function(self)
+		assert(self.dash_speed ~= nil, "dash_speed has not been set")
+
+		if self.dash_traveled_distance >= self.dash_range then
+			self.owner:remove_task(self)
+		else
+			local speed = self.dash_speed * FRAME_DURATION
+			self.owner.shape = self.owner.shape:move_center(speed)
+			self.dash_traveled_distance = self.dash_traveled_distance + speed:length()
+		end
+	end)
+
+	return task
+end
+
+
+
 return skill_mod

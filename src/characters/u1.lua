@@ -234,12 +234,12 @@ return function (u1)
 			local skill = skill_mod.make_blank_skill(u1, 3)
 			skill_mod.with_cooldown(skill, S3_COOLDOWN)
 			skill_mod.with_fresh_key(skill)
+			skill_mod.with_dash(skill, S3_RANGE)
 
 			skill_mod.append_function(skill.task, "init", function(self)
 				local task = self
 
-				task.direction = self.owner:direction()
-				task.traveled_distance = 0
+				task.dash_speed = self.owner:direction():with_length(S3_SPEED)
 
 				for _, entity in pairs(self.owner.colliders) do
 					task:damage_entity(entity)
@@ -255,18 +255,6 @@ return function (u1)
 					entity:damage(S3_DAMAGE)
 				end
 			end
-
-			skill_mod.append_function(skill.task, "tick", function(self)
-				local task = self
-
-				if task.traveled_distance >= S3_RANGE then
-					self.owner:remove_task(task)
-				else
-					self.owner.shape = self.owner.shape:move_center(task.direction:with_length(S3_SPEED * FRAME_DURATION))
-					task.traveled_distance = task.traveled_distance + S3_SPEED * FRAME_DURATION
-				end
-			end)
-
 
 			function skill.task:on_enter_collider(owner, entity)
 				local task = self
