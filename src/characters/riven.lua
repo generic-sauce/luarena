@@ -154,7 +154,7 @@ return function (character)
 
 			skill_mod.append_function(skill.task, "init", function(self)
 				local attack = generate_relative_area(
-					character,
+					self.owner,
 					S2_ANIMATION_TIMEOUT,
 					vec_mod(0, 0),
 					S2_SIZE)
@@ -178,7 +178,7 @@ return function (character)
 				self.traveled_distance = 0
 				self.dash_direction = self.owner:direction()
 				local shield = generate_relative_area(
-					character,
+					self.owner,
 					S3_SHIELD_TIMEOUT,
 					vec_mod(0, 0),
 					S3_SHIELD_SIZE)
