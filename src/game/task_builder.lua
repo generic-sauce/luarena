@@ -27,4 +27,16 @@ return function(task_mod)
 		return task
 	end
 
+	function task_mod.with_duration(task, duration)
+		task.remaining_duration = duration
+
+		func_mod.append_function(task, "tick", function(self)
+			self.remaining_duration = self.remaining_duration - FRAME_DURATION
+			if self.remaining_duration <= 0 then
+				self.owner:remove_task(self)
+			end
+		end)
+
+	end
+
 end

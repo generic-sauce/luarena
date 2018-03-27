@@ -8,21 +8,6 @@ local dev = require('dev')
 local frame_mod = {}
 require("misc")
 
-local function apply_spawn_protection(player)
-	local SPAWN_PROTECT_DURATION = 2
-
-	local task = { class = "spawn_protection", remaining_duration = SPAWN_PROTECT_DURATION}
-
-	function task:tick()
-		self.remaining_duration = self.remaining_duration - FRAME_DURATION
-		if self.remaining_duration <= 0 then
-			self.owner:remove_task(self)
-		end
-	end
-
-	player:add_task(task)
-end
-
 function frame_mod.initial(chars, map_seed)
 	local frame = {}
 	frame.map = visual_map_mod.init_collision_map(collision_map_mod.new(vec_mod(16, 16), map_seed))
@@ -35,7 +20,7 @@ function frame_mod.initial(chars, map_seed)
 		for _, char in pairs(self.chars) do
 			local player = require('game/player')(char)
 			self:add(player)
-			apply_spawn_protection(player)
+			if player.init then player:init() end
 		end
 	end
 
@@ -88,6 +73,7 @@ function frame_mod.initial(chars, map_seed)
 			end
 			self.dummy = require('game/player')('dummy')
 			self:add(self.dummy)
+			if self.dummy.init then self.dummy:init() end
 		end
 
 		self:consider_respawn()

@@ -2,7 +2,10 @@ local circle_mod = require('shape/circle')
 local rect_mod = require("viewmath/rect")
 local vec_mod = require('viewmath/vec')
 local collision_map_mod = require('collision/collision_map')
+local task_mod = require('game/task')
 local dev = require("dev")
+
+local SPAWN_PROTECT_DURATION = 2
 
 KEYS = {
 	right = 'd',
@@ -22,12 +25,17 @@ local function generate_walk_task(direction)
 
 	local task = {direction = direction, class = "walk"}
 
-	function task:init(entity)
-		entity.shape = entity.shape:move_center(self.direction:with_length(WALKSPEED * FRAME_DURATION))
-		entity:remove_task(self)
-	end
+	task_mod.with_instant(task, function (self)
+		self.owner.shape = self.owner.shape:move_center(self.direction:with_length(WALKSPEED * FRAME_DURATION))
+	end)
 
 	return task
+end
+
+local function apply_spawn_protection(player)
+	local task = { class = "spawn_protection" }
+	task_mod.with_duration(task, SPAWN_PROTECT_DURATION)
+	player:add_task(task)
 end
 
 function new_player(char)
@@ -41,6 +49,10 @@ function new_player(char)
 	player.inputs = { up = false, left = false, down = false, right = false, skill1 = false, skill2 = false, skill3 = false, skill4 = false }
 	player.direction_vec = vec_mod(1, 0)
 	player.char = char
+
+	function player:init()
+		apply_spawn_protection(self)
+	end
 
 	function player:damage(dmg)
 		if not self:has_tasks_by_class("invulnerable") then

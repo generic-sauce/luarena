@@ -10,6 +10,8 @@ return function (dummy)
 		return 255, 255, 255
 	end
 
+	function dummy:init() --[[ don't apply spawn protection! ]] end
+
 	function dummy:char_tick()
 		if self.health < 100 then
 			self.regen_counter = self.regen_counter + FRAME_DURATION
