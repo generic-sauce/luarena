@@ -6,6 +6,7 @@ local circle_mod = require('shape/circle')
 
 local collision_detection_mod = require('collision/detection')
 local skill_mod = require('game/skill')
+local func_mod = require('func')
 
 local S1_COOLDOWN = 6
 local S1_RANGE = 75
@@ -105,7 +106,7 @@ return function (u1)
 			skill_mod.with_cooldown(skill, S1_COOLDOWN)
 			skill_mod.with_fresh_key(skill)
 
-			skill_mod.append_function(skill.task, "init", function (self)
+			func_mod.append_function(skill.task, "init", function (self)
 				local task = self
 
 				local blade = {}
@@ -148,7 +149,7 @@ return function (u1)
 				frame():add(blade)
 			end)
 
-			skill_mod.append_function(skill.task, "tick", function (self)
+			func_mod.append_function(skill.task, "tick", function (self)
 				local task = self
 
 				if not task.blade.alive then
@@ -156,7 +157,7 @@ return function (u1)
 				end
 			end)
 
-			skill_mod.append_function(skill.task, "on_cancel", function (self)
+			func_mod.append_function(skill.task, "on_cancel", function (self)
 				local task = self
 
 				frame():remove(task.blade)
@@ -236,7 +237,7 @@ return function (u1)
 			skill_mod.with_fresh_key(skill)
 			skill_mod.with_dash(skill, S3_RANGE)
 
-			skill_mod.append_function(skill.task, "init", function(self)
+			func_mod.append_function(skill.task, "init", function(self)
 				local task = self
 
 				task.dash_speed = self.owner:direction():with_length(S3_SPEED)

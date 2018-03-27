@@ -4,6 +4,7 @@ local polygon_mod = require('shape/polygon')
 local collision_detection_mod = require('collision/detection')
 local line_mod = require('collision/line')
 local skill_mod = require('game/skill')
+local func_mod = require('func')
 
 local S1_2_COOLDOWN = 0.5
 local S1_2_RANGE = 100
@@ -94,20 +95,20 @@ return function (archer)
 			local skill = skill_mod.make_blank_skill(archer, 3)
 			skill.ready = false
 
-			skill_mod.append_function(skill.task, "init", function(self)
+			func_mod.append_function(skill.task, "init", function(self)
 				self.traveled_distance = 0
 				self.dash_direction = self.owner:direction()
 			end)
 
-			skill_mod.append_function(skill, "go_condition", function(self)
+			func_mod.append_function(skill, "go_condition", function(self)
 				return self.ready
 			end)
 
-			skill_mod.append_function(skill, "go", function(self)
+			func_mod.append_function(skill, "go", function(self)
 				self.ready = false
 			end)
 
-			skill_mod.append_function(skill.task, "tick", function(self)
+			func_mod.append_function(skill.task, "tick", function(self)
 				self.owner.shape = self.owner.shape:move_center(self.dash_direction:with_length(S3_SPEED * FRAME_DURATION))
 				self.traveled_distance = self.traveled_distance + S3_SPEED * FRAME_DURATION
 				if self.traveled_distance >= S3_RANGE then

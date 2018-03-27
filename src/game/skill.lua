@@ -2,82 +2,10 @@ local skill_mod = {}
 
 local vec_mod = require('viewmath/vec')
 local rect_mod = require('viewmath/rect')
+local func_mod = require('func')
 require('misc')
 
 local BORDER_R, BORDER_G, BORDER_B = 20, 20, 20
-
--- this object should contain self.list, self.obj attributes
-skill_mod.append_func_meta = {
-	__call = function(self, ...)
-			for _, f in pairs(self.list) do
-				f(self.obj, ...)
-			end
-		end
-}
-
-local function make_append_func(obj)
-	assert(type(obj) == "table")
-	return setmetatable({list = {}, obj = obj}, skill_mod.append_func_meta)
-end
-
-local function is_append_func(t)
-	return type(t) == "table" and type(t.list) ~= nil and type(t.obj) ~= nil
-end
-
-local listify_function = function(obj, name)
-	assert(type(obj) == 'table')
-	assert(type(name) == 'string')
-
-	if type(obj[name]) == 'function' then
-		local f = make_append_func(obj)
-		table.insert(f.list, obj[name])
-		obj[name] = f
-	elseif type(obj[name]) == "nil" then
-		obj[name] = make_append_func(obj)
-	else
-		assert(false)
-	end
-end
-
-local eval_and_function = function(obj, name)
-	assert(type(obj) == 'table')
-	assert(type(name) == 'string')
-
-	if type(obj[name]) == "nil" then
-		return true
-	elseif is_append_func(obj[name]) then
-		for _, f in pairs(obj[name].list) do
-			if not f(obj) then
-				return false
-			end
-		end
-		return true
-	elseif type(obj[name]) == 'function' then
-		return obj[name](obj)
-	else
-		assert(false, "can't call eval_and_function to obj[\"" .. name .. "\"] of type " .. type(obj[name]))
-	end
-
-end
-
-function skill_mod.append_function(obj, name, new_function)
-	assert(type(obj) == 'table')
-	assert(type(name) == 'string')
-	assert(type(new_function) == 'function')
-
-	if type(obj[name]) == 'nil' then
-		obj[name] = new_function
-	elseif type(obj[name]) == 'function' then
-		listify_function(obj, name)
-		table.insert(obj[name].list, new_function)
-	elseif is_append_func(obj[name]) then
-		table.insert(obj[name].list, new_function)
-	else
-		assert(false, "can't append to obj[name] of type " .. type(obj[name]))
-	end
-end
-
--- basics
 
 function skill_mod.make_blank_skill(player, num)
 	assert(type(player) == "table", "wrong player argument in make_blank_skill")
@@ -115,7 +43,7 @@ function skill_mod.make_blank_skill(player, num)
 	skill.go_condition = skill.is_pressed
 
 	function skill:tick()
-		if eval_and_function(self, "go_condition") then
+		if func_mod.eval_and_function(self, "go_condition") then
 			self:go()
 		end
 	end
@@ -136,13 +64,13 @@ end
 
 function skill_mod.with_fresh_key(skill)
 	skill.fresh = true
-	skill_mod.append_function(skill, "tick", function(self)
+	func_mod.append_function(skill, "tick", function(self)
 		if not self.fresh and not self:is_pressed() then
 			self.fresh = true
 		end
 	end)
 
-	skill_mod.append_function(skill.task, "init", function(self)
+	func_mod.append_function(skill.task, "init", function(self)
 		self.skill.fresh = false
 	end)
 
@@ -150,7 +78,7 @@ function skill_mod.with_fresh_key(skill)
 		return self.fresh and self:is_pressed()
 	end
 
-	skill_mod.append_function(skill, "go_condition", skill.is_fresh_pressed)
+	func_mod.append_function(skill, "go_condition", skill.is_fresh_pressed)
 
 	return skill
 end
@@ -163,10 +91,10 @@ function skill_mod.with_cooldown(skill, cooldown)
 		self.cooldown = math.max(0, self.cooldown - FRAME_DURATION)
 	end
 
-	skill_mod.append_function(skill, "go_condition", function(self) return self.cooldown == 0 end)
-	skill_mod.append_function(skill, "go", function(self) self.cooldown = self.max_cooldown end)
+	func_mod.append_function(skill, "go_condition", function(self) return self.cooldown == 0 end)
+	func_mod.append_function(skill, "go", function(self) self.cooldown = self.max_cooldown end)
 
-	skill_mod.append_function(skill, "tick", skill.tick_cooldown)
+	func_mod.append_function(skill, "tick", skill.tick_cooldown)
 
 	function skill:draw_cooldown(viewport)
 		local rect = skill_mod.icon_rect_border(self:icon_rect(), viewport)
@@ -187,8 +115,8 @@ function skill_mod.with_cooldown(skill, cooldown)
 end
 
 function skill_mod.with_instant(skill, init)
-	skill_mod.append_function(skill.task, "init", init)
-	skill_mod.append_function(skill.task, "init", function(self) self.owner:remove_task(self) end)
+	func_mod.append_function(skill.task, "init", init)
+	func_mod.append_function(skill.task, "init", function(self) self.owner:remove_task(self) end)
 
 	return skill
 end
@@ -197,7 +125,7 @@ function skill_mod.with_dash(skill, range)
 	skill.task.dash_traveled_distance = 0
 	skill.task.dash_range = range
 
-	skill_mod.append_function(skill.task, "tick", function(self)
+	func_mod.append_function(skill.task, "tick", function(self)
 		assert(self.dash_speed ~= nil, "dash_speed has not been set")
 
 		if self.dash_traveled_distance >= self.dash_range then

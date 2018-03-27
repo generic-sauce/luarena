@@ -3,6 +3,7 @@ local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
 local task_mod = require('game/task')
 local skill_mod = require('game/skill')
+local func_mod = require('func')
 
 local S1_COOLDOWN = 5
 local S1_TIMEOUT = 2.5
@@ -152,7 +153,7 @@ return function (character)
 			local skill = skill_mod.make_blank_skill(character, 2)
 			skill_mod.with_cooldown(skill, S2_COOLDOWN)
 
-			skill_mod.append_function(skill.task, "init", function(self)
+			func_mod.append_function(skill.task, "init", function(self)
 				local attack = generate_relative_area(
 					self.owner,
 					S2_ANIMATION_TIMEOUT,
@@ -174,7 +175,7 @@ return function (character)
 			local skill = skill_mod.make_blank_skill(character, 3)
 			skill_mod.with_cooldown(skill, S3_COOLDOWN)
 
-			skill_mod.append_function(skill.task, "init", function(self)
+			func_mod.append_function(skill.task, "init", function(self)
 				self.traveled_distance = 0
 				self.dash_direction = self.owner:direction()
 				local shield = generate_relative_area(
@@ -191,7 +192,7 @@ return function (character)
 				frame():add(shield)
 			end)
 
-			skill_mod.append_function(skill.task, "tick", function(self)
+			func_mod.append_function(skill.task, "tick", function(self)
 				self.owner.shape = self.owner.shape:move_center(self.dash_direction:with_length(S3_DASH_SPEED * FRAME_DURATION))
 				self.traveled_distance = self.traveled_distance + S3_DASH_SPEED * FRAME_DURATION
 				if self.traveled_distance >= S3_DASH_DISTANCE then
