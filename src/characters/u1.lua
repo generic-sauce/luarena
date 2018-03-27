@@ -6,6 +6,7 @@ local circle_mod = require('shape/circle')
 
 local collision_detection_mod = require('collision/detection')
 local skill_mod = require('game/skill')
+local task_mod = require('game/task')
 local func_mod = require('func')
 
 local S1_COOLDOWN = 6
@@ -170,7 +171,7 @@ return function (u1)
 			local skill = skill_mod.make_blank_skill(u1, 2)
 			skill_mod.with_cooldown(skill, S2_COOLDOWN)
 			skill_mod.with_fresh_key(skill)
-			skill_mod.with_instant(skill, function(self)
+			task_mod.with_instant(skill.task, function(self)
 				local task = self
 
 				self.owner.s2_cooldown = S2_COOLDOWN
@@ -235,7 +236,7 @@ return function (u1)
 			local skill = skill_mod.make_blank_skill(u1, 3)
 			skill_mod.with_cooldown(skill, S3_COOLDOWN)
 			skill_mod.with_fresh_key(skill)
-			skill_mod.with_dash(skill, S3_RANGE)
+			task_mod.with_dash(skill.task, S3_RANGE)
 
 			func_mod.append_function(skill.task, "init", function(self)
 				local task = self
@@ -270,7 +271,7 @@ return function (u1)
 			local skill = skill_mod.make_blank_skill(u1, 4)
 			skill_mod.with_cooldown(skill, S4_COOLDOWN)
 			skill_mod.with_fresh_key(skill)
-			skill_mod.with_instant(skill, function(self)
+			task_mod.with_instant(skill.task, function(self)
 				local aoe = self.owner:mk_s4_aoe()
 				frame():add(aoe)
 			end)

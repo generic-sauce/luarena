@@ -2,36 +2,8 @@ require('misc')
 
 local task_mod = {}
 
-local TASK_CLASSMAP = {
-	skill = {},
-	move = {},
-	walk = {"move"},
-	dash = {"move"},
-	silence = {},
-	root = {},
-	stun = {"root", "silence"},
-	spawn_protection = {"untouchable"},
-
-	archer_s1 = {"skill"},
-	archer_s2 = {"skill"},
-	archer_s3 = {"skill", "dash"},
-
-	riven_s1 = {"skill"},
-	riven_s1_dash = {"skill", "dash"},
-	riven_s2 = {"skill"},
-	riven_s2_stun = {"stun"},
-	riven_s3 = {"skill", "dash"},
-
-	u1_s1 = {"skill", "untouchable"},
-	u1_s2 = {"skill"},
-	u1_s3 = {"skill", "dash"},
-	u1_s4 = {"skill"},
-
-	invulnerable = {}, -- prevents damage
-	untouchable = {"invulnerable"}, -- prevents negative effects and damage
-
-	dead = {}
-}
+local types_mod = require('game/task_types')
+local TASK_CLASSMAP = types_mod.CLASSES
 
 local function find_superclasses(class)
 	assert(type(class) == "string", "find_superclasses(): class is not string!")
@@ -83,14 +55,7 @@ local function build_task_relation(syntaxed_task_relation)
 	return out
 end
 
--- TASK_RELATION[<old>][<new>]
-local TASK_RELATION = build_task_relation({
-	{old = {"walk"}, new = {"dash", "stun"}, relation = "cancel"},
-	{old = {"dash", "stun"}, new = {"walk"}, relation = "prevent"},
-	{old = {"stun"}, new = {"skill"}, relation = "delay"},
-	{old = {"dash"}, new = {"dash"}, relation = "delay"},
-	{old = {"untouchable"}, new = {"stun"}, relation = "prevent"}
-})
+local TASK_RELATION = build_task_relation(types_mod.RELATIONS)
 
 local function get_relation_partners(tasks, task, rel)
 	assert(task.class, "get_relation_partners(): task.class == nil")
@@ -185,5 +150,7 @@ function task_mod.init_entity(entity)
 		return #self:get_tasks_by_class(class) > 0
 	end
 end
+
+require('game/task_builder')(task_mod)
 
 return task_mod

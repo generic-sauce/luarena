@@ -5,6 +5,7 @@ local collision_detection_mod = require('collision/detection')
 local line_mod = require('collision/line')
 local skill_mod = require('game/skill')
 local func_mod = require('func')
+local task_mod = require('game/task')
 
 local S1_2_COOLDOWN = 0.5
 local S1_2_RANGE = 100
@@ -79,7 +80,7 @@ return function (archer)
 			local skill = skill_mod.make_blank_skill(archer, 1)
 			skill_mod.with_cooldown(skill, S1_2_COOLDOWN)
 			skill_mod.with_fresh_key(skill)
-			skill_mod.with_instant(skill, function(self) self.owner:shoot_arrow(1) end)
+			task_mod.with_instant(skill.task, function(self) self.owner:shoot_arrow(1) end)
 			return skill
 		end)(),
 
@@ -87,7 +88,7 @@ return function (archer)
 			local skill = skill_mod.make_blank_skill(archer, 2)
 			skill_mod.with_cooldown(skill, S1_2_COOLDOWN)
 			skill_mod.with_fresh_key(skill)
-			skill_mod.with_instant(skill, function(self) self.owner:shoot_arrow(-1) end)
+			task_mod.with_instant(skill.task, function(self) self.owner:shoot_arrow(-1) end)
 			return skill
 		end)(),
 
