@@ -3,7 +3,7 @@ local dev = require("dev")
 local backtrack_balancer_mod = require('gamemaster/backtrack_balancer')
 
 function new_clientmaster(networker, chars, local_id, seed)
-	local clientmaster = require("game/mod").new(chars, local_id, seed, love.timer.getTime() - networker.server_host:round_trip_time()/2/1000)
+	local clientmaster = require("frame/structure").new(chars, local_id, seed, love.timer.getTime() - networker.server_host:round_trip_time()/2/1000)
 
 	clientmaster.balancer = backtrack_balancer_mod.new()
 

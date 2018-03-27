@@ -3,7 +3,7 @@ local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
 local collision_detection_mod = require('collision/detection')
 local line_mod = require('collision/line')
-local skill_mod = require('frame/skill')
+local skill_mod = require('game/skill')
 
 local S1_2_COOLDOWN = 0.5
 local S1_2_RANGE = 100

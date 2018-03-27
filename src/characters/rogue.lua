@@ -1,7 +1,7 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local circle_mod = require('shape/circle')
-local skill_mod = require('frame/skill')
+local skill_mod = require('game/skill')
 
 local S1_COOLDOWN = 3
 local S1_RANGE = 200

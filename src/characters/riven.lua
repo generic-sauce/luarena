@@ -1,8 +1,8 @@
 local rect_mod = require('viewmath/rect')
 local vec_mod = require('viewmath/vec')
 local polygon_mod = require('shape/polygon')
-local task_mod = require('frame/task')
-local skill_mod = require('frame/skill')
+local task_mod = require('game/task')
+local skill_mod = require('game/skill')
 
 local S1_COOLDOWN = 5
 local S1_TIMEOUT = 2.5

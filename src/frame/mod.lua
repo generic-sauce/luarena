@@ -1,7 +1,7 @@
 local visual_map_mod = require('graphics/visual_map')
 local collision_mod = require('collision/mod')
 local collision_map_mod = require('collision/collision_map')
-local task_mod = require('frame/task')
+local task_mod = require('game/task')
 local vec_mod = require('viewmath/vec')
 local dev = require('dev')
 
@@ -33,7 +33,7 @@ function frame_mod.initial(chars, map_seed)
 	function frame:init_entities()
 		self.entities = {}
 		for _, char in pairs(self.chars) do
-			local player = require('frame/player')(char)
+			local player = require('game/player')(char)
 			self:add(player)
 			apply_spawn_protection(player)
 		end
@@ -86,7 +86,7 @@ function frame_mod.initial(chars, map_seed)
 			if self.dummy then
 				self:remove(self.dummy)
 			end
-			self.dummy = require('frame/player')('dummy')
+			self.dummy = require('game/player')('dummy')
 			self:add(self.dummy)
 		end
 
