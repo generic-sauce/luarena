@@ -60,11 +60,15 @@ function new_player(char)
 
 		if d:length() ~= 0 then
 			self.direction_vec = d -- for the case that :direction() is not called
-			self:add_task(generate_walk_task(d))
+			if not self:has_tasks_by_class("root") then
+				self:add_task(generate_walk_task(d))
+			end
 		end
 
 		if not self:has_tasks_by_class("dead") then
-			self:tick_skills()
+			if not self:has_tasks_by_class("silence") then
+				self:tick_skills()
+			end
 
 			self:consider_deglitching()
 			self:consider_drowning()
@@ -116,6 +120,10 @@ function new_player(char)
 		end
 
 		viewport:draw_shape(self.shape, r, g, b)
+
+		if self:has_tasks_by_class("spawn_protection") then
+			viewport:draw_world_rect(self.shape:wrapper(), 0, 255, 0, 50)
+		end
 	end
 
 	function player:draw_health(viewport)

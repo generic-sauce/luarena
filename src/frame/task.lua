@@ -7,7 +7,10 @@ local TASK_CLASSMAP = {
 	move = {},
 	walk = {"move"},
 	dash = {"move"},
-	stun = {},
+	silence = {},
+	root = {},
+	stun = {"root", "silence"},
+	spawn_protection = {"untouchable"},
 
 	archer_s1 = {"skill"},
 	archer_s2 = {"skill"},
