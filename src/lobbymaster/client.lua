@@ -42,5 +42,13 @@ return function(client, char, server_ip, server_port)
 		self.networker:handle_events()
 	end
 
+	function client:draw()
+		if self.chars == nil or self.local_id == nil then
+			love.graphics.print("Connecting to server...")
+		else
+			love.graphics.print(string.format("Connected to server.\nPlayers: %d\nMy Id: %d", #self.chars, self.local_id))
+		end
+	end
+
 	return client
 end

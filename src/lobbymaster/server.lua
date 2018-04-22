@@ -47,5 +47,9 @@ return function(server, char, port)
 		end
 	end
 
+	function server:draw()
+		love.graphics.print(string.format("Hosting Server.\nPress 'g' to start the game.\nPlayers: %d\nMy Id: %d", #self.chars, 1))
+	end
+
 	return server
 end
