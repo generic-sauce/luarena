@@ -92,8 +92,9 @@ return function (archer)
 			return skill
 		end)(),
 
-		(function ()
+		(function()
 			local skill = skill_mod.make_blank_skill(archer, 3)
+			skill_mod.with_fresh_key(skill)
 			skill.ready = false
 
 			func_mod.append_function(skill.task, "init", function(self)
