@@ -17,12 +17,7 @@ function generate_map(size, seed)
 
 	local tiles = {}
 
-	for y = 0, size.y - 1, 1 do
-		for x = 0, size.y - 1, 1 do
-			tiles[y * size.x + x + 1] = collision_map_mod.TILE_NONE
-		end
-	end
-
+	--[[
 	do --river
 		math.randomseed(seed)
 		local posx = math.floor(math.random() * size.x / 2) + size.x / 4
@@ -50,15 +45,25 @@ function generate_map(size, seed)
 			end
 		end
 	end
+	]]
+
+	math.randomseed(seed)
+
+	for y = 0, size.y-1 do
+		for x = 0, size.x-1 do
+			r = math.random()
+			t = collision_map_mod.TILE_NONE
+			if r > 0.5 then t = collision_map_mod.TILE_KILL end
+			if r > 0.7 then t = collision_map_mod.TILE_SOLID end
+			tiles[math.floor(y * size.x + x)] = t
+		end
+	end
 
 	-- temporary (hacky) solution for the spawn tile
 	tiles[2 * size.x + 3] = collision_map_mod.TILE_NONE
 	tiles[2 * size.x + 4] = collision_map_mod.TILE_NONE
 	tiles[3 * size.x + 3] = collision_map_mod.TILE_NONE
 	tiles[3 * size.x + 4] = collision_map_mod.TILE_NONE
-
-	-- temporary (hacky) solid tile
-	tiles[4 * size.x + 4] = collision_map_mod.TILE_SOLID
 
 	--local x, y = math.floor(math.random() * size.x), math.floor(math.random() * size.y)
 
